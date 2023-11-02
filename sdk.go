@@ -25,17 +25,19 @@ import "C"
 import (
 	"errors"
 	"fmt"
-	core "github.com/1Password/1password-sdk-core"
 	"os"
 	"runtime"
 	"strconv"
 	"unsafe"
+
+	core "github.com/1Password/1password-sdk-core"
 )
 
 var initClient unsafe.Pointer
 var invoke unsafe.Pointer
 var releaseClient unsafe.Pointer
 
+// init loads the core shared library object for the current platform as well as its exported functions.
 func init() {
 	var err error
 	libPath := core.SharedLibraryPath()
@@ -57,10 +59,12 @@ func init() {
 	}
 }
 
+// opClient The client instance.
 type opClient struct {
 	id uint64
 }
 
+// loadFunction loads function handle from the shared library
 func loadFunction(dllHandle unsafe.Pointer, funcName string) (unsafe.Pointer, error) {
 	cFuncName := C.CString(funcName)
 	defer C.free(unsafe.Pointer(cFuncName))
@@ -72,9 +76,10 @@ func loadFunction(dllHandle unsafe.Pointer, funcName string) (unsafe.Pointer, er
 	return funcPtr, nil
 }
 
+// NewServiceAccountClient constructor for `opClient`.
 func NewServiceAccountClient(saToken string) (*opClient, error) {
 	returnsErr := C.int(0)
-	//defer C.free(unsafe.Pointer(&returnsErr))
+	//TODO: find a way to defer C.free(unsafe.Pointer(&returnsErr))
 
 	cSAToken := C.CString(saToken)
 	defer C.free(unsafe.Pointer(cSAToken))
@@ -92,7 +97,10 @@ func NewServiceAccountClient(saToken string) (*opClient, error) {
 	client := &opClient{id: clientID}
 
 	runtime.SetFinalizer(client, func(f *opClient) {
-		releaseResponse := C.call_release_client(releaseClient, C.ulonglong(clientID), &returnsErr)
+		returnsError := C.int(0)
+		//TODO: find a way to defer C.free(unsafe.Pointer(&returnsErr))
+
+		releaseResponse := C.call_release_client(releaseClient, C.ulonglong(clientID), &returnsError)
 		if int(returnsErr) == 1 {
 			panic(errors.New(C.GoString(releaseResponse)))
 		}
@@ -101,6 +109,7 @@ func NewServiceAccountClient(saToken string) (*opClient, error) {
 	return client, nil
 }
 
+// NewServiceAccountClientFromEnv constructor for `opClient` from the environment.
 func NewServiceAccountClientFromEnv() (*opClient, error) {
 	const tokenEnvVar = "OP_SERVICE_ACCOUNT_TOKEN"
 	token, ok := os.LookupEnv(tokenEnvVar)
@@ -111,12 +120,13 @@ func NewServiceAccountClientFromEnv() (*opClient, error) {
 	return NewServiceAccountClient(token)
 }
 
+// callFFI calls the appropriate function into the core shared library with the given parameters
 func (c *opClient) callFFI(method string, parameters string) (*string, error) {
 	returnsErr := C.int(0)
-	//defer C.free(unsafe.Pointer(&returnsErr))
+	//TODO: find a way to defer C.free(unsafe.Pointer(&returnsErr))
 
 	cID := C.ulonglong(c.id)
-	//defer C.free(unsafe.Pointer(&cID))
+	//TODO: find a way to defer C.free(unsafe.Pointer(&cID))
 
 	cMethod := C.CString(method)
 	defer C.free(unsafe.Pointer(cMethod))
@@ -133,6 +143,7 @@ func (c *opClient) callFFI(method string, parameters string) (*string, error) {
 	return &output, nil
 }
 
+// Resolve returns a secret pointed to by the given secret reference
 func (c *opClient) Resolve(secretReference string) ([]byte, error) {
 	response, err := c.callFFI("Resolve", secretReference)
 	if err != nil {
