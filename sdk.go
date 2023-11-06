@@ -79,7 +79,6 @@ func loadFunction(dllHandle unsafe.Pointer, funcName string) (unsafe.Pointer, er
 // NewServiceAccountClient constructor for `opClient`.
 func NewServiceAccountClient(saToken string) (*opClient, error) {
 	returnsErr := C.int(0)
-	//TODO: find a way to defer C.free(unsafe.Pointer(&returnsErr))
 
 	cSAToken := C.CString(saToken)
 	defer C.free(unsafe.Pointer(cSAToken))
@@ -98,7 +97,6 @@ func NewServiceAccountClient(saToken string) (*opClient, error) {
 
 	runtime.SetFinalizer(client, func(f *opClient) {
 		returnsError := C.int(0)
-		//TODO: find a way to defer C.free(unsafe.Pointer(&returnsErr))
 
 		releaseResponse := C.call_release_client(releaseClient, C.ulonglong(clientID), &returnsError)
 		if int(returnsErr) == 1 {
@@ -123,10 +121,7 @@ func NewServiceAccountClientFromEnv() (*opClient, error) {
 // callFFI calls the appropriate function into the core shared library with the given parameters
 func (c *opClient) callFFI(method string, parameters string) (*string, error) {
 	returnsErr := C.int(0)
-	//TODO: find a way to defer C.free(unsafe.Pointer(&returnsErr))
-
 	cID := C.ulonglong(c.id)
-	//TODO: find a way to defer C.free(unsafe.Pointer(&cID))
 
 	cMethod := C.CString(method)
 	defer C.free(unsafe.Pointer(cMethod))
