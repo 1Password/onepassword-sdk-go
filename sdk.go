@@ -30,7 +30,7 @@ import (
 	"strconv"
 	"unsafe"
 
-	core "github.com/1Password/1password-sdk-core"
+	core "github.com/1password/1password-sdk-core"
 )
 
 var initClient unsafe.Pointer
