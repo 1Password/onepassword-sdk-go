@@ -1,8 +1,6 @@
 # 1Password Go SDK
 
-<aside>
-❗ This project is still in its early, pre-alpha stages of development. Its stability is not yet fully assessed, and future iterations may bring backwards incompatible changes. Proceed with caution.
-</aside>
+> ❗ This project is still in its early, pre-alpha stages of development. Its stability is not yet fully assessed, and future iterations may bring backwards incompatible changes. Proceed with caution.
 
 The 1Password Go SDK offers programmatic read-access to your secrets in 1Password in an interface native to Go. To use it in your project:
 
