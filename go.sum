@@ -10,3 +10,5 @@ github.com/1password/1password-sdk-core v0.0.0-20231109122653-ae40d9d1e1b2 h1:Jw
 github.com/1password/1password-sdk-core v0.0.0-20231109122653-ae40d9d1e1b2/go.mod h1:cu7UmTGFVCOAZs1ILHCmYxZtkH+cSJAWlwLDR0G1Mac=
 github.com/1password/1password-sdk-core v0.0.0-20231109124636-f7a8d265e230 h1:LvG0iXKe+AwRWx8N7noxDhNDJE8RFZIYXm+GpRXdFA4=
 github.com/1password/1password-sdk-core v0.0.0-20231109124636-f7a8d265e230/go.mod h1:cu7UmTGFVCOAZs1ILHCmYxZtkH+cSJAWlwLDR0G1Mac=
+github.com/1password/1password-sdk-core v0.0.0-20231109132628-87835cab057d h1:7PSnUw1OTpFSakAw1cInmveVKaO0/CCnrSXfPz5C1yA=
+github.com/1password/1password-sdk-core v0.0.0-20231109132628-87835cab057d/go.mod h1:cu7UmTGFVCOAZs1ILHCmYxZtkH+cSJAWlwLDR0G1Mac=
