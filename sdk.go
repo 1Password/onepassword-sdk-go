@@ -1,4 +1,4 @@
-package sdk
+package main
 
 /*
 #cgo LDFLAGS: -ldl
@@ -70,13 +70,15 @@ func loadFunction(dllHandle unsafe.Pointer, funcName string) (unsafe.Pointer, er
 	defer C.free(unsafe.Pointer(cFuncName))
 	funcPtr := C.dlsym(dllHandle, cFuncName)
 	if funcPtr == nil {
-		err := C.GoString(C.dlerror())
-		return nil, fmt.Errorf("failed to find the %s function: %s", funcName, err)
+		dlErr := C.dlerror()
+		defer C.free(unsafe.Pointer(dlErr))
+		err := C.GoString(dlErr)
+		return nil, fmt.Errorf("failed to find the %s function: %s", funcName, string(err))
 	}
 	return funcPtr, nil
 }
 
-// NewServiceAccountClient constructor for `opClient`.
+// NewServiceAccountClient creates a new 1Password client authenticated with a service account token.
 func NewServiceAccountClient(saToken string) (*opClient, error) {
 	returnsErr := C.int(0)
 
@@ -99,6 +101,7 @@ func NewServiceAccountClient(saToken string) (*opClient, error) {
 		returnsError := C.int(0)
 
 		releaseResponse := C.call_release_client(releaseClient, C.ulonglong(clientID), &returnsError)
+		defer C.free(unsafe.Pointer(releaseResponse))
 		if int(returnsErr) == 1 {
 			panic(errors.New(C.GoString(releaseResponse)))
 		}
@@ -107,7 +110,8 @@ func NewServiceAccountClient(saToken string) (*opClient, error) {
 	return client, nil
 }
 
-// NewServiceAccountClientFromEnv constructor for `opClient` from the environment.
+// NewServiceAccountClientFromEnv creates a new 1Password client authenticated with a
+// service account token loaded from the $OP_SERVICE_ACCOUNT environment variable.
 func NewServiceAccountClientFromEnv() (*opClient, error) {
 	const tokenEnvVar = "OP_SERVICE_ACCOUNT_TOKEN"
 	token, ok := os.LookupEnv(tokenEnvVar)
