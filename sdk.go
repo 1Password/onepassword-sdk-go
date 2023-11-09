@@ -1,4 +1,4 @@
-package main
+package sdk
 
 /*
 #cgo LDFLAGS: -ldl
