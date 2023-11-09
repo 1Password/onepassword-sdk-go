@@ -8,3 +8,5 @@ github.com/1password/1password-sdk-core v0.0.0-20231109121428-1c2312094cea h1:PE
 github.com/1password/1password-sdk-core v0.0.0-20231109121428-1c2312094cea/go.mod h1:cu7UmTGFVCOAZs1ILHCmYxZtkH+cSJAWlwLDR0G1Mac=
 github.com/1password/1password-sdk-core v0.0.0-20231109122653-ae40d9d1e1b2 h1:Jw/jgyYLOh4rI2OU0te8m5kdn43myv7G60AswS8z0jk=
 github.com/1password/1password-sdk-core v0.0.0-20231109122653-ae40d9d1e1b2/go.mod h1:cu7UmTGFVCOAZs1ILHCmYxZtkH+cSJAWlwLDR0G1Mac=
+github.com/1password/1password-sdk-core v0.0.0-20231109124636-f7a8d265e230 h1:LvG0iXKe+AwRWx8N7noxDhNDJE8RFZIYXm+GpRXdFA4=
+github.com/1password/1password-sdk-core v0.0.0-20231109124636-f7a8d265e230/go.mod h1:cu7UmTGFVCOAZs1ILHCmYxZtkH+cSJAWlwLDR0G1Mac=
