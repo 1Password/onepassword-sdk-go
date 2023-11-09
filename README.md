@@ -35,7 +35,7 @@ func main() {
 	if err != nil {
 		// handle err
 	}
-	secret, err := client.Resolve("op://path/to/your/secret")
+	secret, err := client.Resolve("op://vault/item/field")
 	if err != nil {
 		// handle err
 	}
