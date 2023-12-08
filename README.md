@@ -31,7 +31,12 @@ go get github.com/1password/1password-go-sdk
 import onepassword "github.com/1password/1password-go-sdk"
 
 func main() {
-	client, err := onepassword.NewServiceAccountClient("<your-service-account-token>")
+    token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
+
+    client, err := onepassword.opClient, err := Client(
+        WithServiceAccountToken(token),
+        WithApp("<your app name>", "<your app version>"),
+    )
 	if err != nil {
 		// handle err
 	}
