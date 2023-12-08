@@ -1,6 +1,8 @@
-package main
+package onepassword
 
-import "context"
+import (
+	"context"
+)
 
 type SecretsAPI interface {
 	Resolve(reference string) (*string, error)
