@@ -55,6 +55,10 @@ func Client(opts ...ClientOption) (*OpClient, error) {
 	client.config.RequestLibraryName = DefaultRequestLibrary
 	client.config.RequestLibraryVersion = runtime.Version()
 
+	client.Secrets = SecretsSource{
+		Context: client.context,
+	}
+
 	clientID, err := InitClient(client.context, client.config)
 	if err != nil {
 		return nil, fmt.Errorf("error initializing client: %w", err)
