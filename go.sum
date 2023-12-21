@@ -1,4 +1,12 @@
 github.com/1password/1password-sdk-core v0.0.0-20231208164923-4ec16d1a6744 h1:8+zI1t7fIGE08tKSxRaRe+0TS4pzpQp+IF7dTfouaoY=
 github.com/1password/1password-sdk-core v0.0.0-20231208164923-4ec16d1a6744/go.mod h1:cu7UmTGFVCOAZs1ILHCmYxZtkH+cSJAWlwLDR0G1Mac=
+github.com/1password/1password-sdk-core v0.0.0-20231221155839-393a0e0c1f4e h1:1ZCi4eSH9zMgy6hRVWTOWj6irIoLaEK2myL/G68NFZQ=
+github.com/1password/1password-sdk-core v0.0.0-20231221155839-393a0e0c1f4e/go.mod h1:cu7UmTGFVCOAZs1ILHCmYxZtkH+cSJAWlwLDR0G1Mac=
+github.com/1password/1password-sdk-core/wasm v0.0.0-20231221155839-393a0e0c1f4e h1:0RobGHLguQV9XVVFj8kW2N5cVEzxRzafvoAlh3wW6TQ=
+github.com/1password/1password-sdk-core/wasm v0.0.0-20231221155839-393a0e0c1f4e/go.mod h1:DDWf7iYMWforE7cQ1O43Oi2K2Fbl8027TLm0CZKJkbY=
+github.com/extism/go-sdk v1.0.0-rc2 h1:wkdAvRwq0CHMET/mtTExvfWCTJn33zfot3k72ZDMYTM=
+github.com/extism/go-sdk v1.0.0-rc2/go.mod h1:xUfKSEQndAvHBc1Ohdre0e+UdnRzUpVfbA8QLcx4fbY=
+github.com/gobwas/glob v0.2.3 h1:A4xDbljILXROh+kObIiy5kIaPYD8e96x1tgBhUI5J+Y=
+github.com/gobwas/glob v0.2.3/go.mod h1:d3Ez4x06l9bZtSvzIay5+Yzi0fmZzPgnTbPcKjJAkT8=
 github.com/tetratelabs/wazero v1.5.0 h1:Yz3fZHivfDiZFUXnWMPUoiW7s8tC1sjdBtlJn08qYa0=
 github.com/tetratelabs/wazero v1.5.0/go.mod h1:0U0G41+ochRKoPKCJlh0jMg1CHkyfK8kDqiirMmKY8A=

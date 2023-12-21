@@ -18,7 +18,6 @@ const (
 
 // OpClient The client instance.
 type OpClient struct {
-	id      uint64
 	config  ClientConfig
 	context context.Context
 
@@ -32,6 +31,8 @@ type ClientConfig struct {
 	AppVersion            string `json:"appVersion"`
 	RequestLibraryName    string `json:"requestLibraryName"`
 	RequestLibraryVersion string `json:"requestLibraryVersion"`
+	SystemOS              string `json:"os"`
+	SystemArch            string `json:"arch"`
 }
 
 func Client(opts ...ClientOption) (*OpClient, error) {
@@ -54,19 +55,19 @@ func Client(opts ...ClientOption) (*OpClient, error) {
 	client.config.Language = SDKLanguage
 	client.config.RequestLibraryName = DefaultRequestLibrary
 	client.config.RequestLibraryVersion = runtime.Version()
-
-	client.Secrets = SecretsSource{
-		Context: client.context,
-	}
+	client.config.SystemOS = runtime.GOOS
+	client.config.SystemArch = runtime.GOARCH
 
 	clientID, err := InitClient(client.context, client.config)
 	if err != nil {
 		return nil, fmt.Errorf("error initializing client: %w", err)
 	}
-	client.id = *clientID
 
+	client.Secrets = SecretsSource{
+		clientID: *clientID,
+	}
 	runtime.SetFinalizer(&client, func(f *OpClient) {
-		ReleaseClient(client.context, client.id)
+		ReleaseClient(*clientID)
 	})
 	return &client, nil
 }

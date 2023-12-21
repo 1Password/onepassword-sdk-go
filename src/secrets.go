@@ -1,19 +1,19 @@
 package onepassword
 
-import (
-	"context"
-)
-
 type SecretsAPI interface {
 	Resolve(reference string) (*string, error)
 }
 
 type SecretsSource struct {
-	Context context.Context
+	clientID uint64
 }
 
 func (s SecretsSource) Resolve(reference string) (*string, error) {
-	res, err := Invoke(s.Context, "Resolve", reference)
+	res, err := Invoke(InvokeConfig{
+		ClientID:         s.clientID,
+		MethodName:       "Resolve",
+		SerializedParams: reference,
+	})
 	if err != nil {
 		return nil, err
 	}
