@@ -1,4 +1,4 @@
-package _password_go_sdk
+package onepassword
 
 type SecretsAPI interface {
 	Resolve(reference string) (*string, error)

@@ -2,11 +2,12 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"os"
 
 	onepassword "github.com/1password/1password-go-sdk"
 )
+
+// This is an example for retrieving a secret from 1Password and setting it as SECRET_ENV_VAR using the SDK client.
 
 func main() {
 	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
@@ -29,5 +30,8 @@ func main() {
 }
 
 func doSomethingSecret(secret string) {
-	fmt.Println(secret)
+	err := os.Setenv("SECRET_ENV_VAR", secret)
+	if err != nil {
+		panic(err)
+	}
 }

@@ -1,4 +1,4 @@
-package _password_go_sdk
+package onepassword
 
 import (
 	"context"

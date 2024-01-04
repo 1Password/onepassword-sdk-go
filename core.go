@@ -1,11 +1,10 @@
-package _password_go_sdk
+package onepassword
 
 import (
 	"context"
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
-	"os"
 
 	core "github.com/1password/1password-sdk-core/wasm"
 	extism "github.com/extism/go-sdk"
@@ -15,7 +14,6 @@ const (
 	invokeFuncName        = "invoke"
 	initClientFuncName    = "init_client"
 	releaseClientFuncName = "release_client"
-	allowedHostsPattern   = "*.1password"
 )
 
 var corePlugin *extism.Plugin
@@ -28,32 +26,19 @@ type Invocation struct {
 
 // InitClient creates a client instance in the current core module and returns its unique ID.
 func InitClient(ctx context.Context, config ClientConfig) (*uint64, error) {
-	manifest := extism.Manifest{
-		Wasm: []extism.Wasm{
-			extism.WasmData{
-				Data: core.GetWASMCore(),
-			},
-		},
-		AllowedHosts: allowed1PHosts(),
+	if corePlugin == nil {
+		err := initClient(ctx)
+		if err != nil {
+			return nil, err
+		}
 	}
-
-	extismConfig := extism.PluginConfig{}
-
-	plugin, err := extism.NewPlugin(ctx, manifest, extismConfig, ImportedFunctions())
-	if err != nil {
-		fmt.Printf("Failed to initialize plugin: %v\n", err)
-		os.Exit(1)
-	}
-	corePlugin = plugin
-
 	marshaledConfig, err := json.Marshal(config)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	status, res, err := plugin.Call(initClientFuncName, marshaledConfig)
+	_, res, err := corePlugin.Call(initClientFuncName, marshaledConfig)
 	if err != nil {
-		plugin.Log(extism.LogLevelError, fmt.Sprintf("%s exited with status %d", initClientFuncName, status))
 		return nil, err
 	}
 	id := binary.BigEndian.Uint64(res)
@@ -66,9 +51,8 @@ func Invoke(invokeConfig Invocation) (*string, error) {
 	if err != nil {
 		return nil, err
 	}
-	status, res, err := corePlugin.Call(invokeFuncName, input)
+	_, res, err := corePlugin.Call(invokeFuncName, input)
 	if err != nil {
-		corePlugin.Log(extism.LogLevelError, fmt.Sprintf("%s exited with status %d", initClientFuncName, status))
 		return nil, err
 	}
 
@@ -78,15 +62,47 @@ func Invoke(invokeConfig Invocation) (*string, error) {
 }
 
 // ReleaseClient releases memory in core associated to the given client ID.
-func ReleaseClient(clientId uint64) {
-	data, _ := json.Marshal(clientId)
-	_, _, _ = corePlugin.Call(releaseClientFuncName, data)
+func ReleaseClient(clientID uint64) {
+	marshaledClientID, _ := json.Marshal(clientID)
+	_, _, err := corePlugin.Call(releaseClientFuncName, marshaledClientID)
+	if err != nil {
+		corePlugin.Log(extism.LogLevelError, fmt.Sprintf("memory couldn't be released: %s", err.Error()))
+	}
+}
+
+func initClient(ctx context.Context) error {
+	manifest := extism.Manifest{
+		Wasm: []extism.Wasm{
+			extism.WasmData{
+				Data: core.GetWASMCore(),
+			},
+		},
+		AllowedHosts: allowed1PHosts(),
+	}
+
+	extismConfig := extism.PluginConfig{}
+	plugin, err := extism.NewPlugin(ctx, manifest, extismConfig, ImportedFunctions())
+	if err != nil {
+		return fmt.Errorf("Failed to initialize plugin: %v\n", err)
+	}
+	corePlugin = plugin
+
+	return nil
 }
 
 func allowed1PHosts() []string {
-	var hosts []string
-	hosts = append(hosts, allowedHostsPattern+".com")
-	hosts = append(hosts, allowedHostsPattern+".ca")
-	hosts = append(hosts, allowedHostsPattern+".eu")
-	return hosts
+	return []string{
+		"*.1password.com",
+		"*.1password.ca",
+		"*.1password.eu",
+		"*.b5staging.com",
+		"*.b5dev.com",
+		"*.b5dev.ca",
+		"*.b5dev.eu",
+		"*.b5test.com",
+		"*.b5test.ca",
+		"*.b5test.eu",
+		"*.b5rev.com",
+		"*.b5local.com",
+	}
 }
