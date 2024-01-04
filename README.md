@@ -35,16 +35,15 @@ func main() {
 
     client, err := onepassword.opClient, err := Client(
         WithServiceAccountToken(token),
-        WithApp("<your app name>", "<your app version>"),
-    )
-	if err != nil {
-		// handle err
-	}
-	secret, err := client.Resolve("op://vault/item/field")
-	if err != nil {
-		// handle err
-	}
-	// do something with the secret
+        WithApp("<your app name>", "<your app version>"), )
+    if err != nil {
+        // handle err
+    }
+    secret, err := client.Resolve("op://vault/item/field")
+    if err != nil {
+        // handle err
+    }
+    // do something with the secret
 }
 ```
 For passing the service account token as an environment variable (`OP_SERVICE_ACCOUNT_TOKEN`), you can also leverage the `onepassword.NewServiceAccountClientFromEnv()` function.

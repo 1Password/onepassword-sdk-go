@@ -1,4 +1,4 @@
-package onepassword
+package _password_go_sdk
 
 type SecretsAPI interface {
 	Resolve(reference string) (*string, error)
@@ -9,7 +9,7 @@ type SecretsSource struct {
 }
 
 func (s SecretsSource) Resolve(reference string) (*string, error) {
-	res, err := Invoke(InvokeConfig{
+	res, err := Invoke(Invocation{
 		ClientID:         s.clientID,
 		MethodName:       "Resolve",
 		SerializedParams: reference,

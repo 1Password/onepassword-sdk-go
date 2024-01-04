@@ -6,7 +6,11 @@ github.com/1password/1password-sdk-core/wasm v0.0.0-20231221155839-393a0e0c1f4e 
 github.com/1password/1password-sdk-core/wasm v0.0.0-20231221155839-393a0e0c1f4e/go.mod h1:DDWf7iYMWforE7cQ1O43Oi2K2Fbl8027TLm0CZKJkbY=
 github.com/extism/go-sdk v1.0.0-rc2 h1:wkdAvRwq0CHMET/mtTExvfWCTJn33zfot3k72ZDMYTM=
 github.com/extism/go-sdk v1.0.0-rc2/go.mod h1:xUfKSEQndAvHBc1Ohdre0e+UdnRzUpVfbA8QLcx4fbY=
+github.com/extism/go-sdk v1.0.0-rc3 h1:Y6ykqKuyIln3Vb6zXFUiV7OXM+TPoGxWyOEnb8kwnYU=
+github.com/extism/go-sdk v1.0.0-rc3/go.mod h1:xUfKSEQndAvHBc1Ohdre0e+UdnRzUpVfbA8QLcx4fbY=
 github.com/gobwas/glob v0.2.3 h1:A4xDbljILXROh+kObIiy5kIaPYD8e96x1tgBhUI5J+Y=
 github.com/gobwas/glob v0.2.3/go.mod h1:d3Ez4x06l9bZtSvzIay5+Yzi0fmZzPgnTbPcKjJAkT8=
 github.com/tetratelabs/wazero v1.5.0 h1:Yz3fZHivfDiZFUXnWMPUoiW7s8tC1sjdBtlJn08qYa0=
 github.com/tetratelabs/wazero v1.5.0/go.mod h1:0U0G41+ochRKoPKCJlh0jMg1CHkyfK8kDqiirMmKY8A=
+github.com/tetratelabs/wazero v1.6.0 h1:z0H1iikCdP8t+q341xqepY4EWvHEw8Es7tlqiVzlP3g=
+github.com/tetratelabs/wazero v1.6.0/go.mod h1:0U0G41+ochRKoPKCJlh0jMg1CHkyfK8kDqiirMmKY8A=

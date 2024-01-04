@@ -1,4 +1,4 @@
-package onepassword
+package _password_go_sdk
 
 import (
 	"context"
@@ -49,7 +49,7 @@ func Client(opts ...ClientOption) (*OpClient, error) {
 	}
 
 	if len(client.config.AppName) == 0 || len(client.config.AppVersion) == 0 {
-		return nil, errors.New("cannot create a client without specifying an app name and version. If you don't want to specify any, use the provided default constants")
+		return nil, errors.New("cannot create a client without defining an app name and version. If you don't want to specify any, use the provided constants: 'DefaultAppName', 'DefaultAppVersion'")
 	}
 
 	client.config.Language = SDKLanguage

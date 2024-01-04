@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	onepassword "github.com/1password/1password-go-sdk/src"
+	onepassword "github.com/1password/1password-go-sdk"
 )
 
 func main() {
@@ -16,6 +16,9 @@ func main() {
 		onepassword.WithApp(onepassword.DefaultAppName, onepassword.DefaultAppVersion),
 		onepassword.WithContext(context.Background()),
 	)
+	if err != nil {
+		panic(err)
+	}
 
 	secret, err := client.Secrets.Resolve("op://xw33qlvug6moegr3wkk5zkenoa/bckakdku7bgbnyxvqbkpehifki/foobar")
 	if err != nil {
