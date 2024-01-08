@@ -14,7 +14,7 @@ func main() {
 
 	client, err := onepassword.Client(
 		onepassword.WithServiceAccountToken(token),
-		onepassword.WithApp(onepassword.DefaultAppName, onepassword.DefaultAppVersion),
+		onepassword.WithIntegrationInfo(onepassword.DefaultAppName, onepassword.DefaultAppVersion),
 		onepassword.WithContext(context.Background()),
 	)
 	if err != nil {

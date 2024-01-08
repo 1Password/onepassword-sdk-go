@@ -35,7 +35,7 @@ func main() {
 
     client, err := onepassword.opClient, err := Client(
         WithServiceAccountToken(token),
-        WithApp("<your app name>", "<your app version>"), )
+        WithIntegrationInfo("<your app name>", "<your app version>"), )
     if err != nil {
         // handle err
     }

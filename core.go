@@ -63,8 +63,11 @@ func Invoke(invokeConfig Invocation) (*string, error) {
 
 // ReleaseClient releases memory in core associated to the given client ID.
 func ReleaseClient(clientID uint64) {
-	marshaledClientID, _ := json.Marshal(clientID)
-	_, _, err := corePlugin.Call(releaseClientFuncName, marshaledClientID)
+	marshaledClientID, err := json.Marshal(clientID)
+	if err != nil {
+		corePlugin.Log(extism.LogLevelError, fmt.Sprintf("memory couldn't be released: %s", err.Error()))
+	}
+	_, _, err = corePlugin.Call(releaseClientFuncName, marshaledClientID)
 	if err != nil {
 		corePlugin.Log(extism.LogLevelError, fmt.Sprintf("memory couldn't be released: %s", err.Error()))
 	}

@@ -11,8 +11,7 @@ const (
 	DefaultAppName    = "Unknown"
 	DefaultAppVersion = "Unknown"
 
-	SDKLanguage = "Go"
-
+	SDKLanguage           = "Go"
 	DefaultRequestLibrary = "net/http"
 )
 
@@ -27,14 +26,16 @@ type OpClient struct {
 type ClientConfig struct {
 	SAToken               string `json:"saToken"`
 	Language              string `json:"language"`
-	AppName               string `json:"appName"`
-	AppVersion            string `json:"appVersion"`
+	IntegrationName       string `json:"integrationName"`
+	IntegrationVersion    string `json:"integrationVersion"`
 	RequestLibraryName    string `json:"requestLibraryName"`
 	RequestLibraryVersion string `json:"requestLibraryVersion"`
 	SystemOS              string `json:"os"`
+	SystemOSVersion       string `json:"osVersion"`
 	SystemArch            string `json:"arch"`
 }
 
+// Client returns a 1Password Go SDK client
 func Client(opts ...ClientOption) (*OpClient, error) {
 	client := OpClient{
 		context: context.Background(),
@@ -48,7 +49,7 @@ func Client(opts ...ClientOption) (*OpClient, error) {
 		return nil, errors.New("cannot create a client without specifying a Service Account Token")
 	}
 
-	if len(client.config.AppName) == 0 || len(client.config.AppVersion) == 0 {
+	if len(client.config.IntegrationVersion) == 0 || len(client.config.IntegrationName) == 0 {
 		return nil, errors.New("cannot create a client without defining an app name and version. If you don't want to specify any, use the provided constants: 'DefaultAppName', 'DefaultAppVersion'")
 	}
 
@@ -57,6 +58,7 @@ func Client(opts ...ClientOption) (*OpClient, error) {
 	client.config.RequestLibraryVersion = runtime.Version()
 	client.config.SystemOS = runtime.GOOS
 	client.config.SystemArch = runtime.GOARCH
+	client.config.SystemOSVersion = OSVersion()
 
 	clientID, err := InitClient(client.context, client.config)
 	if err != nil {
@@ -80,10 +82,10 @@ func WithServiceAccountToken(token string) ClientOption {
 	}
 }
 
-func WithApp(name string, version string) ClientOption {
+func WithIntegrationInfo(name string, version string) ClientOption {
 	return func(c *OpClient) {
-		c.config.AppName = name
-		c.config.AppVersion = version
+		c.config.IntegrationName = name
+		c.config.IntegrationVersion = version
 	}
 }
 
