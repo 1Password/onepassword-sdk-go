@@ -13,13 +13,13 @@ func ImportedFunctions() []extism.HostFunction {
 	return []extism.HostFunction{randomFillFunc()}
 }
 
-// randomFillFunc returns an Extism Function that writes a random byte onto the stack memory using crypto/rand.
+// randomFillFunc returns an Extism Function that writes random bytes into the WASM core's memory using crypto/rand.
 func randomFillFunc() extism.HostFunction {
-	randomFillFunc := extism.NewHostFunctionWithStack("random_fill_imported", func(ctx context.Context, p *extism.CurrentPlugin, stack []uint64) {
+	randomFill := extism.NewHostFunctionWithStack("random_fill_imported", func(ctx context.Context, p *extism.CurrentPlugin, stack []uint64) {
 		ptr := api.DecodeU32(stack[0])
-		len := api.DecodeU32(stack[1])
+		length := api.DecodeU32(stack[1])
 
-		b := make([]byte, len)
+		b := make([]byte, length)
 		_, err := rand.Read(b)
 		if err != nil {
 			panic(err)
@@ -27,7 +27,7 @@ func randomFillFunc() extism.HostFunction {
 
 		p.Memory().Write(ptr, b)
 	}, []api.ValueType{api.ValueTypeI32, api.ValueTypeI32}, []api.ValueType{})
-	randomFillFunc.SetNamespace("op-random")
+	randomFill.SetNamespace("op-random")
 
-	return randomFillFunc
+	return randomFill
 }

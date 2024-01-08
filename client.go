@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	DefaultAppName    = "Unknown"
-	DefaultAppVersion = "Unknown"
+	DefaultIntegrationName    = "Unknown"
+	DefaultIntegrationVersion = "Unknown"
 
 	SDKLanguage           = "Go"
 	DefaultRequestLibrary = "net/http"
@@ -35,7 +35,7 @@ type ClientConfig struct {
 	SystemArch            string `json:"arch"`
 }
 
-// Client returns a 1Password Go SDK client
+// Client returns a 1Password Go SDK client.
 func Client(opts ...ClientOption) (*OpClient, error) {
 	client := OpClient{
 		context: context.Background(),
