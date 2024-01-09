@@ -64,6 +64,7 @@ func NewClient(opts ...ClientOption) (*OpClient, error) {
 	client.config.RequestLibraryVersion = runtime.Version()
 	client.config.SystemOS = runtime.GOOS
 	client.config.SystemArch = runtime.GOARCH
+	// TODO: add logic for determining this for all systems in a different PR.
 	client.config.SystemOSVersion = defaultOSVersion
 
 	clientID, err := InitClient(client.context, client.config)
