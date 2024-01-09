@@ -8,6 +8,8 @@ import (
 )
 
 const (
+	SDKSemverVersion = "0010001" // v0.1.0
+
 	DefaultIntegrationName    = "Unknown"
 	DefaultIntegrationVersion = "Unknown"
 
@@ -26,6 +28,7 @@ type OpClient struct {
 type ClientConfig struct {
 	SAToken               string `json:"saToken"`
 	Language              string `json:"language"`
+	SDKVersion            string `json:"sdkVersion"`
 	IntegrationName       string `json:"integrationName"`
 	IntegrationVersion    string `json:"integrationVersion"`
 	RequestLibraryName    string `json:"requestLibraryName"`
@@ -56,6 +59,7 @@ func NewClient(opts ...ClientOption) (*OpClient, error) {
 	const defaultOSVersion = "0.0.0"
 
 	client.config.Language = SDKLanguage
+	client.config.SDKVersion = SDKSemverVersion
 	client.config.RequestLibraryName = DefaultRequestLibrary
 	client.config.RequestLibraryVersion = runtime.Version()
 	client.config.SystemOS = runtime.GOOS
