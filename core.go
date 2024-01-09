@@ -18,6 +18,7 @@ const (
 
 var corePlugin *extism.Plugin
 
+// Invocation holds the information required for invoking SDK functionality.
 type Invocation struct {
 	ClientID         uint64 `json:"client"`
 	MethodName       string `json:"name"`
@@ -41,7 +42,7 @@ func InitClient(ctx context.Context, config ClientConfig) (*uint64, error) {
 	if err != nil {
 		return nil, err
 	}
-	id := binary.BigEndian.Uint64(res)
+	id := binary.LittleEndian.Uint64(res)
 	return &id, nil
 }
 

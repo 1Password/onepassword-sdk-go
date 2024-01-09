@@ -1,4 +1,1 @@
 .imported.go @1Password/security
-
-# CODEOWNERS file is checked by CI.
-/.github/CODEOWNERS

@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"runtime"
-	"strings"
 )
 
 const (
@@ -51,15 +50,17 @@ func Client(opts ...ClientOption) (*OpClient, error) {
 	}
 
 	if len(client.config.IntegrationVersion) == 0 || len(client.config.IntegrationName) == 0 {
-		return nil, errors.New("cannot create a client without defining an app name and version. If you don't want to specify any, use the provided constants: 'DefaultAppName', 'DefaultAppVersion'")
+		return nil, errors.New("cannot create a client without defining an app name and version. If you don't want to specify any, use the provided constants: 'DefaultIntegrationName', 'DefaultIntegrationVersion'")
 	}
+
+	const defaultOSVersion = "0.0.0"
 
 	client.config.Language = SDKLanguage
 	client.config.RequestLibraryName = DefaultRequestLibrary
 	client.config.RequestLibraryVersion = runtime.Version()
 	client.config.SystemOS = runtime.GOOS
 	client.config.SystemArch = runtime.GOARCH
-	client.config.SystemOSVersion = strings.TrimSpace(OSVersion())
+	client.config.SystemOSVersion = defaultOSVersion
 
 	clientID, err := InitClient(client.context, client.config)
 	if err != nil {
