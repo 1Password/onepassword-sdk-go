@@ -35,8 +35,8 @@ type ClientConfig struct {
 	SystemArch            string `json:"arch"`
 }
 
-// Client returns a 1Password Go SDK client.
-func Client(opts ...ClientOption) (*OpClient, error) {
+// NewClient returns a 1Password Go SDK client.
+func NewClient(opts ...ClientOption) (*OpClient, error) {
 	client := OpClient{
 		context: context.Background(),
 	}

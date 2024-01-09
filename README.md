@@ -33,7 +33,7 @@ import onepassword "github.com/1password/1password-go-sdk"
 func main() {
     token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
 
-    client, err := onepassword.opClient, err := Client(
+    client, err := onepassword.NewClient(
         WithServiceAccountToken(token),
         WithIntegrationInfo("<your app name>", "<your app version>"), )
     if err != nil {
