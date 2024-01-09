@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"runtime"
+	"strings"
 )
 
 const (
@@ -58,7 +59,7 @@ func Client(opts ...ClientOption) (*OpClient, error) {
 	client.config.RequestLibraryVersion = runtime.Version()
 	client.config.SystemOS = runtime.GOOS
 	client.config.SystemArch = runtime.GOARCH
-	client.config.SystemOSVersion = OSVersion()
+	client.config.SystemOSVersion = strings.TrimSpace(OSVersion())
 
 	clientID, err := InitClient(client.context, client.config)
 	if err != nil {
