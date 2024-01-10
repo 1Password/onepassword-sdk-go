@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
+	"runtime"
 
 	onepassword "github.com/1password/1password-go-sdk"
 )
@@ -12,6 +14,11 @@ import (
 func main() {
 	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
 
+	var m runtime.MemStats
+	runtime.ReadMemStats(&m)
+	fmt.Print("Before creating client\n")
+	fmt.Printf("Alloc = %v bytes\n", m.Alloc)
+	fmt.Printf("TotalAlloc = %v bytes\n", m.TotalAlloc)
 	client, err := onepassword.Client(
 		onepassword.WithServiceAccountToken(token),
 		onepassword.WithIntegrationInfo(onepassword.DefaultIntegrationName, onepassword.DefaultIntegrationVersion),
@@ -20,18 +27,19 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	runtime.ReadMemStats(&m)
+	fmt.Print("After creating client\n")
+	fmt.Printf("Alloc = %v bytes\n", m.Alloc)
+	fmt.Printf("TotalAlloc = %v bytes\n", m.TotalAlloc)
 
 	secret, err := client.Secrets.Resolve("op://xw33qlvug6moegr3wkk5zkenoa/bckakdku7bgbnyxvqbkpehifki/foobar")
 	if err != nil {
 		panic(err)
 	}
+	runtime.ReadMemStats(&m)
+	fmt.Print("After resolving secret ref\n")
+	fmt.Printf("Alloc = %v bytes\n", m.Alloc)
+	fmt.Printf("TotalAlloc = %v bytes\n", m.TotalAlloc)
 
-	doSomethingSecret(*secret)
-}
-
-func doSomethingSecret(secret string) {
-	err := os.Setenv("SECRET_ENV_VAR", secret)
-	if err != nil {
-		panic(err)
-	}
+	print("Secret: " + *secret)
 }
