@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"runtime"
+	"strings"
+	"unicode"
 )
 
 const (
@@ -45,7 +47,10 @@ func NewClient(opts ...ClientOption) (*OpClient, error) {
 	}
 
 	for _, opt := range opts {
-		opt(&client)
+		err := opt(&client)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	if len(client.config.SAToken) == 0 {
@@ -81,23 +86,51 @@ func NewClient(opts ...ClientOption) (*OpClient, error) {
 	return &client, nil
 }
 
-type ClientOption func(config *OpClient)
+type ClientOption func(config *OpClient) error
 
 func WithServiceAccountToken(token string) ClientOption {
-	return func(c *OpClient) {
+	return func(c *OpClient) error {
 		c.config.SAToken = token
+		return nil
 	}
 }
 
 func WithIntegrationInfo(name string, version string) ClientOption {
-	return func(c *OpClient) {
+	const (
+		integrationNameMaxLen    = 40
+		integrationVersionMaxLen = 20
+		allowedSymbols           = "_- .,"
+	)
+	return func(c *OpClient) error {
+		if len(name) > integrationNameMaxLen {
+			return fmt.Errorf("integration name can't be longer than 40 characters")
+		}
+
+		if len(version) > integrationVersionMaxLen {
+			return fmt.Errorf("integration version can't be longer than 20 characters")
+		}
+
+		for _, r := range name {
+			if !unicode.IsLetter(r) && !unicode.IsDigit(r) && !strings.ContainsRune(allowedSymbols, r) {
+				return fmt.Errorf("integration name can only contain digits, letters and allowed symbols")
+			}
+		}
+
+		for _, r := range version {
+			if !unicode.IsLetter(r) && !unicode.IsDigit(r) && !strings.ContainsRune(allowedSymbols, r) {
+				return fmt.Errorf("integration version can only contain digits, letters and allowed symbols")
+			}
+		}
+
 		c.config.IntegrationName = name
 		c.config.IntegrationVersion = version
+		return nil
 	}
 }
 
 func WithContext(ctx context.Context) ClientOption {
-	return func(c *OpClient) {
+	return func(c *OpClient) error {
 		c.context = ctx
+		return nil
 	}
 }
