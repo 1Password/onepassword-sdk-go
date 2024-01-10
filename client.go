@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"runtime"
+	"strconv"
 	"strings"
 )
 
@@ -69,6 +70,7 @@ func Client(opts ...ClientOption) (*OpClient, error) {
 	client.Secrets = SecretsSource{
 		clientID: *clientID,
 	}
+	println("Client id: " + strconv.FormatUint(*clientID, 10))
 	runtime.SetFinalizer(&client, func(f *OpClient) {
 		ReleaseClient(*clientID)
 	})
