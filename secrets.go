@@ -7,11 +7,16 @@ type SecretsAPI interface {
 
 type SecretsSource struct {
 	clientID uint64
+	core     Core
+}
+
+func NewSecretsSource(id uint64, core Core) *SecretsSource {
+	return &SecretsSource{clientID: id, core: core}
 }
 
 // Resolve returns the secret the provided reference points to.
 func (s SecretsSource) Resolve(reference string) (*string, error) {
-	res, err := Invoke(Invocation{
+	res, err := s.core.Invoke(Invocation{
 		ClientID:         s.clientID,
 		MethodName:       "Resolve",
 		SerializedParams: reference,

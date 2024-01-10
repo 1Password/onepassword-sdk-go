@@ -16,7 +16,23 @@ const (
 	releaseClientFuncName = "release_client"
 )
 
-var corePlugin *extism.Plugin
+type Core interface {
+	InitClient(config ClientConfig) (*uint64, error)
+	Invoke(invokeConfig Invocation) (*string, error)
+	ReleaseClient(clientID uint64)
+}
+
+type ExtismCore struct {
+	plugin *extism.Plugin
+}
+
+func NewExtismCore(ctx context.Context) (Core, error) {
+	p, err := loadWASM(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return ExtismCore{plugin: p}, nil
+}
 
 // Invocation holds the information required for invoking SDK functionality.
 type Invocation struct {
@@ -26,19 +42,13 @@ type Invocation struct {
 }
 
 // InitClient creates a client instance in the current core module and returns its unique ID.
-func InitClient(ctx context.Context, config ClientConfig) (*uint64, error) {
-	if corePlugin == nil {
-		err := initClient(ctx)
-		if err != nil {
-			return nil, err
-		}
-	}
+func (c ExtismCore) InitClient(config ClientConfig) (*uint64, error) {
 	marshaledConfig, err := json.Marshal(config)
 	if err != nil {
 		return nil, err
 	}
 
-	_, res, err := corePlugin.Call(initClientFuncName, marshaledConfig)
+	_, res, err := c.plugin.Call(initClientFuncName, marshaledConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -47,12 +57,12 @@ func InitClient(ctx context.Context, config ClientConfig) (*uint64, error) {
 }
 
 // Invoke calls specified business logic from core
-func Invoke(invokeConfig Invocation) (*string, error) {
+func (c ExtismCore) Invoke(invokeConfig Invocation) (*string, error) {
 	input, err := json.Marshal(invokeConfig)
 	if err != nil {
 		return nil, err
 	}
-	_, res, err := corePlugin.Call(invokeFuncName, input)
+	_, res, err := c.plugin.Call(invokeFuncName, input)
 	if err != nil {
 		return nil, err
 	}
@@ -63,18 +73,19 @@ func Invoke(invokeConfig Invocation) (*string, error) {
 }
 
 // ReleaseClient releases memory in core associated to the given client ID.
-func ReleaseClient(clientID uint64) {
+func (c ExtismCore) ReleaseClient(clientID uint64) {
 	marshaledClientID, err := json.Marshal(clientID)
 	if err != nil {
-		corePlugin.Log(extism.LogLevelError, fmt.Sprintf("memory couldn't be released: %s", err.Error()))
+		c.plugin.Log(extism.LogLevelError, fmt.Sprintf("memory couldn't be released: %s", err.Error()))
 	}
-	_, _, err = corePlugin.Call(releaseClientFuncName, marshaledClientID)
+	_, _, err = c.plugin.Call(releaseClientFuncName, marshaledClientID)
 	if err != nil {
-		corePlugin.Log(extism.LogLevelError, fmt.Sprintf("memory couldn't be released: %s", err.Error()))
+		c.plugin.Log(extism.LogLevelError, fmt.Sprintf("memory couldn't be released: %s", err.Error()))
 	}
 }
 
-func initClient(ctx context.Context) error {
+// loadWASM returns the wasm core loaded into an extism.Plugin
+func loadWASM(ctx context.Context) (*extism.Plugin, error) {
 	manifest := extism.Manifest{
 		Wasm: []extism.Wasm{
 			extism.WasmData{
@@ -87,13 +98,13 @@ func initClient(ctx context.Context) error {
 	extismConfig := extism.PluginConfig{}
 	plugin, err := extism.NewPlugin(ctx, manifest, extismConfig, ImportedFunctions())
 	if err != nil {
-		return fmt.Errorf("Failed to initialize plugin: %v\n", err)
+		return nil, fmt.Errorf("Failed to initialize plugin: %v\n", err)
 	}
-	corePlugin = plugin
 
-	return nil
+	return plugin, nil
 }
 
+// allowed1PHosts returns all hosts that can be accessed through the WASM core
 func allowed1PHosts() []string {
 	return []string{
 		"*.1password.com",
