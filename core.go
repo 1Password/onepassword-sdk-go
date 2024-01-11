@@ -41,7 +41,7 @@ func InitClient(ctx context.Context, config ClientConfig) (*uint64, error) {
 	if err != nil {
 		return nil, err
 	}
-	id := binary.BigEndian.Uint64(res)
+	id := binary.LittleEndian.Uint64(res)
 	return &id, nil
 }
 

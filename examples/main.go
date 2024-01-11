@@ -19,27 +19,23 @@ func main() {
 	fmt.Print("Before creating client\n")
 	fmt.Printf("Alloc = %v bytes\n", m.Alloc)
 	fmt.Printf("TotalAlloc = %v bytes\n", m.TotalAlloc)
-	client, err := onepassword.Client(
-		onepassword.WithServiceAccountToken(token),
-		onepassword.WithIntegrationInfo(onepassword.DefaultIntegrationName, onepassword.DefaultIntegrationVersion),
-		onepassword.WithContext(context.Background()),
-	)
-	if err != nil {
-		panic(err)
+	for i := 0; i < 5; i++ {
+		_, err := onepassword.Client(
+			onepassword.WithServiceAccountToken(token),
+			onepassword.WithIntegrationInfo(onepassword.DefaultIntegrationName, onepassword.DefaultIntegrationVersion),
+			onepassword.WithContext(context.Background()),
+		)
+		if err != nil {
+			panic(err)
+		}
+		runtime.ReadMemStats(&m)
+		fmt.Print("After creating client\n")
+		fmt.Printf("Alloc = %v bytes\n", m.Alloc)
+		fmt.Printf("TotalAlloc = %v bytes\n", m.TotalAlloc)
+		// secret, err := client.Secrets.Resolve("op://xw33qlvug6moegr3wkk5zkenoa/bckakdku7bgbnyxvqbkpehifki/password")
+		// if err != nil {
+		// 	panic(err)
+		// }
+		// println("Secret: " + *secret)
 	}
-	runtime.ReadMemStats(&m)
-	fmt.Print("After creating client\n")
-	fmt.Printf("Alloc = %v bytes\n", m.Alloc)
-	fmt.Printf("TotalAlloc = %v bytes\n", m.TotalAlloc)
-
-	secret, err := client.Secrets.Resolve("op://xw33qlvug6moegr3wkk5zkenoa/bckakdku7bgbnyxvqbkpehifki/foobar")
-	if err != nil {
-		panic(err)
-	}
-	runtime.ReadMemStats(&m)
-	fmt.Print("After resolving secret ref\n")
-	fmt.Printf("Alloc = %v bytes\n", m.Alloc)
-	fmt.Printf("TotalAlloc = %v bytes\n", m.TotalAlloc)
-
-	print("Secret: " + *secret)
 }
