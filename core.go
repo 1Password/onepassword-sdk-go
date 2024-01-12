@@ -16,7 +16,7 @@ const (
 	releaseClientFuncName = "release_client"
 )
 
-var corePlugin *extism.Plugin
+var corePlugins map[uint64]*extism.Plugin
 
 type Invocation struct {
 	ClientID         uint64 `json:"client"`
@@ -26,22 +26,24 @@ type Invocation struct {
 
 // InitClient creates a client instance in the current core module and returns its unique ID.
 func InitClient(ctx context.Context, config ClientConfig) (*uint64, error) {
-	if corePlugin == nil {
-		err := initClient(ctx)
-		if err != nil {
-			return nil, err
-		}
+	if corePlugins == nil {
+		corePlugins = make(map[uint64]*extism.Plugin, 1)
+	}
+	plugin, err := initClient(ctx)
+	if err != nil {
+		return nil, err
 	}
 	marshaledConfig, err := json.Marshal(config)
 	if err != nil {
 		return nil, err
 	}
 
-	_, res, err := corePlugin.Call(initClientFuncName, marshaledConfig)
+	_, res, err := plugin.Call(initClientFuncName, marshaledConfig)
 	if err != nil {
 		return nil, err
 	}
 	id := binary.LittleEndian.Uint64(res)
+	corePlugins[id] = plugin
 	return &id, nil
 }
 
@@ -51,7 +53,7 @@ func Invoke(invokeConfig Invocation) (*string, error) {
 	if err != nil {
 		return nil, err
 	}
-	_, res, err := corePlugin.Call(invokeFuncName, input)
+	_, res, err := corePlugins[invokeConfig.ClientID].Call(invokeFuncName, input)
 	if err != nil {
 		return nil, err
 	}
@@ -63,17 +65,21 @@ func Invoke(invokeConfig Invocation) (*string, error) {
 
 // ReleaseClient releases memory in core associated to the given client ID.
 func ReleaseClient(clientID uint64) {
+	defer func() {
+		corePlugins[clientID].Close()
+		corePlugins[clientID] = nil
+	}()
 	marshaledClientID, err := json.Marshal(clientID)
 	if err != nil {
-		corePlugin.Log(extism.LogLevelError, fmt.Sprintf("memory couldn't be released: %s", err.Error()))
+		corePlugins[clientID].Log(extism.LogLevelError, fmt.Sprintf("memory couldn't be released: %s", err.Error()))
 	}
-	_, _, err = corePlugin.Call(releaseClientFuncName, marshaledClientID)
+	_, _, err = corePlugins[clientID].Call(releaseClientFuncName, marshaledClientID)
 	if err != nil {
-		corePlugin.Log(extism.LogLevelError, fmt.Sprintf("memory couldn't be released: %s", err.Error()))
+		corePlugins[clientID].Log(extism.LogLevelError, fmt.Sprintf("memory couldn't be released: %s", err.Error()))
 	}
 }
 
-func initClient(ctx context.Context) error {
+func initClient(ctx context.Context) (*extism.Plugin, error) {
 	manifest := extism.Manifest{
 		Wasm: []extism.Wasm{
 			extism.WasmData{
@@ -86,11 +92,10 @@ func initClient(ctx context.Context) error {
 	extismConfig := extism.PluginConfig{}
 	plugin, err := extism.NewPlugin(ctx, manifest, extismConfig, ImportedFunctions())
 	if err != nil {
-		return fmt.Errorf("Failed to initialize plugin: %v\n", err)
+		return nil, fmt.Errorf("Failed to initialize plugin: %v\n", err)
 	}
-	corePlugin = plugin
 
-	return nil
+	return plugin, nil
 }
 
 func allowed1PHosts() []string {
