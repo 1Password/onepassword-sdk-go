@@ -2,7 +2,6 @@ package onepassword
 
 import (
 	"context"
-	"encoding/binary"
 	"encoding/json"
 	"fmt"
 
@@ -52,7 +51,11 @@ func (c ExtismCore) InitClient(config ClientConfig) (*uint64, error) {
 	if err != nil {
 		return nil, err
 	}
-	id := binary.LittleEndian.Uint64(res)
+	var id uint64
+	err = json.Unmarshal(res, &id)
+	if err != nil {
+		return nil, err
+	}
 	return &id, nil
 }
 
