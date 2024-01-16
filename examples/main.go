@@ -21,7 +21,7 @@ func main() {
 		panic(err)
 	}
 
-	secret, err := client.Secrets.Resolve("op://xw33qlvug6moegr3wkk5zkenoa/bckakdku7bgbnyxvqbkpehifki/foobar")
+	secret, err := client.Secrets.Resolve("op://ap4iuqok2zlv67jdg47vya26oy/c2idhecagm5j7zzp7nhbffornm/username")
 	if err != nil {
 		panic(err)
 	}

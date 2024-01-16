@@ -30,7 +30,15 @@ func randomFillFunc() extism.HostFunction {
 			panic(err)
 		}
 
-		p.Memory().Write(ptr, b)
+		plugin, ok := ctx.Value("plugin").(*extism.Plugin)
+		if !ok {
+			panic("Invalid context, `plugin` key not found")
+		}
+
+		ok = plugin.Main.Memory().Write(ptr, b)
+		if !ok {
+			panic("Failed to write to memory")
+		}
 	}, []api.ValueType{api.ValueTypeI32, api.ValueTypeI32}, []api.ValueType{})
 	randomFill.SetNamespace("op-random")
 
@@ -45,10 +53,12 @@ func httpRequestFunc() extism.HostFunction {
 		responseLen := stack[2]
 		statusRaw := stack[3]
 
+		println(reqPtr)
 		requestJson, err := cp.ReadBytes(reqPtr)
 		if err != nil {
 			panic(fmt.Errorf("invalid request %v", err))
 		}
+
 		var request extism.HttpRequest
 		err = json.Unmarshal(requestJson, &request)
 		if err != nil {
