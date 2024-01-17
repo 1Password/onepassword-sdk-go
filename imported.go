@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 
 	extism "github.com/extism/go-sdk"
 	"github.com/tetratelabs/wazero/api"
@@ -21,8 +22,7 @@ func ImportedFunctions() []extism.HostFunction {
 // randomFillFunc returns an Extism Function that writes random bytes into the WASM core's memory using crypto/rand.
 func randomFillFunc() extism.HostFunction {
 	randomFill := extism.NewHostFunctionWithStack("random_fill_imported", func(ctx context.Context, p *extism.CurrentPlugin, stack []uint64) {
-		ptr := api.DecodeU32(stack[0])
-		length := api.DecodeU32(stack[1])
+		length := api.DecodeU32(stack[0])
 
 		b := make([]byte, length)
 		_, err := rand.Read(b)
@@ -30,17 +30,12 @@ func randomFillFunc() extism.HostFunction {
 			panic(err)
 		}
 
-		plugin, ok := ctx.Value("plugin").(*extism.Plugin)
-		if !ok {
-			panic("Invalid context, `plugin` key not found")
+		stack[0], err = p.WriteBytes(b)
+		if err != nil {
+			panic(fmt.Errorf("failed to write bytes: %v", err))
 		}
-
-		ok = plugin.Main.Memory().Write(ptr, b)
-		if !ok {
-			panic("Failed to write to memory")
-		}
-	}, []api.ValueType{api.ValueTypeI32, api.ValueTypeI32}, []api.ValueType{})
-	randomFill.SetNamespace("op-random")
+	}, []api.ValueType{api.ValueTypeI64}, []api.ValueType{api.ValueTypeI64})
+	randomFill.SetNamespace("extism:host/user")
 
 	return randomFill
 }
@@ -53,7 +48,12 @@ func httpRequestFunc() extism.HostFunction {
 		responseLen := stack[2]
 		statusRaw := stack[3]
 
-		println(reqPtr)
+		println("reqPtr: " + strconv.Itoa(int(reqPtr)))
+		l, err := cp.Length(reqPtr)
+		if err != nil {
+			panic(err)
+		}
+		println("reqLen: " + strconv.Itoa(int(l)))
 		requestJson, err := cp.ReadBytes(reqPtr)
 		if err != nil {
 			panic(fmt.Errorf("invalid request %v", err))

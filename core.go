@@ -29,16 +29,19 @@ func InitClient(ctx context.Context, config ClientConfig) (*uint64, error) {
 	if corePlugin == nil {
 		err := initClient(ctx)
 		if err != nil {
+			println("A")
 			return nil, err
 		}
 	}
 	marshaledConfig, err := json.Marshal(config)
 	if err != nil {
+		println("B")
 		return nil, err
 	}
 
 	_, res, err := corePlugin.Call(initClientFuncName, marshaledConfig)
 	if err != nil {
+		println("C")
 		return nil, err
 	}
 	id := binary.BigEndian.Uint64(res)
