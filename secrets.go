@@ -1,6 +1,6 @@
 package onepassword
 
-// SecretsAPI represent all operations that can be done on secrets.
+// `SecretsAPI` represents all operations the SDK client can perform on 1Password secrets.
 type SecretsAPI interface {
 	Resolve(reference string) (*string, error)
 }

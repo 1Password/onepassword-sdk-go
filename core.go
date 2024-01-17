@@ -75,7 +75,7 @@ func (c ExtismCore) Invoke(invokeConfig Invocation) (*string, error) {
 	return &response, nil
 }
 
-// ReleaseClient releases memory in core associated to the given client ID.
+// `ReleaseClient` releases memory in the core associated with the given client ID.
 func (c ExtismCore) ReleaseClient(clientID uint64) {
 	marshaledClientID, err := json.Marshal(clientID)
 	if err != nil {
@@ -87,7 +87,7 @@ func (c ExtismCore) ReleaseClient(clientID uint64) {
 	}
 }
 
-// loadWASM returns the wasm core loaded into an extism.Plugin
+// `loadWASM` returns the WASM core loaded into an `extism.Plugin`.
 func loadWASM(ctx context.Context) (*extism.Plugin, error) {
 	manifest := extism.Manifest{
 		Wasm: []extism.Wasm{
@@ -107,7 +107,7 @@ func loadWASM(ctx context.Context) (*extism.Plugin, error) {
 	return plugin, nil
 }
 
-// allowed1PHosts returns all hosts that can be accessed through the WASM core
+// `allowed1PHosts` returns all hosts accessible through the WASM core.
 func allowed1PHosts() []string {
 	return []string{
 		"*.1password.com",

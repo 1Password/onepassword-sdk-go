@@ -7,7 +7,7 @@ import (
 	onepassword "github.com/1password/1password-go-sdk"
 )
 
-// This is an example for retrieving a secret from 1Password and setting it as SECRET_ENV_VAR using the SDK client.
+// This is an example of how to retrieve a secret from 1Password and set it as SECRET_ENV_VAR using the SDK client.
 
 func main() {
 	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")

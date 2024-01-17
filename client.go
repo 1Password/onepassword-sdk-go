@@ -19,7 +19,7 @@ const (
 	DefaultRequestLibrary = "net/http"
 )
 
-// OpClient The client instance.
+// `OpClient` represents an instance of the 1Password Go SDK client.
 type OpClient struct {
 	config  ClientConfig
 	Secrets SecretsAPI
@@ -53,7 +53,7 @@ func NewDefaultConfig() ClientConfig {
 	}
 }
 
-// ClientFactory is responsible for creating 1Password Go SDK clients based on the same instance of a WASM module.
+// The `ClientFactory` creates 1Password Go SDK clients based on the same instance of a WASM module.
 type ClientFactory struct {
 	core Core
 }
@@ -102,7 +102,7 @@ func (cf ClientFactory) NewClient(opts ...ClientOption) (*OpClient, error) {
 
 type ClientOption func(config *OpClient) error
 
-// WithServiceAccountToken allows for specifying the Service Account token used for authentication the SDK client.
+// `WithServiceAccountToken` specifies the [1Password Service Account](https://developer.1password.com/docs/service-accounts) token to use to authenticate the SDK client.
 func WithServiceAccountToken(token string) ClientOption {
 	return func(c *OpClient) error {
 		c.config.SAToken = token
@@ -110,7 +110,7 @@ func WithServiceAccountToken(token string) ClientOption {
 	}
 }
 
-// WithIntegrationInfo allows for specifying the name and version of the integration built using the SDK. These allow 1Password to better support popular use cases. DefaultIntegrationName and DefaultIntegrationVersion can be used when nothing else makes sense.
+// `WithIntegrationInfo` specifies the name and version of the integration built using the 1Password Go SDK. If you don't know which name and version to use, use `DefaultIntegrationName` and `DefaultIntegrationVersion`, respectively.
 func WithIntegrationInfo(name string, version string) ClientOption {
 	const (
 		integrationNameMaxLen    = 40
