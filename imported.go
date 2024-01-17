@@ -30,12 +30,15 @@ func randomFillFunc() extism.HostFunction {
 			panic(err)
 		}
 
+		println("[GO] Writing bytes")
+		println("[GO] Byte count " + strconv.Itoa(len(b)))
 		stack[0], err = p.WriteBytes(b)
+		println("[GO] Returned address " + strconv.Itoa(int(stack[0])))
 		if err != nil {
 			panic(fmt.Errorf("failed to write bytes: %v", err))
 		}
-	}, []api.ValueType{api.ValueTypeI64}, []api.ValueType{api.ValueTypeI64})
-	randomFill.SetNamespace("extism:host/user")
+	}, []api.ValueType{api.ValueTypeI32}, []api.ValueType{api.ValueTypeI64})
+	randomFill.SetNamespace("op-random")
 
 	return randomFill
 }
