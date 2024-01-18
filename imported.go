@@ -43,6 +43,8 @@ func randomFillFunc() extism.HostFunction {
 	return randomFill
 }
 
+// TODO make this have the following signature that is compatible with js
+// (reqOffset: u64, bodyOffset: u64) -> (result_offest: u64) where result offset contains both the response and the status code.
 func httpRequestFunc() extism.HostFunction {
 	const requestBodySizeLimit = 1024 * 1024 * 50
 	httpRequest := extism.NewHostFunctionWithStack("http_request_imported", func(ctx context.Context, cp *extism.CurrentPlugin, stack []uint64) {

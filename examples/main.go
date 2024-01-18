@@ -21,12 +21,13 @@ func main() {
 		panic(err)
 	}
 
-	secret, err := client.Secrets.Resolve("op://ap4iuqok2zlv67jdg47vya26oy/c2idhecagm5j7zzp7nhbffornm/username")
+	secret, err := client.Secrets.Resolve("op://ljetebpbiql2tgwkqoa2vogrvi/qvncatly7yydv2lpj7f3gu5ntm/password")
 	if err != nil {
 		panic(err)
 	}
 
 	doSomethingSecret(*secret)
+	println(*secret)
 }
 
 func doSomethingSecret(secret string) {
