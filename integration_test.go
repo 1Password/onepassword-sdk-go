@@ -27,7 +27,7 @@ func TestSecretRetrievalFromTestAccount(t *testing.T) {
 		panic(err)
 	}
 
-	secret, err := client.Secrets.Resolve("op://xw33qlvug6moegr3wkk5zkenoa/bckakdku7bgbnyxvqbkpehifki/foobar")
+	secret, err := client.Secrets.Resolve("op://tfctuk7dxnrwjwqqhwatuhy3gi/dqtyg7dswx5kvpcxwv32psdbse/password")
 	if err != nil {
 		panic(err)
 	}
