@@ -21,3 +21,13 @@ func TestRandomFillFunc(t *testing.T) {
 	assert.Equal(t, 1, len(stack))
 	assert.Equal(t, uint64(25089), stack[0])
 }
+
+func TestImportedFunctions(t *testing.T) {
+	// initial call
+	value := ImportedFunctions()
+
+	// check the returned function name is "random_fill_imported"
+	if value[0].Name != "random_fill_imported" {
+		t.Fatal("ImportedFunctions() expected to return function 'random_fill_imported', returns ", value[0].Name, " instead")
+	}
+}
