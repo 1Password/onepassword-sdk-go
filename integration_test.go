@@ -2,9 +2,11 @@ package onepassword
 
 import (
 	"context"
-	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 // These tests were designed for CI/CD. If you want to run them locally you must make sure the following dependencies are in place:
@@ -28,4 +30,27 @@ func TestSecretRetrievalFromTestAccount(t *testing.T) {
 	}
 
 	assert.Equal(t, "test_password", *secret)
+}
+
+func TestInitClientIncrement(t *testing.T) {
+
+	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
+
+	ctx := context.TODO()
+	core, _ := NewExtismCore(ctx)
+	config := NewDefaultConfig()
+	config.SAToken = token
+	config.IntegrationName = "name"
+	config.IntegrationVersion = "version"
+
+	value1, err1 := Core.InitClient(core, config)
+	require.NoError(t, err1)
+	value2, err2 := Core.InitClient(core, config)
+	require.NoError(t, err2)
+	value3, err3 := Core.InitClient(core, config)
+	require.NoError(t, err3)
+
+	assert.Equal(t, 0, value1)
+	assert.Equal(t, 1, value2)
+	assert.Equal(t, 2, value3)
 }
