@@ -32,5 +32,5 @@ func TestSecretRetrievalFromTestAccount(t *testing.T) {
 		panic(err)
 	}
 
-	assert.Equal(t, "test_password", secret)
+	assert.Equal(t, "test_password", *secret)
 }
