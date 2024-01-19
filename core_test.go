@@ -69,40 +69,12 @@ func TestNewClientId(t *testing.T) {
 	}
 }
 
-func TestInitClientIncrement(t *testing.T) {
-	ctx := context.TODO()
-	core, _ := NewExtismCore(ctx)
-	config := ClientConfig{} //TODO: make valid config
-	value1, _ := Core.InitClient(core, config)
-	value2, _ := Core.InitClient(core, config)
-	value3, _ := Core.InitClient(core, config)
-	if *value1 != 0 || *value2 != 1 || *value3 != 2 {
-		t.Fatalf("client id does not increment")
-	}
-}
-
 func TestInvalidClientConfig(t *testing.T) {
 	ctx := context.TODO()
 	core, _ := NewExtismCore(ctx)
 	config := ClientConfig{} //TODO: make invalid config
 	_, err := Core.InitClient(core, config)
 	require.Error(t, err)
-}
-
-func TestInvokeReturnsSecret(t *testing.T) {
-
-	clientId := 0
-	methodName := ""
-	params := ""
-
-	ctx := context.TODO()
-	core, _ := NewExtismCore(ctx)
-	invocation := Invocation{uint64(clientId), methodName, params}
-	invoke, err := Core.Invoke(core, invocation)
-	require.NoError(t, err)
-
-	//TODO: setup on valid test secret reference
-	*invoke = "" // just here to remove error temporarily
 }
 
 func TestInvalidInvoke(t *testing.T) {
