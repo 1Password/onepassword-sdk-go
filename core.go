@@ -2,12 +2,19 @@ package onepassword
 
 import (
 	"context"
+	_ "embed"
 	"encoding/json"
 	"fmt"
 
-	core "github.com/1password/1password-sdk-core/wasm"
 	extism "github.com/extism/go-sdk"
 )
+
+//go:embed wasm/core.wasm
+var coreWASM []byte
+
+func GetWASMCore() []byte {
+	return coreWASM
+}
 
 const (
 	invokeFuncName        = "invoke"
@@ -92,7 +99,7 @@ func loadWASM(ctx context.Context) (*extism.Plugin, error) {
 	manifest := extism.Manifest{
 		Wasm: []extism.Wasm{
 			extism.WasmData{
-				Data: core.GetWASMCore(),
+				Data: GetWASMCore(),
 			},
 		},
 		AllowedHosts: allowed1PHosts(),

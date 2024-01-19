@@ -27,8 +27,8 @@ type OpClient struct {
 
 // ClientConfig contains information about the current client.
 type ClientConfig struct {
-	SAToken               string `json:"saToken"`
-	Language              string `json:"language"`
+	SAToken               string `json:"serviceAccountToken"`
+	Language              string `json:"programmingLanguage"`
 	SDKVersion            string `json:"sdkVersion"`
 	IntegrationName       string `json:"integrationName"`
 	IntegrationVersion    string `json:"integrationVersion"`
@@ -36,7 +36,7 @@ type ClientConfig struct {
 	RequestLibraryVersion string `json:"requestLibraryVersion"`
 	SystemOS              string `json:"os"`
 	SystemOSVersion       string `json:"osVersion"`
-	SystemArch            string `json:"arch"`
+	SystemArch            string `json:"architecture"`
 }
 
 func NewDefaultConfig() ClientConfig {
