@@ -50,7 +50,112 @@ func TestInitClientIncrement(t *testing.T) {
 	value3, err3 := Core.InitClient(core, config)
 	require.NoError(t, err3)
 
-	assert.Equal(t, 0, value1)
-	assert.Equal(t, 1, value2)
-	assert.Equal(t, 2, value3)
+	assert.Equal(t, uint64(0), *value1)
+	assert.Equal(t, uint64(1), *value2)
+	assert.Equal(t, uint64(2), *value3)
+}
+
+func TestNewClientId(t *testing.T) {
+	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
+	ctx := context.TODO()
+	core, _ := NewExtismCore(ctx)
+	config1 := NewDefaultConfig()
+	config1.SAToken = token
+	config1.IntegrationName = "name"
+	config1.IntegrationVersion = "version"
+	config2 := NewDefaultConfig()
+	config2.SAToken = token
+	config2.IntegrationName = "name"
+	config2.IntegrationVersion = "version"
+	value1, _ := Core.InitClient(core, config1)
+	value2, _ := Core.InitClient(core, config2)
+	assert.NotEqual(t, *value1, *value2)
+}
+
+//
+// invalid NewClient calls
+//
+
+func TestNoIntegrationNameOrVersion(t *testing.T) {
+	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
+
+	clientFactory, err := NewClientFactory(context.TODO())
+	require.NoError(t, err)
+
+	_, err = clientFactory.NewClient(
+		WithServiceAccountToken(token),
+		WithIntegrationInfo("", ""))
+	require.Error(t, err)
+}
+
+func TestNoIntegrationName(t *testing.T) {
+	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
+
+	clientFactory, err := NewClientFactory(context.TODO())
+	require.NoError(t, err)
+
+	_, err = clientFactory.NewClient(
+		WithServiceAccountToken(token),
+		WithIntegrationInfo("", DefaultIntegrationVersion))
+	require.Error(t, err)
+}
+
+func TestInvalidIntegrationNameLength(t *testing.T) {
+	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
+
+	clientFactory, err := NewClientFactory(context.TODO())
+	require.NoError(t, err)
+
+	_, err = clientFactory.NewClient(
+		WithServiceAccountToken(token),
+		WithIntegrationInfo("12345678901234567890123456789012345678901234567890", DefaultIntegrationVersion))
+	require.Error(t, err)
+}
+
+func TestInvalidIntegrationNameCharacters(t *testing.T) {
+	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
+
+	clientFactory, err := NewClientFactory(context.TODO())
+	require.NoError(t, err)
+
+	_, err = clientFactory.NewClient(
+		WithServiceAccountToken(token),
+		WithIntegrationInfo("$", DefaultIntegrationVersion))
+	require.Error(t, err)
+}
+
+func TestNoIntegrationVersion(t *testing.T) {
+	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
+
+	clientFactory, err := NewClientFactory(context.TODO())
+	require.NoError(t, err)
+
+	_, err = clientFactory.NewClient(
+		WithServiceAccountToken(token),
+		WithIntegrationInfo(DefaultIntegrationName, ""))
+	require.Error(t, err)
+}
+
+func TestInvalidIntegrationVersionLength(t *testing.T) {
+	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
+
+	clientFactory, err := NewClientFactory(context.TODO())
+	require.NoError(t, err)
+
+	_, err = clientFactory.NewClient(
+		WithServiceAccountToken(token),
+		WithIntegrationInfo(DefaultIntegrationName, "12345678901234567890123456789012345678901234567890"))
+	require.Error(t, err)
+}
+
+func TestInvalidIntegrationVersionCharacters(t *testing.T) {
+	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
+
+	clientFactory, err := NewClientFactory(context.TODO())
+	require.NoError(t, err)
+
+	_, err = clientFactory.NewClient(
+		WithServiceAccountToken(token),
+		WithIntegrationInfo(DefaultIntegrationName, "$"))
+	require.Error(t, err)
 }

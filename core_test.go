@@ -5,22 +5,13 @@ import (
 	"sort"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestLoadWASM(t *testing.T) {
 	ctx := context.TODO()
 	value, _ := loadWASM(ctx)
-
-	/*
-		The following three lines of code are commented out to pass the test case
-		I am unsure if checking the return type of loadWASM() is necessary
-	*/
-
-	// check return type is extism.Plugin
-	// if reflect.TypeOf(value).Kind() != reflect.TypeOf(extism.NewPlugin).Kind() {
-	// 	t.Fatal("loadWASM returns ", reflect.TypeOf(*value).Kind(), ", expected ", reflect.TypeOf(extism.NewPlugin).Kind())
-	// }
 
 	// check only one module field
 	if len(value.Modules) != 1 {
@@ -46,33 +37,17 @@ func TestLoadWASM(t *testing.T) {
 	plugin_hosts := sort.StringSlice(value.AllowedHosts)
 	op_hosts := sort.StringSlice(allowed1PHosts())
 
-	if len(plugin_hosts) != len(op_hosts) {
-		t.Fatal("Expected AllowedHosts is different from actual AllowedHosts")
-	}
+	assert.Equal(t, len(plugin_hosts), len(op_hosts))
 
 	for x := range plugin_hosts {
-		if plugin_hosts[x] != op_hosts[x] {
-			t.Fatal("Expected AllowedHosts is different from actual AllowedHosts")
-		}
-	}
-}
-
-func TestNewClientId(t *testing.T) {
-	ctx := context.TODO()
-	core, _ := NewExtismCore(ctx)
-	config1 := ClientConfig{} //TODO: make valid config
-	config2 := ClientConfig{} //TODO: make valid config
-	value1, _ := Core.InitClient(core, config1)
-	value2, _ := Core.InitClient(core, config2)
-	if *value1 == *value2 {
-		t.Fatalf("new client id not created")
+		assert.Equal(t, plugin_hosts[x], op_hosts[x])
 	}
 }
 
 func TestInvalidClientConfig(t *testing.T) {
 	ctx := context.TODO()
 	core, _ := NewExtismCore(ctx)
-	config := ClientConfig{} //TODO: make invalid config
+	config := NewDefaultConfig() // invalid without setting SAToken field
 	_, err := Core.InitClient(core, config)
 	require.Error(t, err)
 }
@@ -92,6 +67,7 @@ func TestInvalidInvoke(t *testing.T) {
 	// invalid client id
 	invocation1 := Invocation{uint64(invalid_clientId), valid_methodName, valid_params}
 	_, err1 := Core.Invoke(core, invocation1)
+	println(err1.Error())
 
 	require.Error(t, err1)
 
@@ -121,7 +97,5 @@ func TestReleaseClient(t *testing.T) {
 
 	// check next initialization has id zero
 	value, _ := Core.InitClient(core, config)
-	if *value != 0 {
-		t.Fatal("client id after memory release expected to be 0, is ", *value, " instead")
-	}
+	assert.Equal(t, 0, *value)
 }
