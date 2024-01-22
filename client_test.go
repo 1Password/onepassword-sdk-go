@@ -1,10 +1,9 @@
 package onepassword
 
 import (
-	"os"
 	"testing"
 
-	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNoToken(t *testing.T) {
@@ -13,84 +12,73 @@ func TestNoToken(t *testing.T) {
 	// missing token
 	_, err := clientFactory.NewClient(
 		WithIntegrationInfo(DefaultIntegrationName, DefaultIntegrationVersion))
-	require.Error(t, err)
-}
-
-func TestNoIntegrationNameOrVersion(t *testing.T) {
-	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
-
-	clientFactory := NewTestClientFactory()
-
-	_, err := clientFactory.NewClient(
-		WithServiceAccountToken(token),
-		WithIntegrationInfo("", ""))
-	require.Error(t, err)
+	assert.Equal(t, "cannot create a client without specifying a Service Account Token", err.Error())
 }
 
 func TestNoIntegrationName(t *testing.T) {
-	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
+	token := "my_token"
 
 	clientFactory := NewTestClientFactory()
 
 	_, err := clientFactory.NewClient(
 		WithServiceAccountToken(token),
 		WithIntegrationInfo("", DefaultIntegrationVersion))
-	require.Error(t, err)
+	assert.Equal(t, "cannot create a client without defining an app name and version. If you don't want to specify any, use the provided constants: 'DefaultIntegrationName', 'DefaultIntegrationVersion'", err.Error())
 }
 
 func TestInvalidIntegrationNameLength(t *testing.T) {
-	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
+	token := "my_token"
 
 	clientFactory := NewTestClientFactory()
 
 	_, err := clientFactory.NewClient(
 		WithServiceAccountToken(token),
 		WithIntegrationInfo("12345678901234567890123456789012345678901234567890", DefaultIntegrationVersion))
-	require.Error(t, err)
+	assert.Equal(t, "integration name can't be longer than 40 characters", err.Error())
 }
 
 func TestInvalidIntegrationNameCharacters(t *testing.T) {
-	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
+	token := "my_token"
 
 	clientFactory := NewTestClientFactory()
 
 	_, err := clientFactory.NewClient(
 		WithServiceAccountToken(token),
 		WithIntegrationInfo("$", DefaultIntegrationVersion))
-	require.Error(t, err)
+	assert.Equal(t, "integration name can only contain digits, letters and allowed symbols", err.Error())
 }
 
 func TestNoIntegrationVersion(t *testing.T) {
-	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
+	token := "my_token"
 
 	clientFactory := NewTestClientFactory()
 
 	_, err := clientFactory.NewClient(
 		WithServiceAccountToken(token),
 		WithIntegrationInfo(DefaultIntegrationName, ""))
-	require.Error(t, err)
+	assert.Equal(t, "cannot create a client without defining an app name and version. If you don't want to specify any, use the provided constants: 'DefaultIntegrationName', 'DefaultIntegrationVersion'", err.Error())
 }
 
 func TestInvalidIntegrationVersionLength(t *testing.T) {
-	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
+	token := "my_token"
 
 	clientFactory := NewTestClientFactory()
 
 	_, err := clientFactory.NewClient(
 		WithServiceAccountToken(token),
 		WithIntegrationInfo(DefaultIntegrationName, "12345678901234567890123456789012345678901234567890"))
-	require.Error(t, err)
+	assert.Equal(t, "integration version can't be longer than 20 characters", err.Error())
 }
 
 func TestInvalidIntegrationVersionCharacters(t *testing.T) {
-	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
+	token := "my_token"
 
 	clientFactory := NewTestClientFactory()
 
 	_, err := clientFactory.NewClient(
 		WithServiceAccountToken(token),
 		WithIntegrationInfo(DefaultIntegrationName, "$"))
-	require.Error(t, err)
+	assert.Equal(t, "integration version can only contain digits, letters and allowed symbols", err.Error())
 }
 
 func NewTestClientFactory() *ClientFactory {
