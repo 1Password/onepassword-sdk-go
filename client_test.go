@@ -2,8 +2,9 @@ package onepassword
 
 import (
 	"context"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func preTest() {
@@ -92,3 +93,7 @@ func (c TestCore) Invoke(invokeConfig Invocation) (*string, error) {
 }
 
 func (c TestCore) ReleaseClient(clientID uint64) {}
+
+func TestGarbageCollectorReleasesClient(t *testing.T) {
+
+}
