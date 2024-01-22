@@ -14,14 +14,9 @@ import (
 func TestSecretRetrievalFromTestAccount(t *testing.T) {
 	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
 
-	clientFactory, err := NewClientFactory(context.TODO())
-	if err != nil {
-		panic(err)
-	}
-
-	client, err := clientFactory.NewClient(
+	client, err := NewClient(context.TODO(),
 		WithServiceAccountToken(token),
-		WithIntegrationInfo("Integration_Test_Go_SDK", DefaultIntegrationVersion),
+		WithIntegrationInfo(DefaultIntegrationName, DefaultIntegrationVersion),
 	)
 	if err != nil {
 		panic(err)
