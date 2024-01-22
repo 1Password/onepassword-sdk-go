@@ -7,7 +7,7 @@ import (
 )
 
 func preTest() {
-	sharedCore = NewTestCore()
+	sharedCore = TestCore{}
 }
 
 func TestNoToken(t *testing.T) {
@@ -79,18 +79,10 @@ func TestInvalidIntegrationVersionCharacters(t *testing.T) {
 }
 
 type TestCore struct {
-	id           uint64
-	clientExists map[uint64]bool
-}
-
-func NewTestCore() *TestCore {
-	return &TestCore{clientExists: make(map[uint64]bool)}
 }
 
 func (c TestCore) InitClient(config ClientConfig) (*uint64, error) {
-	c.clientExists[c.id] = true
-	res := c.id
-	c.id++
+	res := uint64(0)
 	return &res, nil
 }
 
@@ -99,6 +91,4 @@ func (c TestCore) Invoke(invokeConfig Invocation) (*string, error) {
 	return &response, nil
 }
 
-func (c TestCore) ReleaseClient(clientID uint64) {
-	c.clientExists[clientID] = false
-}
+func (c TestCore) ReleaseClient(clientID uint64) {}
