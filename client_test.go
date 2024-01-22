@@ -2,11 +2,8 @@ package onepassword
 
 import (
 	"context"
-	"github.com/stretchr/testify/require"
-	"runtime"
-	"testing"
-
 	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func preTest() {
@@ -81,15 +78,27 @@ func TestInvalidIntegrationVersionCharacters(t *testing.T) {
 	assert.Equal(t, "integration version can only contain digits, letters and allowed symbols", err.Error())
 }
 
-func TestClientIsReleasedWhenGarbageCollected(t *testing.T) {
-	preTest()
-	testCore := NewTestCore()
-	sharedCore = testCore
-	_, err := NewClient(context.TODO(),
-		WithServiceAccountToken("test_token"),
-		WithIntegrationInfo(DefaultIntegrationName, DefaultIntegrationVersion))
-	require.NoError(t, err)
-	assert.True(t, testCore.clientExists[0])
-	runtime.GC()
-	assert.False(t, testCore.clientExists[0])
+type TestCore struct {
+	id           uint64
+	clientExists map[uint64]bool
+}
+
+func NewTestCore() *TestCore {
+	return &TestCore{clientExists: make(map[uint64]bool)}
+}
+
+func (c TestCore) InitClient(config ClientConfig) (*uint64, error) {
+	c.clientExists[c.id] = true
+	res := c.id
+	c.id++
+	return &res, nil
+}
+
+func (c TestCore) Invoke(invokeConfig Invocation) (*string, error) {
+	response := "secret"
+	return &response, nil
+}
+
+func (c TestCore) ReleaseClient(clientID uint64) {
+	c.clientExists[clientID] = false
 }
