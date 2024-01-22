@@ -16,10 +16,12 @@ func NewSecretsSource(id uint64, core Core) *SecretsSource {
 
 // Resolve returns the secret the provided reference points to.
 func (s SecretsSource) Resolve(reference string) (*string, error) {
-	res, err := s.core.Invoke(Invocation{
-		ClientID:         s.clientID,
-		MethodName:       "Resolve",
-		SerializedParams: reference,
+	res, err := s.core.Invoke(InvokeConfig{
+		ClientID: s.clientID,
+		Invocation: Invocation{
+			MethodName:       "Resolve",
+			SerializedParams: reference,
+		},
 	})
 	if err != nil {
 		return nil, err

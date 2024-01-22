@@ -24,7 +24,7 @@ const (
 
 type Core interface {
 	InitClient(config ClientConfig) (*uint64, error)
-	Invoke(invokeConfig Invocation) (*string, error)
+	Invoke(invokeConfig InvokeConfig) (*string, error)
 	ReleaseClient(clientID uint64)
 }
 
@@ -40,11 +40,16 @@ func NewExtismCore(ctx context.Context) (Core, error) {
 	return ExtismCore{plugin: p}, nil
 }
 
+// InvokeConfig specifies over the FFI on which client the specified method should be invoked on.
+type InvokeConfig struct {
+	ClientID   uint64     `json:"clientId"`
+	Invocation Invocation `json:"invocation"`
+}
+
 // Invocation holds the information required for invoking SDK functionality.
 type Invocation struct {
-	ClientID         uint64 `json:"client"`
 	MethodName       string `json:"name"`
-	SerializedParams string `json:"data"`
+	SerializedParams string `json:"parameters"`
 }
 
 // InitClient creates a client instance in the current core module and returns its unique ID.
@@ -67,7 +72,7 @@ func (c ExtismCore) InitClient(config ClientConfig) (*uint64, error) {
 }
 
 // Invoke calls specified business logic from core
-func (c ExtismCore) Invoke(invokeConfig Invocation) (*string, error) {
+func (c ExtismCore) Invoke(invokeConfig InvokeConfig) (*string, error) {
 	input, err := json.Marshal(invokeConfig)
 	if err != nil {
 		return nil, err
