@@ -22,14 +22,10 @@ func TestSecretRetrievalFromTestAccount(t *testing.T) {
 		onepassword.WithServiceAccountToken(token),
 		onepassword.WithIntegrationInfo("Integration_Test_Go_SDK", onepassword.DefaultIntegrationVersion),
 	)
-	if err != nil {
-		panic(err)
-	}
+	require.NoError(t, err)
 
 	secret, err := client.Secrets.Resolve("op://tfctuk7dxnrwjwqqhwatuhy3gi/dqtyg7dswx5kvpcxwv32psdbse/password")
-	if err != nil {
-		panic(err)
-	}
+	require.NoError(t, err)
 
 	assert.Equal(t, "test_password", *secret)
 }
@@ -55,4 +51,52 @@ func TestInitClientIncrement(t *testing.T) {
 	assert.Equal(t, uint64(0), *value1)
 	assert.Equal(t, uint64(1), *value2)
 	assert.Equal(t, uint64(2), *value3)
+}
+
+func TestInvalidInvoke(t *testing.T) {
+
+	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
+
+	ctx := context.TODO()
+	core, _ := onepassword.NewExtismCore(ctx)
+	config := onepassword.NewDefaultConfig()
+	config.SAToken = token
+	config.IntegrationName = "name"
+	config.IntegrationVersion = "version"
+
+	value, _ := core.InitClient(config)
+
+	client, err := onepassword.NewClient(context.TODO(),
+		onepassword.WithServiceAccountToken(token),
+		onepassword.WithIntegrationInfo("Integration_Test_Go_SDK", onepassword.DefaultIntegrationVersion),
+	)
+	require.NoError(t, err)
+
+	secret, err := client.Secrets.Resolve("op://tfctuk7dxnrwjwqqhwatuhy3gi/dqtyg7dswx5kvpcxwv32psdbse/password")
+	require.NoError(t, err)
+
+	validClientID := *value
+	validMethodName := "Resolve"
+	validParams := *secret
+	invalidClientID := -1
+	invalidMethodName := ""
+	invalidParams := ""
+
+	// invalid client id
+	invocation1 := onepassword.Invocation{ClientID: uint64(invalidClientID), MethodName: validMethodName, SerializedParams: validParams}
+	_, err1 := core.Invoke(invocation1)
+
+	assert.Equal(t, "wrong method", err1.Error())
+
+	// invalid method name
+	invocation2 := onepassword.Invocation{ClientID: uint64(validClientID), MethodName: invalidMethodName, SerializedParams: validParams}
+	_, err2 := core.Invoke(invocation2)
+
+	assert.Equal(t, "wrong method", err2.Error())
+
+	// invalid serialized params
+	invocation3 := onepassword.Invocation{ClientID: uint64(validClientID), MethodName: validMethodName, SerializedParams: invalidParams}
+	_, err3 := core.Invoke(invocation3)
+
+	assert.Equal(t, "wrong method", err3.Error())
 }
