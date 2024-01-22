@@ -18,12 +18,7 @@ import (
 func TestSecretRetrievalFromTestAccount(t *testing.T) {
 	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
 
-	clientFactory, err := onepassword.NewClientFactory(context.TODO())
-	if err != nil {
-		panic(err)
-	}
-
-	client, err := clientFactory.NewClient(
+	client, err := onepassword.NewClient(context.TODO(),
 		onepassword.WithServiceAccountToken(token),
 		onepassword.WithIntegrationInfo("Integration_Test_Go_SDK", onepassword.DefaultIntegrationVersion),
 	)
@@ -60,26 +55,4 @@ func TestInitClientIncrement(t *testing.T) {
 	assert.Equal(t, uint64(0), *value1)
 	assert.Equal(t, uint64(1), *value2)
 	assert.Equal(t, uint64(2), *value3)
-}
-
-func TestReleaseClient(t *testing.T) {
-	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
-
-	// ensure latest id is not zero
-	ctx := context.TODO()
-	core, _ := onepassword.NewExtismCore(ctx)
-	config := onepassword.NewDefaultConfig()
-	config.SAToken = token
-	config.IntegrationName = "name"
-	config.IntegrationVersion = "version"
-	_, err := core.InitClient(config)
-	require.NoError(t, err)
-	latest, _ := core.InitClient(config)
-
-	// release memory
-	core.ReleaseClient(*latest)
-
-	// check next initialization has id zero
-	value, _ := core.InitClient(config)
-	assert.Equal(t, uint64(0), *value)
 }

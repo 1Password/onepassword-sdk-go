@@ -131,3 +131,27 @@ func allowed1PHosts() []string {
 		"*.b5local.com",
 	}
 }
+
+type TestCore struct {
+	id           uint64
+	clientExists map[uint64]bool
+}
+
+func NewTestCore() *TestCore {
+	return &TestCore{clientExists: make(map[uint64]bool)}
+}
+
+func (c TestCore) InitClient(config ClientConfig) (*uint64, error) {
+	c.clientExists[c.id] = true
+	c.id++
+	return &c.id, nil
+}
+
+func (c TestCore) Invoke(invokeConfig Invocation) (*string, error) {
+	response := "secret"
+	return &response, nil
+}
+
+func (c TestCore) ReleaseClient(clientID uint64) {
+	c.clientExists[clientID] = false
+}
