@@ -12,12 +12,7 @@ import (
 func main() {
 	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
 
-	clientFactory, err := onepassword.NewClientFactory(context.TODO())
-	if err != nil {
-		panic(err)
-	}
-
-	client, err := clientFactory.NewClient(
+	client, err := onepassword.NewClient(context.TODO(),
 		onepassword.WithServiceAccountToken(token),
 		onepassword.WithIntegrationInfo(onepassword.DefaultIntegrationName, onepassword.DefaultIntegrationVersion),
 	)

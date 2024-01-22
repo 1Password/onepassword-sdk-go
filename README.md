@@ -33,13 +33,10 @@ import onepassword "github.com/1password/1password-go-sdk"
 func main() {
     token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
 	
-    clientFactory, err := onepassword.NewClientFactory(context.TODO())
-    if err != nil {
-        // handle err
-    }
-    client, err := clientFactory.NewClient(
-        WithServiceAccountToken(token),
-        WithIntegrationInfo("<your app name>", "<your app version>"), )
+    client, err := onepassword.NewClient(
+        context.TODO()
+        onepassword.WithServiceAccountToken(token),
+        onepassword.WithIntegrationInfo("<your app name>", "<your app version>"), )
     if err != nil {
         // handle err
     }

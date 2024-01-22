@@ -19,8 +19,10 @@ const (
 	DefaultRequestLibrary = "net/http"
 )
 
-// `OpClient` represents an instance of the 1Password Go SDK client.
-type OpClient struct {
+var sharedCore Core
+
+// Client represents an instance of the 1Password Go SDK client.
+type Client struct {
 	config  ClientConfig
 	Secrets SecretsAPI
 }
@@ -53,22 +55,17 @@ func NewDefaultConfig() ClientConfig {
 	}
 }
 
-// The `ClientFactory` creates 1Password Go SDK clients based on the same instance of a WASM module.
-type ClientFactory struct {
-	core Core
-}
-
-func NewClientFactory(ctx context.Context) (*ClientFactory, error) {
-	extismCore, err := NewExtismCore(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return &ClientFactory{core: extismCore}, nil
-}
-
 // NewClient returns a 1Password Go SDK client using the provided ClientOption list.
-func (cf ClientFactory) NewClient(opts ...ClientOption) (*OpClient, error) {
-	client := OpClient{
+func NewClient(ctx context.Context, opts ...ClientOption) (*Client, error) {
+	if sharedCore == nil {
+		core, err := NewExtismCore(ctx)
+		if err != nil {
+			return nil, err
+		}
+		sharedCore = core
+	}
+
+	client := Client{
 		config: NewDefaultConfig(),
 	}
 
@@ -86,38 +83,37 @@ func (cf ClientFactory) NewClient(opts ...ClientOption) (*OpClient, error) {
 	if len(client.config.IntegrationVersion) == 0 || len(client.config.IntegrationName) == 0 {
 		return nil, errors.New("cannot create a client without defining an app name and version. If you don't want to specify any, use the provided constants: 'DefaultIntegrationName', 'DefaultIntegrationVersion'")
 	}
-
-	clientID, err := cf.core.InitClient(client.config)
+	clientID, err := sharedCore.InitClient(client.config)
 	if err != nil {
 		return nil, fmt.Errorf("error initializing client: %w", err)
 	}
 
-	client.Secrets = NewSecretsSource(*clientID, cf.core)
+	client.Secrets = NewSecretsSource(*clientID, sharedCore)
 
-	runtime.SetFinalizer(&client, func(f *OpClient) {
-		cf.core.ReleaseClient(*clientID)
+	runtime.SetFinalizer(&client, func(f *Client) {
+		sharedCore.ReleaseClient(*clientID)
 	})
 	return &client, nil
 }
 
-type ClientOption func(config *OpClient) error
+type ClientOption func(client *Client) error
 
-// `WithServiceAccountToken` specifies the [1Password Service Account](https://developer.1password.com/docs/service-accounts) token to use to authenticate the SDK client.
+// WithServiceAccountToken specifies the [1Password Service Account](https://developer.1password.com/docs/service-accounts) token to use to authenticate the SDK client.
 func WithServiceAccountToken(token string) ClientOption {
-	return func(c *OpClient) error {
+	return func(c *Client) error {
 		c.config.SAToken = token
 		return nil
 	}
 }
 
-// `WithIntegrationInfo` specifies the name and version of the integration built using the 1Password Go SDK. If you don't know which name and version to use, use `DefaultIntegrationName` and `DefaultIntegrationVersion`, respectively.
+// WithIntegrationInfo specifies the name and version of the integration built using the 1Password Go SDK. If you don't know which name and version to use, use `DefaultIntegrationName` and `DefaultIntegrationVersion`, respectively.
 func WithIntegrationInfo(name string, version string) ClientOption {
 	const (
 		integrationNameMaxLen    = 40
 		integrationVersionMaxLen = 20
 		allowedSymbols           = "_- .,"
 	)
-	return func(c *OpClient) error {
+	return func(c *Client) error {
 		if len(name) > integrationNameMaxLen {
 			return fmt.Errorf("integration name can't be longer than 40 characters")
 		}
