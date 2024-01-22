@@ -4,6 +4,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/tetratelabs/wazero/api"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestRandomFillFunc(t *testing.T) {
@@ -27,7 +29,5 @@ func TestImportedFunctions(t *testing.T) {
 	value := ImportedFunctions()
 
 	// check the returned function name is "random_fill_imported"
-	if value[0].Name != "random_fill_imported" {
-		t.Fatal("ImportedFunctions() expected to return function 'random_fill_imported', returns ", value[0].Name, " instead")
-	}
+	assert.Equal(t, "random_fill_imported", value[0].Name)
 }

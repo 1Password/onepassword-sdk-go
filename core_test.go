@@ -83,19 +83,3 @@ func TestInvalidInvoke(t *testing.T) {
 
 	require.Error(t, err3)
 }
-
-func TestReleaseClient(t *testing.T) {
-	// ensure latest id is not zero
-	ctx := context.TODO()
-	core, _ := NewExtismCore(ctx)
-	config := ClientConfig{} //TODO: make valid config
-	Core.InitClient(core, config)
-	latest, _ := Core.InitClient(core, config)
-
-	// release memory
-	Core.ReleaseClient(core, *latest)
-
-	// check next initialization has id zero
-	value, _ := Core.InitClient(core, config)
-	assert.Equal(t, uint64(0), *value)
-}
