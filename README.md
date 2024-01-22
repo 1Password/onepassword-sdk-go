@@ -47,4 +47,3 @@ func main() {
     // do something with the secret
 }
 ```
-To pass the service account token as an environment variable (`OP_SERVICE_ACCOUNT_TOKEN`), you can also use the `onepassword.NewServiceAccountClientFromEnv()` function.
