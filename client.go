@@ -89,7 +89,6 @@ func NewClient(ctx context.Context, opts ...ClientOption) (*Client, error) {
 	}
 
 	client.Secrets = NewSecretsSource(*clientID, sharedCore)
-
 	runtime.SetFinalizer(&client, func(f *Client) {
 		sharedCore.ReleaseClient(*clientID)
 	})
