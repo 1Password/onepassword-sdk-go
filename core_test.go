@@ -97,5 +97,5 @@ func TestReleaseClient(t *testing.T) {
 
 	// check next initialization has id zero
 	value, _ := Core.InitClient(core, config)
-	assert.Equal(t, 0, *value)
+	assert.Equal(t, uint64(0), *value)
 }
