@@ -2,9 +2,10 @@ package integration_tests
 
 import (
 	"context"
-	onepassword "github.com/1password/1password-go-sdk"
 	"os"
 	"testing"
+
+	onepassword "github.com/1password/1password-go-sdk"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

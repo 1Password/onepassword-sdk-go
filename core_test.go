@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestLoadWASM(t *testing.T) {
@@ -14,9 +13,8 @@ func TestLoadWASM(t *testing.T) {
 	value, _ := loadWASM(ctx)
 
 	// check only one module field
-	if len(value.Modules) != 1 {
-		t.Fatal("1 extism plugin module expected, ", len(value.Modules), " instead")
-	}
+	assert.Equal(t, 1, len(value.Modules))
+
 	// check ExportedFunctionsDefinitions names match (init_client, invoke, release_client)
 	list := [3]string{"init_client", "invoke", "release_client"}
 
@@ -29,18 +27,16 @@ func TestLoadWASM(t *testing.T) {
 		}
 	}
 
-	if count != len(list) {
-		t.Fatal("ExportedFunctionDefinitions expected ", len(list), " functions, ", count, " were counted instead")
-	}
+	assert.Equal(t, 3, count)
 
 	// check AllowedHosts field matches allowed1PHosts
-	plugin_hosts := sort.StringSlice(value.AllowedHosts)
-	op_hosts := sort.StringSlice(allowed1PHosts())
+	pluginHosts := sort.StringSlice(value.AllowedHosts)
+	opHosts := sort.StringSlice(allowed1PHosts())
 
-	assert.Equal(t, len(plugin_hosts), len(op_hosts))
+	assert.Equal(t, len(pluginHosts), len(opHosts))
 
-	for x := range plugin_hosts {
-		assert.Equal(t, plugin_hosts[x], op_hosts[x])
+	for x := range pluginHosts {
+		assert.Equal(t, pluginHosts[x], opHosts[x])
 	}
 }
 
@@ -49,37 +45,37 @@ func TestInvalidClientConfig(t *testing.T) {
 	core, _ := NewExtismCore(ctx)
 	config := NewDefaultConfig() // invalid without setting SAToken field
 	_, err := Core.InitClient(core, config)
-	require.Error(t, err)
+	assert.Equal(t, "invalid service account token", err.Error())
 }
 
 func TestInvalidInvoke(t *testing.T) {
 
-	valid_clientId := 0
-	valid_methodName := ""
-	valid_params := ""
-	invalid_clientId := 0
-	invalid_methodName := ""
-	invalid_params := ""
+	validClientID := 0
+	validMethodName := ""
+	validParams := ""
+	invalidClientID := 0
+	invalidMethodName := ""
+	invalidParams := ""
 
 	ctx := context.TODO()
 	core, _ := NewExtismCore(ctx)
 
 	// invalid client id
-	invocation1 := Invocation{uint64(invalid_clientId), valid_methodName, valid_params}
-	_, err1 := Core.Invoke(core, invocation1)
+	invocation1 := Invocation{uint64(invalidClientID), validMethodName, validParams}
+	_, err1 := core.Invoke(invocation1)
 	println(err1.Error())
 
-	require.Error(t, err1)
+	assert.Equal(t, "wrong method", err1.Error())
 
 	// invalid method name
-	invocation2 := Invocation{uint64(valid_clientId), invalid_methodName, valid_params}
-	_, err2 := Core.Invoke(core, invocation2)
+	invocation2 := Invocation{uint64(validClientID), invalidMethodName, validParams}
+	_, err2 := core.Invoke(invocation2)
 
-	require.Error(t, err2)
+	assert.Equal(t, "wrong method", err2.Error())
 
 	// serialized params
-	invocation3 := Invocation{uint64(valid_clientId), valid_methodName, invalid_params}
-	_, err3 := Core.Invoke(core, invocation3)
+	invocation3 := Invocation{uint64(validClientID), validMethodName, invalidParams}
+	_, err3 := core.Invoke(invocation3)
 
-	require.Error(t, err3)
+	assert.Equal(t, "wrong method", err3.Error())
 }
