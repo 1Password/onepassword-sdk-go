@@ -159,3 +159,28 @@ func TestInvalidIntegrationVersionCharacters(t *testing.T) {
 		WithIntegrationInfo(DefaultIntegrationName, "$"))
 	require.Error(t, err)
 }
+
+//
+// end of invalid NewClient Calls
+//
+
+func TestReleaseClient(t *testing.T) {
+	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
+
+	// ensure latest id is not zero
+	ctx := context.TODO()
+	core, _ := NewExtismCore(ctx)
+	config := NewDefaultConfig()
+	config.SAToken = token
+	config.IntegrationName = "name"
+	config.IntegrationVersion = "version"
+	Core.InitClient(core, config)
+	latest, _ := Core.InitClient(core, config)
+
+	// release memory
+	Core.ReleaseClient(core, *latest)
+
+	// check next initialization has id zero
+	value, _ := Core.InitClient(core, config)
+	assert.Equal(t, uint64(0), *value)
+}
