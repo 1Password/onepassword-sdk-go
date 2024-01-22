@@ -1,11 +1,10 @@
 package onepassword
 
 import (
-	"github.com/stretchr/testify/assert"
-	"github.com/tetratelabs/wazero/api"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/tetratelabs/wazero/api"
 )
 
 func TestRandomFillFunc(t *testing.T) {
