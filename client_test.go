@@ -87,7 +87,7 @@ func (c TestCore) InitClient(config ClientConfig) (*uint64, error) {
 	return &res, nil
 }
 
-func (c TestCore) Invoke(invokeConfig Invocation) (*string, error) {
+func (c TestCore) Invoke(invokeConfig InvokeConfig) (*string, error) {
 	response := "secret"
 	return &response, nil
 }

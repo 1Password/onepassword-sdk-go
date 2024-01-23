@@ -75,19 +75,36 @@ func TestInvalidInvoke(t *testing.T) {
 	invalidParams := ""
 
 	// invalid client id
-	invocation1 := onepassword.Invocation{ClientID: uint64(invalidClientID), MethodName: validMethodName, SerializedParams: validParams}
+	invocation1 := onepassword.InvokeConfig{
+		ClientID: uint64(invalidClientID),
+		Invocation: onepassword.Invocation{
+			MethodName:       validMethodName,
+			SerializedParams: validParams,
+		},
+	}
 	_, err1 := core.Invoke(invocation1)
 
 	assert.Equal(t, "invalid client id", err1.Error())
 
 	// invalid method name
-	invocation2 := onepassword.Invocation{ClientID: uint64(validClientID), MethodName: invalidMethodName, SerializedParams: validParams}
+	invocation2 := onepassword.InvokeConfig{
+		ClientID: uint64(validClientID),
+		Invocation: onepassword.Invocation{
+			MethodName:       invalidMethodName,
+			SerializedParams: invalidParams,
+		}}
 	_, err2 := core.Invoke(invocation2)
 
 	assert.Equal(t, "wrong method", err2.Error())
 
 	// invalid serialized params
-	invocation3 := onepassword.Invocation{ClientID: uint64(validClientID), MethodName: validMethodName, SerializedParams: invalidParams}
+	invocation3 := onepassword.InvokeConfig{
+		ClientID: uint64(validClientID),
+		Invocation: onepassword.Invocation{
+			MethodName:       validMethodName,
+			SerializedParams: invalidParams,
+		},
+	}
 	_, err3 := core.Invoke(invocation3)
 
 	assert.Equal(t, "secret reference is not prefixed with \"op://\"", err3.Error())
