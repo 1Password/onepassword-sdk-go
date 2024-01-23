@@ -80,6 +80,8 @@ func TestInvalidIntegrationVersionCharacters(t *testing.T) {
 }
 
 type TestCore struct {
+	id           uint64
+	clientExists map[uint64]bool
 }
 
 func (c TestCore) InitClient(config ClientConfig) (*uint64, error) {
@@ -94,6 +96,6 @@ func (c TestCore) Invoke(invokeConfig Invocation) (*string, error) {
 
 func (c TestCore) ReleaseClient(clientID uint64) {}
 
-func TestGarbageCollectorReleasesClient(t *testing.T) {
-
+func NewTestCore() *TestCore {
+	return &TestCore{clientExists: make(map[uint64]bool)}
 }
