@@ -1,8 +1,14 @@
-package onepassword
+package ffi
 
 import (
 	"context"
 	"runtime"
+)
+
+const (
+	SDKSemverVersion      = "0010001" // v0.1.0
+	SDKLanguage           = "Go"
+	DefaultRequestLibrary = "net/http"
 )
 
 type Core interface {

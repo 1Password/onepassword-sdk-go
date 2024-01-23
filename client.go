@@ -4,33 +4,30 @@ import (
 	"context"
 	"fmt"
 	"runtime"
+
+	"github.com/1password/1password-go-sdk/ffi"
 )
 
 const (
-	SDKSemverVersion = "0010001" // v0.1.0
-
 	DefaultIntegrationName    = "Unknown"
 	DefaultIntegrationVersion = "Unknown"
-
-	SDKLanguage           = "Go"
-	DefaultRequestLibrary = "net/http"
 )
 
 // Client represents an instance of the 1Password Go SDK client.
 type Client struct {
-	config  ClientConfig
+	config  ffi.ClientConfig
 	Secrets SecretsAPI
 }
 
 // NewClient returns a 1Password Go SDK client using the provided ClientOption list.
 func NewClient(sharedContext context.Context, opts ...ClientOption) (*Client, error) {
-	core := GetSharedCore(sharedContext)
+	core := ffi.GetSharedCore(sharedContext)
 	return createClient(core, opts...)
 }
 
-func createClient(core Core, opts ...ClientOption) (*Client, error) {
+func createClient(core ffi.Core, opts ...ClientOption) (*Client, error) {
 	client := Client{
-		config: NewDefaultConfig(),
+		config: ffi.NewDefaultConfig(),
 	}
 
 	for _, opt := range opts {
@@ -61,7 +58,7 @@ func createClient(core Core, opts ...ClientOption) (*Client, error) {
 // InnerClient represents the sdk-core client on which calls will be made.
 type InnerClient struct {
 	id   uint64
-	core Core
+	core ffi.Core
 }
 
 type ClientOption func(client *Client) error
