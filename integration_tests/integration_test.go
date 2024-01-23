@@ -64,8 +64,6 @@ func TestInvalidInvoke(t *testing.T) {
 	config.IntegrationName = "name"
 	config.IntegrationVersion = "version"
 
-	value, _ := core.InitClient(config)
-
 	client, err := onepassword.NewClient(context.TODO(),
 		onepassword.WithServiceAccountToken(token),
 		onepassword.WithIntegrationInfo("Integration_Test_Go_SDK", onepassword.DefaultIntegrationVersion),
@@ -75,10 +73,10 @@ func TestInvalidInvoke(t *testing.T) {
 	secret, err := client.Secrets.Resolve("op://tfctuk7dxnrwjwqqhwatuhy3gi/dqtyg7dswx5kvpcxwv32psdbse/password")
 	require.NoError(t, err)
 
-	validClientID := *value
+	validClientID := 0
 	validMethodName := "Resolve"
 	validParams := *secret
-	invalidClientID := -1
+	invalidClientID := 1
 	invalidMethodName := ""
 	invalidParams := ""
 
