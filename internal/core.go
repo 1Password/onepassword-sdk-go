@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"context"
 	"runtime"
 )
 
@@ -56,21 +55,3 @@ type Invocation struct {
 	MethodName       string `json:"name"`
 	SerializedParams string `json:"parameters"`
 }
-
-// SharedCore implements Core in such a way that all created client instances share the same core resources.
-type SharedCore struct {
-	sharedContext context.Context
-}
-
-// GetSharedCore initializes the shared core once and re-uses it on subsequent calls.
-func GetSharedCore(ctx context.Context) *SharedCore {
-	return &SharedCore{ctx}
-}
-
-func (ec SharedCore) InitClient(config ClientConfig) (*uint64, error) {
-	return nil, nil
-}
-func (ec SharedCore) Invoke(invokeConfig InvokeConfig) (*string, error) {
-	return nil, nil
-}
-func (ec SharedCore) ReleaseClient(clientID uint64) {}
