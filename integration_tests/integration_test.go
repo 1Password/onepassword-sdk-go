@@ -3,6 +3,7 @@ package integration_tests
 import (
 	"context"
 	"os"
+	"runtime"
 	"testing"
 
 	onepassword "github.com/1password/1password-go-sdk"
@@ -16,8 +17,11 @@ import (
 // Secret references and expected values are matching existing secrets in the test account.
 
 func TestSecretRetrievalFromTestAccount(t *testing.T) {
-	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
+	t.Cleanup(func() {
+		internal.ReleaseCore()
+	})
 
+	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
 	client, err := onepassword.NewClient(context.TODO(),
 		onepassword.WithServiceAccountToken(token),
 		onepassword.WithIntegrationInfo("Integration_Test_Go_SDK", onepassword.DefaultIntegrationVersion),
@@ -31,17 +35,16 @@ func TestSecretRetrievalFromTestAccount(t *testing.T) {
 }
 
 func TestRetrivalWithMultipleClients(t *testing.T) {
+	t.Cleanup(func() {
+		internal.ReleaseCore()
+	})
 	TestSecretRetrievalFromTestAccount(t)
 	TestSecretRetrievalFromTestAccount(t)
 	TestSecretRetrievalFromTestAccount(t)
-}
 
-func TestMultipleClientsIDs(t *testing.T) {
-
+	// keep creating clients to check what happens
 	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
-
-	ctx := context.TODO()
-	core, _ := internal.GetSharedCore(ctx)
+	core, _ := internal.GetSharedCore(context.TODO())
 	config := internal.NewDefaultConfig()
 	config.SAToken = token
 	config.IntegrationName = "name"
@@ -54,12 +57,15 @@ func TestMultipleClientsIDs(t *testing.T) {
 	value3, err3 := core.InitClient(config)
 	require.NoError(t, err3)
 
-	assert.Equal(t, uint64(0), *value1)
-	assert.Equal(t, uint64(1), *value2)
-	assert.Equal(t, uint64(2), *value3)
+	assert.Equal(t, uint64(4), *value1)
+	assert.Equal(t, uint64(5), *value2)
+	assert.Equal(t, uint64(6), *value3)
 }
 
 func TestInvalidInvoke(t *testing.T) {
+	t.Cleanup(func() {
+		internal.ReleaseCore()
+	})
 	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
 
 	core, err := internal.GetSharedCore(context.TODO())
@@ -73,16 +79,16 @@ func TestInvalidInvoke(t *testing.T) {
 	_, err = core.InitClient(config)
 	require.NoError(t, err)
 
-	validClientID := 0
+	validClientID := uint64(0)
 	validMethodName := "Resolve"
 	validParams := "op://tfctuk7dxnrwjwqqhwatuhy3gi/dqtyg7dswx5kvpcxwv32psdbse/password"
-	invalidClientID := 1
+	invalidClientID := uint64(1)
 	invalidMethodName := "InvalidName"
 	invalidParams := ""
 
 	// invalid client id
 	invocation1 := internal.InvokeConfig{
-		ClientID: uint64(invalidClientID),
+		ClientID: invalidClientID,
 		Invocation: internal.Invocation{
 			MethodName:       validMethodName,
 			SerializedParams: validParams,
@@ -93,7 +99,7 @@ func TestInvalidInvoke(t *testing.T) {
 
 	// invalid method name
 	invocation2 := internal.InvokeConfig{
-		ClientID: uint64(validClientID),
+		ClientID: validClientID,
 		Invocation: internal.Invocation{
 			MethodName:       invalidMethodName,
 			SerializedParams: invalidParams,
@@ -103,7 +109,7 @@ func TestInvalidInvoke(t *testing.T) {
 
 	// invalid serialized params
 	invocation3 := internal.InvokeConfig{
-		ClientID: uint64(validClientID),
+		ClientID: validClientID,
 		Invocation: internal.Invocation{
 			MethodName:       validMethodName,
 			SerializedParams: invalidParams,
@@ -111,4 +117,22 @@ func TestInvalidInvoke(t *testing.T) {
 	}
 	_, err3 := core.Invoke(invocation3)
 	assert.EqualError(t, err3, "error resolving secret reference: secret reference is not prefixed with \"op://\"")
+}
+
+func TestClientReleasedSuccessfully(t *testing.T) {
+	TestSecretRetrievalFromTestAccount(t)
+	runtime.GC()
+
+	core, err := internal.GetSharedCore(context.TODO())
+	require.NoError(t, err)
+
+	invocation := internal.InvokeConfig{
+		ClientID: 0, // this client id should be invalid because the client has been cleaned up by GC
+		Invocation: internal.Invocation{
+			MethodName:       "Resolve",
+			SerializedParams: "SecretRef",
+		},
+	}
+	_, err = core.Invoke(invocation)
+	assert.EqualError(t, err, "internal error: invalid client id")
 }

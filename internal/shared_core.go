@@ -33,6 +33,10 @@ func GetSharedCore(ctx context.Context) (*SharedCore, error) {
 	return core, nil
 }
 
+func ReleaseCore() {
+	core = nil
+}
+
 // SharedCore implements Core in such a way that all created client instances share the same core resources.
 type SharedCore struct {
 	plugin *extism.Plugin
