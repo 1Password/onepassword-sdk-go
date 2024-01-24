@@ -57,9 +57,9 @@ func TestRetrivalWithMultipleClients(t *testing.T) {
 	value3, err3 := core.InitClient(config)
 	require.NoError(t, err3)
 
-	assert.Equal(t, uint64(4), *value1)
-	assert.Equal(t, uint64(5), *value2)
-	assert.Equal(t, uint64(6), *value3)
+	assert.Equal(t, uint64(3), *value1)
+	assert.Equal(t, uint64(4), *value2)
+	assert.Equal(t, uint64(5), *value3)
 }
 
 func TestInvalidInvoke(t *testing.T) {
@@ -105,7 +105,7 @@ func TestInvalidInvoke(t *testing.T) {
 			SerializedParams: invalidParams,
 		}}
 	_, err2 := core.Invoke(invocation2)
-	assert.EqualError(t, err2, "unknown variant `InvalidName`, expected `Resolve` at line 1 column 37")
+	assert.EqualError(t, err2, "unknown variant `InvalidName`, expected `Resolve` at line 1 column 48")
 
 	// invalid serialized params
 	invocation3 := internal.InvokeConfig{
