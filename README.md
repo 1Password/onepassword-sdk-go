@@ -28,18 +28,27 @@ go get github.com/1password/1password-go-sdk
 5. Use the SDK in your project:
 
 ```go
-import onepassword "github.com/1password/1password-go-sdk"
+import (
+    "context"
+    "os"
+
+    onepassword "github.com/1password/1password-go-sdk"
+)
 
 func main() {
-	client, err := onepassword.NewServiceAccountClient("<your-service-account-token>")
-	if err != nil {
-		// handle err
-	}
-	secret, err := client.Resolve("op://vault/item/field")
-	if err != nil {
-		// handle err
-	}
-	// do something with the secret
+    token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
+	
+    client, err := onepassword.NewClient(
+        context.TODO()
+        onepassword.WithServiceAccountToken(token),
+        onepassword.WithIntegrationInfo("<your app name>", "<your app version>"), )
+    if err != nil {
+        // handle err
+    }
+    secret, err := client.Resolve("op://vault/item/field")
+    if err != nil {
+        // handle err
+    }
+    // do something with the secret
 }
 ```
-For passing the service account token as an environment variable (`OP_SERVICE_ACCOUNT_TOKEN`), you can also leverage the `onepassword.NewServiceAccountClientFromEnv()` function.
