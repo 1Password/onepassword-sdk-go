@@ -21,7 +21,7 @@ func randomFillImportedFunc() extism.HostFunction {
 			return p.WriteBytes(b)
 		})
 	}, []api.ValueType{api.ValueTypeI32}, []api.ValueType{api.ValueTypeI64})
-	randomFillImported.SetNamespace("op-random")
+	randomFillImported.SetNamespace("op-extism-core")
 
 	return randomFillImported
 }
