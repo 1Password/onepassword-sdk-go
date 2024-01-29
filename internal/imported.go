@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/rand"
 	"fmt"
+	"time"
 
 	extism "github.com/extism/go-sdk"
 	"github.com/tetratelabs/wazero/api"
@@ -11,7 +12,7 @@ import (
 
 // ImportedFunctions returns all functions 1Password SDK core must import.
 func ImportedFunctions() []extism.HostFunction {
-	return []extism.HostFunction{randomFillImportedFunc()}
+	return []extism.HostFunction{randomFillImportedFunc(), getTimeFunc()}
 }
 
 // randomFillImportedFunc returns an Extism Function for generating random byte sequence of a given length that will be imported into the WASM core.
@@ -24,6 +25,16 @@ func randomFillImportedFunc() extism.HostFunction {
 	randomFillImported.SetNamespace("op-extism-core")
 
 	return randomFillImported
+}
+
+// getTimeFunc returns an Extism Function for retrieving the current UNIX time.
+func getTimeFunc() extism.HostFunction {
+	getTimeFunc := extism.NewHostFunctionWithStack("unix_time_milliseconds_imported", func(ctx context.Context, p *extism.CurrentPlugin, stack []uint64) {
+		stack[0] = uint64(time.Now().UnixMilli())
+	}, []api.ValueType{}, []api.ValueType{api.ValueTypeI64})
+	getTimeFunc.SetNamespace("op-now")
+
+	return getTimeFunc
 }
 
 // randomFill writes random bytes to the WASM plugin's memory using crypto.rand and pushes the pointer to that memory on the stack.
