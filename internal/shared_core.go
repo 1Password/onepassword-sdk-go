@@ -20,7 +20,7 @@ const (
 
 var core *SharedCore
 
-// GetSharedCore initializes the shared core once and re-uses it on subsequent calls.
+// GetSharedCore initializes the shared core once and returns the already existing one on subsequent calls.
 func GetSharedCore(ctx context.Context) (*SharedCore, error) {
 	if core == nil {
 		p, err := loadWASM(ctx)
@@ -49,6 +49,7 @@ func (c SharedCore) InitClient(config ClientConfig) (*uint64, error) {
 		return nil, err
 	}
 
+	// first return parameter is a sys.Exit code, which we don't need since the error is fully recoverable
 	_, res, err := c.plugin.Call(initClientFuncName, marshaledConfig)
 	if err != nil {
 		return nil, err
@@ -81,11 +82,11 @@ func (c SharedCore) Invoke(invokeConfig InvokeConfig) (*string, error) {
 func (c SharedCore) ReleaseClient(clientID uint64) {
 	marshaledClientID, err := json.Marshal(clientID)
 	if err != nil {
-		c.plugin.Log(extism.LogLevelError, fmt.Sprintf("memory couldn't be released: %s", err.Error()))
+		c.plugin.Log(extism.LogLevelWarn, fmt.Sprintf("memory couldn't be released: %s", err.Error()))
 	}
 	_, _, err = c.plugin.Call(releaseClientFuncName, marshaledClientID)
 	if err != nil {
-		c.plugin.Log(extism.LogLevelError, fmt.Sprintf("memory couldn't be released: %s", err.Error()))
+		c.plugin.Log(extism.LogLevelWarn, fmt.Sprint("memory couldn't be released"))
 	}
 }
 
