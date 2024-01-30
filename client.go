@@ -21,7 +21,10 @@ type Client struct {
 
 // NewClient returns a 1Password Go SDK client using the provided ClientOption list.
 func NewClient(sharedContext context.Context, opts ...ClientOption) (*Client, error) {
-	core := internal.GetSharedCore(sharedContext)
+	core, err := internal.GetSharedCore(sharedContext)
+	if err != nil {
+		return nil, err
+	}
 	return createClient(core, opts...)
 }
 
