@@ -86,7 +86,7 @@ func (c SharedCore) ReleaseClient(clientID uint64) {
 	}
 	_, _, err = c.plugin.Call(releaseClientFuncName, marshaledClientID)
 	if err != nil {
-		c.plugin.Log(extism.LogLevelWarn, fmt.Sprint("memory couldn't be released"))
+		c.plugin.Log(extism.LogLevelWarn, "memory couldn't be released")
 	}
 }
 
