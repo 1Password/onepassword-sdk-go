@@ -15,7 +15,7 @@ To use the 1Password Go SDK in your project:
 export OP_SERVICE_ACCOUNT_TOKEN=<your-service-account-token>
 ```
 
-3. Add the 1Password namespace on GitHub to your `GOPRIVATE` environment variable:
+3. Add the 1Password namespace on GitHub to your [`GOPRIVATE` environment variable](https://pkg.go.dev/cmd/go#hdr-Configuration_for_downloading_non_public_code):
 
 ```bash
 export GOPRIVATE=${GOPRIVATE},github.com/1password/*
