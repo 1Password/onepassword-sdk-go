@@ -34,7 +34,7 @@ export GOPRIVATE=${GOPRIVATE},github.com/1password/*
 go get github.com/1password/1password-go-sdk
 ```
 
-5. Use the SDK in your project: 
+5. Use the SDK in your project:
 
 ```go
 import (
