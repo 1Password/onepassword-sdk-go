@@ -25,7 +25,7 @@ func main() {
 		panic(err)
 	}
 
-	doSomethingSecret(*secret)
+	doSomethingSecret(secret)
 }
 
 func doSomethingSecret(secret string) {

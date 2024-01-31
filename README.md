@@ -41,7 +41,8 @@ func main() {
     client, err := onepassword.NewClient(
         context.TODO()
         onepassword.WithServiceAccountToken(token),
-        onepassword.WithIntegrationInfo("<your app name>", "<your app version>"), )
+        onepassword.WithIntegrationInfo("<your app name>", "<your app version>"), 
+    )
     if err != nil {
         // handle err
     }

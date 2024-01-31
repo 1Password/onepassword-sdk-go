@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"runtime"
+	"sync"
 	"testing"
 
 	onepassword "github.com/1password/1password-go-sdk"
@@ -31,7 +32,7 @@ func TestSecretRetrievalFromTestAccount(t *testing.T) {
 	secret, err := client.Secrets.Resolve("op://tfctuk7dxnrwjwqqhwatuhy3gi/dqtyg7dswx5kvpcxwv32psdbse/password")
 	require.NoError(t, err)
 
-	assert.Equal(t, "test_password", *secret)
+	assert.Equal(t, "test_password", secret)
 }
 
 func TestRetrivalWithMultipleClients(t *testing.T) {
@@ -135,4 +136,56 @@ func TestClientReleasedSuccessfully(t *testing.T) {
 	}
 	_, err = core.Invoke(invocation)
 	assert.EqualError(t, err, "internal error: invalid client id")
+}
+
+func TestConcurrentCallsFromOneClient(t *testing.T) {
+	t.Cleanup(func() {
+		internal.ReleaseCore()
+	})
+	var wg sync.WaitGroup
+	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
+	client, err := onepassword.NewClient(context.TODO(),
+		onepassword.WithServiceAccountToken(token),
+		onepassword.WithIntegrationInfo("Integration_Test_Go_SDK", onepassword.DefaultIntegrationVersion),
+	)
+	require.NoError(t, err)
+
+	concurrentCalls := 10
+	wg.Add(concurrentCalls)
+	for i := 0; i < concurrentCalls; i++ {
+		go func() {
+			secret, err := client.Secrets.Resolve("op://tfctuk7dxnrwjwqqhwatuhy3gi/dqtyg7dswx5kvpcxwv32psdbse/password")
+			require.NoError(t, err)
+
+			assert.Equal(t, "test_password", secret)
+			wg.Done()
+		}()
+	}
+	wg.Wait()
+}
+
+func TestConcurrentCallsFromMultipleClientsOnTheSameToken(t *testing.T) {
+	t.Cleanup(func() {
+		internal.ReleaseCore()
+	})
+	var wg sync.WaitGroup
+	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
+	concurrentClients := 5
+	wg.Add(concurrentClients)
+	for i := 0; i < concurrentClients; i++ {
+		go func() {
+			client, err := onepassword.NewClient(context.TODO(),
+				onepassword.WithServiceAccountToken(token),
+				onepassword.WithIntegrationInfo("Integration_Test_Go_SDK", onepassword.DefaultIntegrationVersion),
+			)
+			require.NoError(t, err)
+
+			secret, err := client.Secrets.Resolve("op://tfctuk7dxnrwjwqqhwatuhy3gi/dqtyg7dswx5kvpcxwv32psdbse/password")
+			require.NoError(t, err)
+
+			assert.Equal(t, "test_password", secret)
+			wg.Done()
+		}()
+	}
+	wg.Wait()
 }
