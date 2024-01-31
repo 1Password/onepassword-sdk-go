@@ -8,7 +8,7 @@ The 1Password Go SDK offers programmatic read access to your secrets in 1Passwor
 
 To use the 1Password Go SDK in your project:
 
-1. [Create a 1Password Service Account](https://developer.1password.com/docs/service-accounts/get-started/#create-a-service-account). Make sure you grant the service account access to the vaults your project needs access to.
+1. [Create a 1Password Service Account](https://developer.1password.com/docs/service-accounts/get-started/#create-a-service-account). Make sure to grant the service account access to the vaults where the secrets your project needs access to are stored.
 2. Export your service account token to the `OP_SERVICE_ACCOUNT_TOKEN` environment variable:
 
 ```bash
@@ -34,7 +34,7 @@ export GOPRIVATE=${GOPRIVATE},github.com/1password/*
 go get github.com/1password/1password-go-sdk
 ```
 
-5. Use the SDK in your project. Make sure to use [secret reference URIs](https://developer.1password.com/docs/cli/secret-references/) (`op://vault/item/field` in the example below) to securely load your secrets from 1Password.
+5. Use the SDK in your project: 
 
 ```go
 import (
@@ -62,3 +62,6 @@ func main() {
     // do something with the secret
 }
 ```
+
+Make sure to use [secret reference URIs](https://developer.1password.com/docs/cli/secret-references/) with the syntax `op://vault/item/field` to securely load secrets from 1Password into your code.
+
