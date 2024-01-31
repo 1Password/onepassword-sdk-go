@@ -46,6 +46,7 @@ import (
 
 func main() {
     token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
+
     client, err := onepassword.NewClient(
         context.TODO()
         onepassword.WithServiceAccountToken(token),
