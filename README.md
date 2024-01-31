@@ -21,7 +21,7 @@ export OP_SERVICE_ACCOUNT_TOKEN=<your-service-account-token>
 export GOPRIVATE=${GOPRIVATE},github.com/1password/*
 ```
 
-3. Redirect the default traffic of `go get` from HTTPS to SSH. To do this, add the following snippet to your `~/.gitconfig` file:
+4. Redirect the default traffic of `go get` from HTTPS to SSH. To do this, add the following snippet to your `~/.gitconfig` file:
 
 ```
 [url "ssh://git@github.com/"]
