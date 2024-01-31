@@ -8,7 +8,7 @@ The 1Password Go SDK offers programmatic read access to your secrets in 1Passwor
 
 To use the 1Password Go SDK in your project:
 
-1. [Create a 1Password Service Account](https://developer.1password.com/docs/service-accounts/get-started/#create-a-service-account) and [make sure it has access to the vaults](https://developer.1password.com/docs/service-accounts/manage-service-accounts#manage-access) where the secrets you want to use in your project are stored.
+1. [Create a 1Password Service Account](https://developer.1password.com/docs/service-accounts/get-started/#create-a-service-account) and make sure it has access to the vaults where the secrets you want to use in your project are stored.
 2. Export your service account token to the `OP_SERVICE_ACCOUNT_TOKEN` environment variable:
 
 ```bash
