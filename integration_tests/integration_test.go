@@ -153,11 +153,13 @@ func TestConcurrentCallsFromOneClient(t *testing.T) {
 	concurrentCalls := 10
 	wg.Add(concurrentCalls)
 	for i := 0; i < concurrentCalls; i++ {
-		secret, err := client.Secrets.Resolve("op://tfctuk7dxnrwjwqqhwatuhy3gi/dqtyg7dswx5kvpcxwv32psdbse/password")
-		require.NoError(t, err)
+		go func() {
+			secret, err := client.Secrets.Resolve("op://tfctuk7dxnrwjwqqhwatuhy3gi/dqtyg7dswx5kvpcxwv32psdbse/password")
+			require.NoError(t, err)
 
-		assert.Equal(t, "test_password", secret)
-		wg.Done()
+			assert.Equal(t, "test_password", secret)
+			wg.Done()
+		}()
 	}
 	wg.Wait()
 }

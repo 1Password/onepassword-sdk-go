@@ -40,7 +40,9 @@ func ReleaseCore() {
 
 // SharedCore implements Core in such a way that all created client instances share the same core resources.
 type SharedCore struct {
-	mu     sync.Mutex
+	// lock is used to synchronize access to the shared WASM core which is single threaded
+	lock sync.Mutex
+	// plugin is the Extism plugin which represents the WASM core loaded into memory
 	plugin *extism.Plugin
 }
 
@@ -93,9 +95,9 @@ func (c *SharedCore) ReleaseClient(clientID uint64) {
 }
 
 func (c *SharedCore) call(functionName string, serializedParameters []byte) ([]byte, error) {
-	c.mu.Lock()
+	c.lock.Lock()
+	defer c.lock.Unlock()
 	_, response, err := c.plugin.Call(functionName, serializedParameters)
-	c.mu.Unlock()
 	if err != nil {
 		return nil, err
 	}
