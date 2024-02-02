@@ -1,6 +1,6 @@
 package onepassword
 
-import "github.com/1password/1password-go-sdk/internal"
+import "github.com/1password/onepassword-sdk-go/internal"
 
 // SecretsAPI represents all operations the SDK client can perform on 1Password secrets.
 type SecretsAPI interface {
