@@ -31,7 +31,7 @@ export GOPRIVATE=${GOPRIVATE},github.com/1password/*
 4. In your project, download the 1Password Go SDK:
 
 ```bash
-go get github.com/1password/1password-go-sdk
+go get github.com/1password/onepassword-sdk-go
 ```
 
 5. Use the SDK in your project:

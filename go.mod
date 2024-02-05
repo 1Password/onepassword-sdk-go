@@ -1,4 +1,4 @@
-module github.com/1password/1password-go-sdk
+module github.com/1password/onepassword-sdk-go
 
 go 1.21
 
