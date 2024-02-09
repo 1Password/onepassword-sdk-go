@@ -41,21 +41,21 @@ import (
     "context"
     "os"
 
-    onepassword "github.com/1password/1password-go-sdk"
+    "github.com/1password/onepassword-sdk-go"
 )
 
 func main() {
     token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
 	
     client, err := onepassword.NewClient(
-        context.TODO()
-        onepassword.WithServiceAccountToken(token),
-        onepassword.WithIntegrationInfo("<your app name>", "<your app version>"), 
+                context.TODO(),
+                onepassword.WithServiceAccountToken(token),
+                onepassword.WithIntegrationInfo(onepassword.DefaultIntegrationName, onepassword.DefaultIntegrationVersion),
     )
     if err != nil {
-        // handle err
+	// handle err
     }
-    secret, err := client.Resolve("op://vault/item/field")
+    secret, err := client.Secrets.Resolve("op://vault/item/field")
     if err != nil {
         // handle err
     }
