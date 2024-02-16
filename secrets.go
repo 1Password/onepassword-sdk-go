@@ -1,6 +1,9 @@
 package onepassword
 
-import "github.com/1password/onepassword-sdk-go/internal"
+import (
+	"fmt"
+	"github.com/1password/onepassword-sdk-go/internal"
+)
 
 // SecretsAPI represents all operations the SDK client can perform on 1Password secrets.
 type SecretsAPI interface {
@@ -22,7 +25,7 @@ func (s SecretsSource) Resolve(reference string) (string, error) {
 		ClientID: s.id,
 		Invocation: internal.Invocation{
 			MethodName:       "Resolve",
-			SerializedParams: reference,
+			SerializedParams: fmt.Sprintf(reference),
 		},
 	})
 	if err != nil {
