@@ -75,3 +75,13 @@ func WithIntegrationInfo(name string, version string) ClientOption {
 		return nil
 	}
 }
+
+func clientInvoke(innerClient InnerClient, invocation string, params map[string]interface{}) (*string, error) {
+	return innerClient.core.Invoke(internal.InvokeConfig{
+		ClientID: innerClient.id,
+		Invocation: internal.Invocation{
+			MethodName: invocation,
+			Parameters: params,
+		},
+	})
+}
