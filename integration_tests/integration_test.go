@@ -82,17 +82,21 @@ func TestInvalidInvoke(t *testing.T) {
 
 	validClientID := uint64(0)
 	validMethodName := "Resolve"
-	validParams := "op://tfctuk7dxnrwjwqqhwatuhy3gi/dqtyg7dswx5kvpcxwv32psdbse/password"
+	validParams := map[string]interface{}{
+		"secret_reference": "op://tfctuk7dxnrwjwqqhwatuhy3gi/dqtyg7dswx5kvpcxwv32psdbse/password",
+	}
 	invalidClientID := uint64(1)
 	invalidMethodName := "InvalidName"
-	invalidParams := ""
+	invalidParams := map[string]interface{}{
+		"secret_reference": "",
+	}
 
 	// invalid client id
 	invocation1 := internal.InvokeConfig{
 		ClientID: invalidClientID,
 		Invocation: internal.Invocation{
-			MethodName:       validMethodName,
-			SerializedParams: validParams,
+			MethodName: validMethodName,
+			Parameters: validParams,
 		},
 	}
 	_, err1 := core.Invoke(invocation1)
@@ -102,8 +106,8 @@ func TestInvalidInvoke(t *testing.T) {
 	invocation2 := internal.InvokeConfig{
 		ClientID: validClientID,
 		Invocation: internal.Invocation{
-			MethodName:       invalidMethodName,
-			SerializedParams: invalidParams,
+			MethodName: invalidMethodName,
+			Parameters: invalidParams,
 		}}
 	_, err2 := core.Invoke(invocation2)
 	assert.EqualError(t, err2, "unknown variant `InvalidName`, expected `Resolve` at line 1 column 48")
@@ -112,8 +116,8 @@ func TestInvalidInvoke(t *testing.T) {
 	invocation3 := internal.InvokeConfig{
 		ClientID: validClientID,
 		Invocation: internal.Invocation{
-			MethodName:       validMethodName,
-			SerializedParams: invalidParams,
+			MethodName: validMethodName,
+			Parameters: invalidParams,
 		},
 	}
 	_, err3 := core.Invoke(invocation3)
@@ -130,8 +134,8 @@ func TestClientReleasedSuccessfully(t *testing.T) {
 	invocation := internal.InvokeConfig{
 		ClientID: 0, // this client id should be invalid because the client has been cleaned up by GC
 		Invocation: internal.Invocation{
-			MethodName:       "Resolve",
-			SerializedParams: "SecretRef",
+			MethodName: "Resolve",
+			Parameters: map[string]interface{}{},
 		},
 	}
 	_, err = core.Invoke(invocation)
