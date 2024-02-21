@@ -135,7 +135,9 @@ func TestClientReleasedSuccessfully(t *testing.T) {
 		ClientID: 0, // this client id should be invalid because the client has been cleaned up by GC
 		Invocation: internal.Invocation{
 			MethodName: "Resolve",
-			Parameters: map[string]interface{}{},
+			Parameters: map[string]interface{}{
+				"secret_reference": "",
+			},
 		},
 	}
 	_, err = core.Invoke(invocation)
