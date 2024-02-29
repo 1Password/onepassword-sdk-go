@@ -1,7 +1,9 @@
 name: Notify about PR ready for review
 
 on:
-  pull_request:
+  # Run this workflow from the target branch. We do this because GitHub doesn't allow reading secrets from forked PRs
+  # source branch, and it would cause problems for PRs opened by dependabot.
+  pull_request_target:
     branches: ["main"]
     types: [ opened, ready_for_review ]
 
