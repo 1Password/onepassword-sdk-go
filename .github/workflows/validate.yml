@@ -15,31 +15,36 @@ jobs:
     name: Build & Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version: '^1.21'
 
       - name: Build
         run: go build -v ./...
 
-      - name: Test
+      - name: Integration Test
+        if: github.repository_owner == '1Password' # don't run integration tests on forked PRs because those don't have access to pipeline secrets
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.TEST_SA_TOKEN }}
-        run: go test -v ./...
+        run: go test -v ./integration_tests/...
+
+      - name: Unit Test
+        run: go test -v ./internal/...
+
   golangci:
     name: Lint
     runs-on: ubuntu-latest
     steps:
       - name: Set up Go
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v5
         with:
           go-version: '^1.21'
 
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Lint with golanci-lint
-        uses: golangci/golangci-lint-action@v3
+        uses: golangci/golangci-lint-action@v4
