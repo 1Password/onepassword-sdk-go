@@ -55,7 +55,7 @@ func (c *SharedCore) InitClient(ctx context.Context, config ClientConfig) (*uint
 	}
 
 	// first return parameter is a sys.Exit code, which we don't need since the error is fully recoverable
-	res, err := c.call(ctx, initClientFuncName, marshaledConfig)
+	res, err := c.callWithCtx(ctx, initClientFuncName, marshaledConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +73,7 @@ func (c *SharedCore) Invoke(ctx context.Context, invokeConfig InvokeConfig) (*st
 	if err != nil {
 		return nil, err
 	}
-	res, err := c.call(ctx, invokeFuncName, input)
+	res, err := c.callWithCtx(ctx, invokeFuncName, input)
 	if err != nil {
 		return nil, err
 	}
@@ -89,22 +89,30 @@ func (c *SharedCore) ReleaseClient(clientID uint64) {
 	if err != nil {
 		c.plugin.Log(extism.LogLevelWarn, fmt.Sprintf("memory couldn't be released: %s", err.Error()))
 	}
-	_, err = c.call(nil, releaseClientFuncName, marshaledClientID)
+	_, err = c.call(releaseClientFuncName, marshaledClientID)
 	if err != nil {
 		c.plugin.Log(extism.LogLevelWarn, "memory couldn't be released")
 	}
 }
 
-func (c *SharedCore) call(ctx context.Context, functionName string, serializedParameters []byte) ([]byte, error) {
+func (c *SharedCore) callWithCtx(ctx context.Context, functionName string, serializedParameters []byte) ([]byte, error) {
 	c.lock.Lock()
 	defer c.lock.Unlock()
-	var response []byte
-	var err error
-	if ctx == nil {
-		_, response, err = c.plugin.Call(functionName, serializedParameters)
-	} else {
-		_, response, err = c.plugin.CallWithContext(ctx, functionName, serializedParameters)
+
+	_, response, err := c.plugin.CallWithContext(ctx, functionName, serializedParameters)
+
+	if err != nil {
+		return nil, err
 	}
+	return response, nil
+}
+
+func (c *SharedCore) call(functionName string, serializedParameters []byte) ([]byte, error) {
+	c.lock.Lock()
+	defer c.lock.Unlock()
+
+	_, response, err := c.plugin.Call(functionName, serializedParameters)
+
 	if err != nil {
 		return nil, err
 	}
