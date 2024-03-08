@@ -12,7 +12,8 @@ import (
 func main() {
 	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
 
-	client, err := onepassword.NewClient(context.TODO(),
+	clientAuthenticationCtx := context.Background()
+	client, err := onepassword.NewClient(clientAuthenticationCtx,
 		onepassword.WithServiceAccountToken(token),
 		onepassword.WithIntegrationInfo(onepassword.DefaultIntegrationName, onepassword.DefaultIntegrationVersion),
 	)
@@ -20,7 +21,8 @@ func main() {
 		panic(err)
 	}
 
-	secret, err := client.Secrets.Resolve("op://xw33qlvug6moegr3wkk5zkenoa/bckakdku7bgbnyxvqbkpehifki/foobar")
+	functionCtx := context.Background()
+	secret, err := client.Secrets.Resolve(functionCtx, "op://xw33qlvug6moegr3wkk5zkenoa/bckakdku7bgbnyxvqbkpehifki/foobar")
 	if err != nil {
 		panic(err)
 	}

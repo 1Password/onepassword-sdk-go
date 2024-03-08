@@ -20,15 +20,16 @@ type Client struct {
 }
 
 // NewClient returns a 1Password Go SDK client using the provided ClientOption list.
-func NewClient(sharedContext context.Context, opts ...ClientOption) (*Client, error) {
-	core, err := internal.GetSharedCore(sharedContext)
+// The provided context.Context operates on the client initialization and authentication process. Cancelling the context after the client instance was already initialized won't clean up the client.
+func NewClient(ctx context.Context, opts ...ClientOption) (*Client, error) {
+	core, err := internal.GetSharedCore()
 	if err != nil {
 		return nil, err
 	}
-	return createClient(core, opts...)
+	return createClient(ctx, core, opts...)
 }
 
-func createClient(core internal.Core, opts ...ClientOption) (*Client, error) {
+func createClient(ctx context.Context, core internal.Core, opts ...ClientOption) (*Client, error) {
 	client := Client{
 		config: internal.NewDefaultConfig(),
 	}
@@ -40,7 +41,7 @@ func createClient(core internal.Core, opts ...ClientOption) (*Client, error) {
 		}
 	}
 
-	clientID, err := core.InitClient(client.config)
+	clientID, err := core.InitClient(ctx, client.config)
 	if err != nil {
 		return nil, fmt.Errorf("error initializing client: %w", err)
 	}
