@@ -66,7 +66,7 @@ type InnerClient struct {
 
 type ClientOption func(client *Client) error
 
-// WithServiceAccountToken specifies the [1Password Service Account](https://developer.1password.com/docs/service-accounts) token to use to authenticate the SDK client.
+// WithServiceAccountToken specifies the [1Password Service Account](https://developer.1password.com/docs/service-accounts) token to use to authenticate the SDK client. Read more on how to get started with service accounts: https://developer.1password.com/docs/service-accounts/get-started/#create-a-service-account
 func WithServiceAccountToken(token string) ClientOption {
 	return func(c *Client) error {
 		c.config.SAToken = token
