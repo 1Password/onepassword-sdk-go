@@ -24,6 +24,11 @@ body:
       label: Expected Behavior
       description: What would you have expected happened instead?
       placeholder: "Please share what you had expected to happen. How should this have behaved?"
+  - type: input
+    id: version
+    attributes:
+      label: SDK version
+      description: "You can find the version you're using in the go.mod file."
   - type: textarea
     id: info
     attributes:

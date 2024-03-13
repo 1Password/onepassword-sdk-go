@@ -21,8 +21,3 @@ body:
     attributes:
       label: Additional information
       description: Any additional information that's relevant to add?
-  - type: input
-    id: version
-    attributes:
-      label: SDK version
-      description: "You can find the version you're using in the go.mod file."
