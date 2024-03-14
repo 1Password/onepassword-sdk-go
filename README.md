@@ -50,7 +50,7 @@ func main() {
     client, err := onepassword.NewClient(
                 context.TODO(),
                 onepassword.WithServiceAccountToken(token),
-                onepassword.WithIntegrationInfo(onepassword.DefaultIntegrationName, onepassword.DefaultIntegrationVersion),
+                onepassword.WithIntegrationInfo("My_Project_Name", "x.x.x"),
     )
     if err != nil {
 	// handle err
@@ -65,3 +65,4 @@ func main() {
 
 Make sure to use [secret reference URIs](https://developer.1password.com/docs/cli/secret-references/) with the syntax `op://vault/item/field` to securely load secrets from 1Password into your code.
 
+Inside ```onepassword.WithIntegrationInfo(...)```, pass the name of your application and the version of your application as arguments.
