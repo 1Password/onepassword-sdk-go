@@ -14,7 +14,7 @@ func main() {
 
 	client, err := onepassword.NewClient(context.TODO(),
 		onepassword.WithServiceAccountToken(token),
-		onepassword.WithIntegrationInfo("My_Project_Name", "x.x.x"),
+		onepassword.WithIntegrationInfo("My 1Password Integration", "v1.0.0"),
 	)
 	if err != nil {
 		panic(err)
