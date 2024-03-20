@@ -23,13 +23,13 @@ func TestSecretRetrievalFromTestAccount(t *testing.T) {
 	})
 
 	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
-	client, err := onepassword.NewClient(context.TODO(),
+	client, err := onepassword.NewClient(context.Background(),
 		onepassword.WithServiceAccountToken(token),
 		onepassword.WithIntegrationInfo("Integration_Test_Go_SDK", onepassword.DefaultIntegrationVersion),
 	)
 	require.NoError(t, err)
 
-	secret, err := client.Secrets.Resolve(context.TODO(), "op://gowwbvgow7kxocrfmfvtwni6vi/6ydrn7ne6mwnqc2prsbqx4i4aq/password")
+	secret, err := client.Secrets.Resolve(context.Background(), "op://gowwbvgow7kxocrfmfvtwni6vi/6ydrn7ne6mwnqc2prsbqx4i4aq/password")
 	require.NoError(t, err)
 
 	assert.Equal(t, "test_password_42", secret)
@@ -51,7 +51,7 @@ func TestRetrivalWithMultipleClients(t *testing.T) {
 	config.IntegrationName = "name"
 	config.IntegrationVersion = "version"
 
-	ctx := context.TODO()
+	ctx := context.Background()
 	value1, err1 := core.InitClient(ctx, config)
 	require.NoError(t, err1)
 	value2, err2 := core.InitClient(ctx, config)
@@ -78,7 +78,7 @@ func TestInvalidInvoke(t *testing.T) {
 	config.IntegrationName = "name"
 	config.IntegrationVersion = "version"
 
-	_, err = core.InitClient(context.TODO(), config)
+	_, err = core.InitClient(context.Background(), config)
 	require.NoError(t, err)
 
 	validClientID := uint64(0)
@@ -96,7 +96,7 @@ func TestInvalidInvoke(t *testing.T) {
 			SerializedParams: validParams,
 		},
 	}
-	_, err1 := core.Invoke(context.TODO(), invocation1)
+	_, err1 := core.Invoke(context.Background(), invocation1)
 	assert.EqualError(t, err1, "internal error: invalid client id")
 
 	// invalid method name
@@ -106,7 +106,7 @@ func TestInvalidInvoke(t *testing.T) {
 			MethodName:       invalidMethodName,
 			SerializedParams: invalidParams,
 		}}
-	_, err2 := core.Invoke(context.TODO(), invocation2)
+	_, err2 := core.Invoke(context.Background(), invocation2)
 	assert.EqualError(t, err2, "unknown variant `InvalidName`, expected `Resolve` at line 1 column 48")
 
 	// invalid serialized params
@@ -117,7 +117,7 @@ func TestInvalidInvoke(t *testing.T) {
 			SerializedParams: invalidParams,
 		},
 	}
-	_, err3 := core.Invoke(context.TODO(), invocation3)
+	_, err3 := core.Invoke(context.Background(), invocation3)
 	assert.EqualError(t, err3, "error resolving secret reference: secret reference is not prefixed with \"op://\"")
 }
 
@@ -135,7 +135,7 @@ func TestClientReleasedSuccessfully(t *testing.T) {
 			SerializedParams: "SecretRef",
 		},
 	}
-	_, err = core.Invoke(context.TODO(), invocation)
+	_, err = core.Invoke(context.Background(), invocation)
 	assert.EqualError(t, err, "internal error: invalid client id")
 }
 
@@ -145,7 +145,7 @@ func TestConcurrentCallsFromOneClient(t *testing.T) {
 	})
 	var wg sync.WaitGroup
 	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
-	client, err := onepassword.NewClient(context.TODO(),
+	client, err := onepassword.NewClient(context.Background(),
 		onepassword.WithServiceAccountToken(token),
 		onepassword.WithIntegrationInfo("Integration_Test_Go_SDK", onepassword.DefaultIntegrationVersion),
 	)
@@ -155,7 +155,7 @@ func TestConcurrentCallsFromOneClient(t *testing.T) {
 	wg.Add(concurrentCalls)
 	for i := 0; i < concurrentCalls; i++ {
 		go func() {
-			secret, err := client.Secrets.Resolve(context.TODO(), "op://gowwbvgow7kxocrfmfvtwni6vi/6ydrn7ne6mwnqc2prsbqx4i4aq/password")
+			secret, err := client.Secrets.Resolve(context.Background(), "op://gowwbvgow7kxocrfmfvtwni6vi/6ydrn7ne6mwnqc2prsbqx4i4aq/password")
 			require.NoError(t, err)
 
 			assert.Equal(t, "test_password_42", secret)
@@ -175,13 +175,13 @@ func TestConcurrentCallsFromMultipleClientsOnTheSameToken(t *testing.T) {
 	wg.Add(concurrentClients)
 	for i := 0; i < concurrentClients; i++ {
 		go func() {
-			client, err := onepassword.NewClient(context.TODO(),
+			client, err := onepassword.NewClient(context.Background(),
 				onepassword.WithServiceAccountToken(token),
 				onepassword.WithIntegrationInfo("Integration_Test_Go_SDK", onepassword.DefaultIntegrationVersion),
 			)
 			require.NoError(t, err)
 
-			secret, err := client.Secrets.Resolve(context.TODO(), "op://gowwbvgow7kxocrfmfvtwni6vi/6ydrn7ne6mwnqc2prsbqx4i4aq/password")
+			secret, err := client.Secrets.Resolve(context.Background(), "op://gowwbvgow7kxocrfmfvtwni6vi/6ydrn7ne6mwnqc2prsbqx4i4aq/password")
 			require.NoError(t, err)
 
 			assert.Equal(t, "test_password_42", secret)

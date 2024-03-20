@@ -20,7 +20,6 @@ type Client struct {
 }
 
 // NewClient returns a 1Password Go SDK client using the provided ClientOption list.
-// The provided context.Context operates on the client initialization and authentication process. Cancelling the context after the client instance was already initialized won't clean up the client.
 func NewClient(ctx context.Context, opts ...ClientOption) (*Client, error) {
 	core, err := internal.GetSharedCore()
 	if err != nil {

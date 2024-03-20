@@ -12,8 +12,8 @@ import (
 func main() {
 	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
 
-	clientAuthenticationCtx := context.Background()
-	client, err := onepassword.NewClient(clientAuthenticationCtx,
+	ctx := context.Background()
+	client, err := onepassword.NewClient(ctx,
 		onepassword.WithServiceAccountToken(token),
 		onepassword.WithIntegrationInfo(onepassword.DefaultIntegrationName, onepassword.DefaultIntegrationVersion),
 	)
