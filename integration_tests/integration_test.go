@@ -2,15 +2,14 @@ package integration_tests
 
 import (
 	"context"
-	"os"
-	"runtime"
-	"sync"
-	"testing"
-
 	"github.com/1password/onepassword-sdk-go"
 	"github.com/1password/onepassword-sdk-go/internal"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"os"
+	"runtime"
+	"sync"
+	"testing"
 )
 
 // These tests were designed for CI/CD. If you want to run them locally you must make sure the following dependencies are in place:
@@ -189,4 +188,23 @@ func TestConcurrentCallsFromMultipleClientsOnTheSameToken(t *testing.T) {
 		}()
 	}
 	wg.Wait()
+}
+
+func TestExpiredContextCancelsLongRunningOperation(t *testing.T) {
+	c := context.Background()
+	ctx, cancel := context.WithCancel(c)
+	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
+	var err error
+	out := make(chan error)
+	cancel()
+	go func() {
+		_, err = onepassword.NewClient(ctx,
+			onepassword.WithServiceAccountToken(token),
+			onepassword.WithIntegrationInfo("Integration_Test_Go_SDK", onepassword.DefaultIntegrationVersion),
+		)
+		out <- err
+	}()
+
+	err = <-out
+	require.ErrorContains(t, err, `context canceled (recovered by wazero)`)
 }
