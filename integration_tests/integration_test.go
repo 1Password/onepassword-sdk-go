@@ -2,14 +2,15 @@ package integration_tests
 
 import (
 	"context"
-	"github.com/1password/onepassword-sdk-go"
-	"github.com/1password/onepassword-sdk-go/internal"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"os"
 	"runtime"
 	"sync"
 	"testing"
+
+	"github.com/1password/onepassword-sdk-go"
+	"github.com/1password/onepassword-sdk-go/internal"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 // These tests were designed for CI/CD. If you want to run them locally you must make sure the following dependencies are in place:
