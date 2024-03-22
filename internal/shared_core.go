@@ -100,7 +100,6 @@ func (c *SharedCore) callWithCtx(ctx context.Context, functionName string, seria
 	defer c.lock.Unlock()
 
 	_, response, err := c.plugin.CallWithContext(ctx, functionName, serializedParameters)
-
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +111,6 @@ func (c *SharedCore) call(functionName string, serializedParameters []byte) ([]b
 	defer c.lock.Unlock()
 
 	_, response, err := c.plugin.Call(functionName, serializedParameters)
-
 	if err != nil {
 		return nil, err
 	}
