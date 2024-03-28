@@ -40,9 +40,9 @@ func createClient(ctx context.Context, core internal.Core, opts ...ClientOption)
 		return nil, fmt.Errorf("error initializing client: %w", err)
 	}
 
-	inner := InnerClient{
-		id:   *clientID,
-		core: core,
+	inner := internal.InnerClient{
+		ID:   *clientID,
+		Core: core,
 	}
 
 	initAPIs(&client, inner)
@@ -51,12 +51,6 @@ func createClient(ctx context.Context, core internal.Core, opts ...ClientOption)
 		core.ReleaseClient(*clientID)
 	})
 	return &client, nil
-}
-
-// InnerClient represents the sdk-core client on which calls will be made.
-type InnerClient struct {
-	id   uint64
-	core internal.Core
 }
 
 type ClientOption func(client *Client) error
@@ -78,9 +72,9 @@ func WithIntegrationInfo(name string, version string) ClientOption {
 	}
 }
 
-func clientInvoke(ctx context.Context, innerClient InnerClient, invocation string, params []string) (*string, error) {
-	invocationResponse, err := innerClient.core.Invoke(ctx, internal.InvokeConfig{
-		ClientID: innerClient.id,
+func clientInvoke(ctx context.Context, innerClient internal.InnerClient, invocation string, params []string) (*string, error) {
+	invocationResponse, err := innerClient.Core.Invoke(ctx, internal.InvokeConfig{
+		ClientID: innerClient.ID,
 		Invocation: internal.Invocation{
 			MethodName:       invocation,
 			SerializedParams: strings.Join(params, ","),

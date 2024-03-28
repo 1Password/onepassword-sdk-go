@@ -10,6 +10,6 @@ type Client struct {
 	Secrets SecretsAPI
 }
 
-func initAPIs(client *Client, inner InnerClient) {
+func initAPIs(client *Client, inner internal.InnerClient) {
 	client.Secrets = NewSecretsSource(inner)
 }

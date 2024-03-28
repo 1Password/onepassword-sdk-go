@@ -56,3 +56,9 @@ type Invocation struct {
 	MethodName       string `json:"name"`
 	SerializedParams string `json:"parameters"`
 }
+
+// InnerClient represents the sdk-core client on which calls will be made.
+type InnerClient struct {
+	ID   uint64
+	Core Core
+}

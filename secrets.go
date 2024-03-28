@@ -1,6 +1,9 @@
 package onepassword
 
-import "context"
+import (
+	"context"
+	"github.com/1password/onepassword-sdk-go/internal"
+)
 
 // SecretsAPI represents all operations the SDK client can perform on 1Password secrets.
 type SecretsAPI interface {
@@ -12,10 +15,10 @@ type SecretsAPI interface {
 
 // SecretsSource implements SecretsAPI relying on an inner client for operations with secrets.
 type SecretsSource struct {
-	InnerClient
+	internal.InnerClient
 }
 
-func NewSecretsSource(inner InnerClient) *SecretsSource {
+func NewSecretsSource(inner internal.InnerClient) *SecretsSource {
 	return &SecretsSource{inner}
 }
 
