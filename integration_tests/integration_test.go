@@ -83,21 +83,17 @@ func TestInvalidInvoke(t *testing.T) {
 
 	validClientID := uint64(0)
 	validMethodName := "Resolve"
-	validParams := map[string]interface{}{
-		"secret_reference": "op://gowwbvgow7kxocrfmfvtwni6vi/6ydrn7ne6mwnqc2prsbqx4i4aq/password",
-	}
+	validParams := "op://gowwbvgow7kxocrfmfvtwni6vi/6ydrn7ne6mwnqc2prsbqx4i4aq/password"
 	invalidClientID := uint64(1)
 	invalidMethodName := "InvalidName"
-	invalidParams := map[string]interface{}{
-		"secret_reference": "",
-	}
+	invalidParams := ""
 
 	// invalid client id
 	invocation1 := internal.InvokeConfig{
 		ClientID: invalidClientID,
 		Invocation: internal.Invocation{
-			MethodName: validMethodName,
-			Parameters: validParams,
+			MethodName:       validMethodName,
+			SerializedParams: validParams,
 		},
 	}
 	_, err1 := core.Invoke(context.Background(), invocation1)
@@ -107,8 +103,8 @@ func TestInvalidInvoke(t *testing.T) {
 	invocation2 := internal.InvokeConfig{
 		ClientID: validClientID,
 		Invocation: internal.Invocation{
-			MethodName: invalidMethodName,
-			Parameters: invalidParams,
+			MethodName:       invalidMethodName,
+			SerializedParams: invalidParams,
 		}}
 	_, err2 := core.Invoke(context.Background(), invocation2)
 	assert.EqualError(t, err2, "unknown variant `InvalidName`, expected `Resolve` at line 1 column 48")
@@ -117,8 +113,8 @@ func TestInvalidInvoke(t *testing.T) {
 	invocation3 := internal.InvokeConfig{
 		ClientID: validClientID,
 		Invocation: internal.Invocation{
-			MethodName: validMethodName,
-			Parameters: invalidParams,
+			MethodName:       validMethodName,
+			SerializedParams: invalidParams,
 		},
 	}
 	_, err3 := core.Invoke(context.Background(), invocation3)
@@ -135,10 +131,8 @@ func TestClientReleasedSuccessfully(t *testing.T) {
 	invocation := internal.InvokeConfig{
 		ClientID: 0, // this client id should be invalid because the client has been cleaned up by GC
 		Invocation: internal.Invocation{
-			MethodName: "Resolve",
-			Parameters: map[string]interface{}{
-				"secret_reference": "",
-			},
+			MethodName:       "Resolve",
+			SerializedParams: "SecretRef",
 		},
 	}
 	_, err = core.Invoke(context.Background(), invocation)
