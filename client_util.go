@@ -17,8 +17,8 @@ func clientInvoke(ctx context.Context, innerClient InnerClient, invocation strin
 	invocationResponse, err := innerClient.core.Invoke(ctx, internal.InvokeConfig{
 		ClientID: innerClient.id,
 		Invocation: internal.Invocation{
-			MethodName: invocation,
-			Parameters: strings.Join(params, ","),
+			MethodName:       invocation,
+			SerializedParams: strings.Join(params, ","),
 		},
 	})
 	if err != nil {
