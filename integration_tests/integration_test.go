@@ -23,13 +23,13 @@ func TestSecretRetrievalFromTestAccount(t *testing.T) {
 	})
 
 	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
-	client, err := onepassword.NewClient(context.TODO(),
+	client, err := onepassword.NewClient(context.Background(),
 		onepassword.WithServiceAccountToken(token),
 		onepassword.WithIntegrationInfo("Integration_Test_Go_SDK", onepassword.DefaultIntegrationVersion),
 	)
 	require.NoError(t, err)
 
-	secret, err := client.Secrets.Resolve("op://gowwbvgow7kxocrfmfvtwni6vi/6ydrn7ne6mwnqc2prsbqx4i4aq/password")
+	secret, err := client.Secrets.Resolve(context.Background(), "op://gowwbvgow7kxocrfmfvtwni6vi/6ydrn7ne6mwnqc2prsbqx4i4aq/password")
 	require.NoError(t, err)
 
 	assert.Equal(t, "test_password_42", secret)
@@ -45,17 +45,18 @@ func TestRetrivalWithMultipleClients(t *testing.T) {
 
 	// keep creating clients to check what happens
 	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
-	core, _ := internal.GetSharedCore(context.TODO())
+	core, _ := internal.GetSharedCore()
 	config := internal.NewDefaultConfig()
 	config.SAToken = token
 	config.IntegrationName = "name"
 	config.IntegrationVersion = "version"
 
-	value1, err1 := core.InitClient(config)
+	ctx := context.Background()
+	value1, err1 := core.InitClient(ctx, config)
 	require.NoError(t, err1)
-	value2, err2 := core.InitClient(config)
+	value2, err2 := core.InitClient(ctx, config)
 	require.NoError(t, err2)
-	value3, err3 := core.InitClient(config)
+	value3, err3 := core.InitClient(ctx, config)
 	require.NoError(t, err3)
 
 	assert.Equal(t, uint64(3), *value1)
@@ -69,7 +70,7 @@ func TestInvalidInvoke(t *testing.T) {
 	})
 	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
 
-	core, err := internal.GetSharedCore(context.TODO())
+	core, err := internal.GetSharedCore()
 	require.NoError(t, err)
 
 	config := internal.NewDefaultConfig()
@@ -77,7 +78,7 @@ func TestInvalidInvoke(t *testing.T) {
 	config.IntegrationName = "name"
 	config.IntegrationVersion = "version"
 
-	_, err = core.InitClient(config)
+	_, err = core.InitClient(context.Background(), config)
 	require.NoError(t, err)
 
 	validClientID := uint64(0)
@@ -99,7 +100,7 @@ func TestInvalidInvoke(t *testing.T) {
 			Parameters: validParams,
 		},
 	}
-	_, err1 := core.Invoke(invocation1)
+	_, err1 := core.Invoke(context.Background(), invocation1)
 	assert.EqualError(t, err1, "internal error: invalid client id")
 
 	// invalid method name
@@ -109,7 +110,7 @@ func TestInvalidInvoke(t *testing.T) {
 			MethodName: invalidMethodName,
 			Parameters: invalidParams,
 		}}
-	_, err2 := core.Invoke(invocation2)
+	_, err2 := core.Invoke(context.Background(), invocation2)
 	assert.EqualError(t, err2, "unknown variant `InvalidName`, expected `Resolve` at line 1 column 48")
 
 	// invalid serialized params
@@ -120,7 +121,7 @@ func TestInvalidInvoke(t *testing.T) {
 			Parameters: invalidParams,
 		},
 	}
-	_, err3 := core.Invoke(invocation3)
+	_, err3 := core.Invoke(context.Background(), invocation3)
 	assert.EqualError(t, err3, "error resolving secret reference: secret reference is not prefixed with \"op://\"")
 }
 
@@ -128,7 +129,7 @@ func TestClientReleasedSuccessfully(t *testing.T) {
 	TestSecretRetrievalFromTestAccount(t)
 	runtime.GC()
 
-	core, err := internal.GetSharedCore(context.TODO())
+	core, err := internal.GetSharedCore()
 	require.NoError(t, err)
 
 	invocation := internal.InvokeConfig{
@@ -140,7 +141,7 @@ func TestClientReleasedSuccessfully(t *testing.T) {
 			},
 		},
 	}
-	_, err = core.Invoke(invocation)
+	_, err = core.Invoke(context.Background(), invocation)
 	assert.EqualError(t, err, "internal error: invalid client id")
 }
 
@@ -150,7 +151,7 @@ func TestConcurrentCallsFromOneClient(t *testing.T) {
 	})
 	var wg sync.WaitGroup
 	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
-	client, err := onepassword.NewClient(context.TODO(),
+	client, err := onepassword.NewClient(context.Background(),
 		onepassword.WithServiceAccountToken(token),
 		onepassword.WithIntegrationInfo("Integration_Test_Go_SDK", onepassword.DefaultIntegrationVersion),
 	)
@@ -160,7 +161,7 @@ func TestConcurrentCallsFromOneClient(t *testing.T) {
 	wg.Add(concurrentCalls)
 	for i := 0; i < concurrentCalls; i++ {
 		go func() {
-			secret, err := client.Secrets.Resolve("op://gowwbvgow7kxocrfmfvtwni6vi/6ydrn7ne6mwnqc2prsbqx4i4aq/password")
+			secret, err := client.Secrets.Resolve(context.Background(), "op://gowwbvgow7kxocrfmfvtwni6vi/6ydrn7ne6mwnqc2prsbqx4i4aq/password")
 			require.NoError(t, err)
 
 			assert.Equal(t, "test_password_42", secret)
@@ -180,13 +181,13 @@ func TestConcurrentCallsFromMultipleClientsOnTheSameToken(t *testing.T) {
 	wg.Add(concurrentClients)
 	for i := 0; i < concurrentClients; i++ {
 		go func() {
-			client, err := onepassword.NewClient(context.TODO(),
+			client, err := onepassword.NewClient(context.Background(),
 				onepassword.WithServiceAccountToken(token),
 				onepassword.WithIntegrationInfo("Integration_Test_Go_SDK", onepassword.DefaultIntegrationVersion),
 			)
 			require.NoError(t, err)
 
-			secret, err := client.Secrets.Resolve("op://gowwbvgow7kxocrfmfvtwni6vi/6ydrn7ne6mwnqc2prsbqx4i4aq/password")
+			secret, err := client.Secrets.Resolve(context.Background(), "op://gowwbvgow7kxocrfmfvtwni6vi/6ydrn7ne6mwnqc2prsbqx4i4aq/password")
 			require.NoError(t, err)
 
 			assert.Equal(t, "test_password_42", secret)
@@ -194,4 +195,23 @@ func TestConcurrentCallsFromMultipleClientsOnTheSameToken(t *testing.T) {
 		}()
 	}
 	wg.Wait()
+}
+
+func TestExpiredContextCancelsLongRunningOperation(t *testing.T) {
+	c := context.Background()
+	ctx, cancel := context.WithCancel(c)
+	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
+	var err error
+	out := make(chan error)
+	cancel()
+	go func() {
+		_, err = onepassword.NewClient(ctx,
+			onepassword.WithServiceAccountToken(token),
+			onepassword.WithIntegrationInfo("Integration_Test_Go_SDK", onepassword.DefaultIntegrationVersion),
+		)
+		out <- err
+	}()
+
+	err = <-out
+	require.ErrorContains(t, err, `context canceled (recovered by wazero)`)
 }

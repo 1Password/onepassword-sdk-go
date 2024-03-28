@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"context"
 	"runtime"
 )
 
@@ -11,8 +12,8 @@ const (
 )
 
 type Core interface {
-	InitClient(config ClientConfig) (*uint64, error)
-	Invoke(invokeConfig InvokeConfig) (*string, error)
+	InitClient(ctx context.Context, config ClientConfig) (*uint64, error)
+	Invoke(ctx context.Context, invokeConfig InvokeConfig) (*string, error)
 	ReleaseClient(clientID uint64)
 }
 
@@ -52,6 +53,6 @@ type InvokeConfig struct {
 
 // Invocation holds the information required for invoking SDK functionality.
 type Invocation struct {
-	MethodName string                 `json:"name"`
-	Parameters map[string]interface{} `json:"parameters"`
+	MethodName string `json:"name"`
+	Parameters string `json:"parameters"`
 }

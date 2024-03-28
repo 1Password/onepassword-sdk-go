@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/1password/onepassword-sdk-go/internal"
 	"runtime"
+	"strings"
 )
 
 const (
@@ -12,7 +13,30 @@ const (
 	DefaultIntegrationVersion = "Unknown"
 )
 
-func createClient(core internal.Core, opts ...ClientOption) (*Client, error) {
+func clientInvoke(ctx context.Context, innerClient InnerClient, invocation string, params []string) (*string, error) {
+	invocationResponse, err := innerClient.core.Invoke(ctx, internal.InvokeConfig{
+		ClientID: innerClient.id,
+		Invocation: internal.Invocation{
+			MethodName: invocation,
+			Parameters: strings.Join(params, ","),
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	return invocationResponse, nil
+}
+
+// NewClient returns a 1Password Go SDK client using the provided ClientOption list.
+func NewClient(ctx context.Context, opts ...ClientOption) (*Client, error) {
+	core, err := internal.GetSharedCore()
+	if err != nil {
+		return nil, err
+	}
+	return createClient(ctx, core, opts...)
+}
+
+func createClient(ctx context.Context, core internal.Core, opts ...ClientOption) (*Client, error) {
 	client := Client{
 		config: internal.NewDefaultConfig(),
 	}
@@ -24,7 +48,7 @@ func createClient(core internal.Core, opts ...ClientOption) (*Client, error) {
 		}
 	}
 
-	clientID, err := core.InitClient(client.config)
+	clientID, err := core.InitClient(ctx, client.config)
 	if err != nil {
 		return nil, fmt.Errorf("error initializing client: %w", err)
 	}
@@ -42,15 +66,6 @@ func createClient(core internal.Core, opts ...ClientOption) (*Client, error) {
 	return &client, nil
 }
 
-// NewClient returns a 1Password Go SDK client using the provided ClientOption list.
-func NewClient(sharedContext context.Context, opts ...ClientOption) (*Client, error) {
-	core, err := internal.GetSharedCore(sharedContext)
-	if err != nil {
-		return nil, err
-	}
-	return createClient(core, opts...)
-}
-
 // InnerClient represents the sdk-core client on which calls will be made.
 type InnerClient struct {
 	id   uint64
@@ -59,7 +74,7 @@ type InnerClient struct {
 
 type ClientOption func(client *Client) error
 
-// WithServiceAccountToken specifies the [1Password Service Account](https://developer.1password.com/docs/service-accounts) token to use to authenticate the SDK client.
+// WithServiceAccountToken specifies the [1Password Service Account](https://developer.1password.com/docs/service-accounts) token to use to authenticate the SDK client. Read more about how to get started with service accounts: https://developer.1password.com/docs/service-accounts/get-started/#create-a-service-account
 func WithServiceAccountToken(token string) ClientOption {
 	return func(c *Client) error {
 		c.config.SAToken = token
@@ -74,14 +89,4 @@ func WithIntegrationInfo(name string, version string) ClientOption {
 		c.config.IntegrationVersion = version
 		return nil
 	}
-}
-
-func clientInvoke(innerClient InnerClient, invocation string, params map[string]interface{}) (*string, error) {
-	return innerClient.core.Invoke(internal.InvokeConfig{
-		ClientID: innerClient.id,
-		Invocation: internal.Invocation{
-			MethodName: invocation,
-			Parameters: params,
-		},
-	})
 }
