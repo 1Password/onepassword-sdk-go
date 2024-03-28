@@ -2,6 +2,7 @@ package onepassword
 
 import (
 	"context"
+
 	"github.com/1password/onepassword-sdk-go/internal"
 )
 
@@ -15,10 +16,10 @@ type SecretsAPI interface {
 
 // SecretsSource implements SecretsAPI relying on an inner client for operations with secrets.
 type SecretsSource struct {
-	InnerClient
+	internal.InnerClient
 }
 
-func NewSecretsSource(inner InnerClient) *SecretsSource {
+func NewSecretsSource(inner internal.InnerClient) *SecretsSource {
 	return &SecretsSource{inner}
 }
 
@@ -26,13 +27,7 @@ func NewSecretsSource(inner InnerClient) *SecretsSource {
 // Secret reference syntax: op://<vault-name>/<item-name>[/<section-name>]/<field-name>
 // Read more about secret references: https://developer.1password.com/docs/cli/secret-references
 func (s SecretsSource) Resolve(ctx context.Context, reference string) (string, error) {
-	res, err := s.core.Invoke(ctx, internal.InvokeConfig{
-		ClientID: s.id,
-		Invocation: internal.Invocation{
-			MethodName:       "Resolve",
-			SerializedParams: reference,
-		},
-	})
+	res, err := clientInvoke(ctx, s.InnerClient, "Resolve", []string{reference})
 	if err != nil {
 		return "", err
 	}
