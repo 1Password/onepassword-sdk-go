@@ -3,29 +3,16 @@ package onepassword
 import (
 	"context"
 	"fmt"
-	"github.com/1password/onepassword-sdk-go/internal"
 	"runtime"
 	"strings"
+
+	"github.com/1password/onepassword-sdk-go/internal"
 )
 
 const (
 	DefaultIntegrationName    = "Unknown"
 	DefaultIntegrationVersion = "Unknown"
 )
-
-func clientInvoke(ctx context.Context, innerClient InnerClient, invocation string, params []string) (*string, error) {
-	invocationResponse, err := innerClient.core.Invoke(ctx, internal.InvokeConfig{
-		ClientID: innerClient.id,
-		Invocation: internal.Invocation{
-			MethodName:       invocation,
-			SerializedParams: strings.Join(params, ","),
-		},
-	})
-	if err != nil {
-		return nil, err
-	}
-	return invocationResponse, nil
-}
 
 // NewClient returns a 1Password Go SDK client using the provided ClientOption list.
 func NewClient(ctx context.Context, opts ...ClientOption) (*Client, error) {
@@ -89,4 +76,18 @@ func WithIntegrationInfo(name string, version string) ClientOption {
 		c.config.IntegrationVersion = version
 		return nil
 	}
+}
+
+func clientInvoke(ctx context.Context, innerClient InnerClient, invocation string, params []string) (*string, error) {
+	invocationResponse, err := innerClient.core.Invoke(ctx, internal.InvokeConfig{
+		ClientID: innerClient.id,
+		Invocation: internal.Invocation{
+			MethodName:       invocation,
+			SerializedParams: strings.Join(params, ","),
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	return invocationResponse, nil
 }
