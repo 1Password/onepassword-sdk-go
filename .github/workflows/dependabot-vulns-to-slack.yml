@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Notify Vulnerabilities
-        uses: kunalnagarco/action-cve@v1.12.14
+        uses: kunalnagarco/action-cve@v1.12.22
         with:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           slack_webhook: ${{ secrets.SLACK_WEBHOOK }}
