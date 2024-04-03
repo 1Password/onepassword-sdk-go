@@ -83,10 +83,10 @@ func TestInvalidInvoke(t *testing.T) {
 
 	validClientID := uint64(0)
 	validMethodName := "Resolve"
-	validParams := "op://gowwbvgow7kxocrfmfvtwni6vi/6ydrn7ne6mwnqc2prsbqx4i4aq/password"
+	validParams := map[string]interface{}{"secret_reference": "op://gowwbvgow7kxocrfmfvtwni6vi/6ydrn7ne6mwnqc2prsbqx4i4aq/password"}
 	invalidClientID := uint64(1)
 	invalidMethodName := "InvalidName"
-	invalidParams := ""
+	invalidParams := map[string]interface{}{"secret_reference": ""}
 
 	// invalid client id
 	invocation1 := internal.InvokeConfig{
@@ -132,7 +132,7 @@ func TestClientReleasedSuccessfully(t *testing.T) {
 		ClientID: 0, // this client id should be invalid because the client has been cleaned up by GC
 		Invocation: internal.Invocation{
 			MethodName:       "Resolve",
-			SerializedParams: "SecretRef",
+			SerializedParams: map[string]interface{}{"secret_reference": "op://foo/bar/baz"},
 		},
 	}
 	_, err = core.Invoke(context.Background(), invocation)
