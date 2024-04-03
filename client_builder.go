@@ -2,9 +2,9 @@ package onepassword
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"runtime"
-	"strings"
 
 	"github.com/1password/onepassword-sdk-go/internal"
 )
@@ -72,12 +72,16 @@ func WithIntegrationInfo(name string, version string) ClientOption {
 	}
 }
 
-func clientInvoke(ctx context.Context, innerClient internal.InnerClient, invocation string, params []string) (*string, error) {
+func clientInvoke(ctx context.Context, innerClient internal.InnerClient, invocation string, params map[string]interface{}) (*string, error) {
+	jsonParameters, err := json.Marshal(params)
+	if err != nil {
+		return nil, err
+	}
 	invocationResponse, err := innerClient.Core.Invoke(ctx, internal.InvokeConfig{
 		ClientID: innerClient.ID,
 		Invocation: internal.Invocation{
 			MethodName:       invocation,
-			SerializedParams: strings.Join(params, ","),
+			SerializedParams: string(jsonParameters),
 		},
 	})
 	if err != nil {
