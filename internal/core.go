@@ -53,8 +53,8 @@ type InvokeConfig struct {
 
 // Invocation holds the information required for invoking SDK functionality.
 type Invocation struct {
-	MethodName       string `json:"name"`
-	SerializedParams string `json:"parameters"`
+	MethodName       string                 `json:"name"`
+	SerializedParams map[string]interface{} `json:"parameters"`
 }
 
 // InnerClient represents the sdk-core client on which calls will be made.
