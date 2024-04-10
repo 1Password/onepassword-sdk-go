@@ -1,6 +1,6 @@
 # Examples
 
-This folder contains code snippets that demonstrate how to import and use the 1Password Go SDK. 
+This folder contains a code snippet that demonstrates how to use the 1Password Go SDK to retrieve a secret from 1Password and export it as an environment variable. 
 
 ## Prerequisites
 
