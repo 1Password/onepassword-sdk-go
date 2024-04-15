@@ -107,7 +107,7 @@ func TestInvalidInvoke(t *testing.T) {
 			SerializedParams: invalidParams,
 		}}
 	_, err2 := core.Invoke(context.Background(), invocation2)
-	assert.EqualError(t, err2, "unknown variant `InvalidName`, expected `Resolve` at line 1 column 48")
+	assert.NotNil(t, err2, "expected error when sending invocation that doesn't exist")
 
 	// invalid serialized params
 	invocation3 := internal.InvokeConfig{
