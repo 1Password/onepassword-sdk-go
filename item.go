@@ -25,7 +25,6 @@ const (
 	ItemCategorySshKey ItemCategory = "SshKey"
 	ItemCategorySocialSecurityNumber ItemCategory = "SocialSecurityNumber"
 	ItemCategorySoftwareLicense ItemCategory = "SoftwareLicense"
-	ItemCategoryVaultCollectionPiece ItemCategory = "VaultCollectionPiece"
 	ItemCategoryPerson ItemCategory = "Person"
 	ItemCategoryUnsupported ItemCategory = "Unsupported"
 )
@@ -38,7 +37,7 @@ const (
 type ItemField struct {
 	ID string `json:"id"`
 	Title string `json:"title"`
-	SectionID string `json:"section_id"`
+	SectionID *string `json:"section_id,omitempty"`
 	FieldType ItemFieldType `json:"field_type"`
 	Value string `json:"value"`
 }
@@ -50,7 +49,7 @@ type Item struct {
 	ID string `json:"id"`
 	Title string `json:"title"`
 	Category ItemCategory `json:"category"`
-	VaultID string `json:"vault_id"`
+	VaultID *string `json:"vault_id,omitempty"`
 	Fields []ItemField `json:"fields"`
 	Sections []ItemSection `json:"sections"`
 }
