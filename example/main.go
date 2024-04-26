@@ -10,7 +10,7 @@ import (
 func main() {
 	// Gets your service account token from the OP_SERVICE_ACCOUNT_TOKEN environment variable.
 	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
-	
+
 	// Authenticates with your service account token and connects to 1Password.
 	client, err := onepassword.NewClient(context.Background(),
 		onepassword.WithServiceAccountToken(token),
@@ -19,8 +19,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	
-	// Retrieves a secret from 1Password. 
+
+	// Retrieves a secret from 1Password.
 	// Takes a secret reference as input and returns the secret to which it points.
 	secret, err := client.Secrets.Resolve(context.Background(), "op://vault/item/field")
 	if err != nil {
