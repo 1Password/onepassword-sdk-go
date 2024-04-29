@@ -39,21 +39,21 @@ const (
 )
 
 type ItemField struct {
-	Id        string        `json:"id"`
+	ID        string        `json:"id"`
 	Title     string        `json:"title"`
-	SectionId *string       `json:"section_id,omitempty"`
+	SectionID *string       `json:"section_id,omitempty"`
 	FieldType ItemFieldType `json:"field_type"`
 	Value     string        `json:"value"`
 }
 type ItemSection struct {
-	Id    string `json:"id"`
+	ID    string `json:"id"`
 	Title string `json:"title"`
 }
 type Item struct {
-	Id       string        `json:"id"`
+	ID       string        `json:"id"`
 	Title    string        `json:"title"`
 	Category ItemCategory  `json:"category"`
-	VaultId  string        `json:"vault_id"`
+	VaultID  string        `json:"vault_id"`
 	Fields   []ItemField   `json:"fields"`
 	Sections []ItemSection `json:"sections"`
 }
