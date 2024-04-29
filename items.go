@@ -9,7 +9,7 @@ import (
 )
 
 type ItemsAPI interface {
-	Get(ctx context.Context, vaultId string, itemId string) (Item, error)
+	Get(ctx context.Context, vaultID string, itemID string) (Item, error)
 }
 
 type ItemsSource struct {
@@ -20,11 +20,11 @@ func NewItemsSource(inner internal.InnerClient) *ItemsSource {
 	return &ItemsSource{inner}
 }
 
-func (s ItemsSource) Get(ctx context.Context, vaultId string, itemId string) (Item, error) {
+func (s ItemsSource) Get(ctx context.Context, vaultID string, itemID string) (Item, error) {
 
 	resultString, err := clientInvoke(ctx, s.InnerClient, "Get", map[string]interface{}{
-		"vault_id": vaultId,
-		"item_id":  itemId,
+		"vault_id": vaultID,
+		"item_id":  itemID,
 	})
 	if err != nil {
 		return Item{}, err
