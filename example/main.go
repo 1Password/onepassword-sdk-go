@@ -36,7 +36,7 @@ func resolveSecretReference(client *onepassword.Client) {
 }
 
 func createAndGetItem(client *onepassword.Client) {
-	sectionID := "extra_details"
+	sectionID := "extradetails"
 	item := onepassword.Item{
 		ID:       "",
 		Title:    "My Login",
@@ -56,7 +56,7 @@ func createAndGetItem(client *onepassword.Client) {
 				FieldType: onepassword.ItemFieldTypeConcealed,
 			},
 			{
-				ID:        "unique_id",
+				ID:        "uniqueid",
 				Title:     "Web address",
 				Value:     "1password.com",
 				FieldType: onepassword.ItemFieldTypeText,
