@@ -20,6 +20,11 @@ func main() {
 		panic(err)
 	}
 
+	resolveSecretReference(client)
+	createAndGetItem(client)
+}
+
+func resolveSecretReference(client *onepassword.Client) {
 	// Retrieves a secret from 1Password.
 	// Takes a secret reference as input and returns the secret to which it points.
 	secret, err := client.Secrets.Resolve(context.Background(), "op://vault/item/field")
@@ -28,6 +33,59 @@ func main() {
 	}
 
 	doSomethingSecret(secret)
+}
+
+func createAndGetItem(client *onepassword.Client) {
+	sectionID := "extra_details"
+	item := onepassword.Item{
+		ID:       "",
+		Title:    "My Login",
+		Category: onepassword.ItemCategoryLogin,
+		VaultID:  "qw33qlyug6moear3wkk9zkemui",
+		Fields: []onepassword.ItemField{
+			{
+				ID:        "username",
+				Title:     "username",
+				Value:     "Wendy_Appleseed",
+				FieldType: onepassword.ItemFieldTypeText,
+			},
+			{
+				ID:        "password",
+				Title:     "password",
+				Value:     "my_weak_password123",
+				FieldType: onepassword.ItemFieldTypeConcealed,
+			},
+			{
+				ID:        "unique_id",
+				Title:     "Web address",
+				Value:     "1password.com",
+				FieldType: onepassword.ItemFieldTypeText,
+				SectionID: &sectionID,
+			},
+		},
+		Sections: []onepassword.ItemSection{
+			{
+				ID:    sectionID,
+				Title: "Extra Details",
+			},
+		},
+	}
+
+	// Creates a new item based on the structure definition above
+	createdItem, err := client.Items.Create(context.Background(), item)
+	if err != nil {
+		panic(err)
+	}
+
+	// Retrieves the newly created item
+	login, err := client.Items.Get(context.Background(), createdItem.VaultID, createdItem.ID)
+	if err != nil {
+		panic(err)
+	}
+
+	if len(login.Fields) > 0 {
+		doSomethingSecret(login.Fields[0].Value)
+	}
 }
 
 // Exports the secret to the SECRET_ENV_VAR environment variable.
