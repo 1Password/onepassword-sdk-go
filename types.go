@@ -55,7 +55,7 @@ type ItemField struct {
 // A section groups together multiple fields in an item.
 type ItemSection struct {
 	// The section's ID
-	ID    string `json:"id"`
+	ID string `json:"id"`
 	// The section's name
 	Title string `json:"title"`
 }
