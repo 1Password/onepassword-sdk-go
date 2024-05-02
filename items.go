@@ -8,10 +8,15 @@ import (
 	"github.com/1password/onepassword-sdk-go/internal"
 )
 
+// ItemsAPI contains all operations the SDK client can perform on 1Password items.
 type ItemsAPI interface {
+	// Create a new item
 	Create(ctx context.Context, item Item) (Item, error)
+	// Get an item by vault and item ID
 	Get(ctx context.Context, vaultId string, itemId string) (Item, error)
+	// Update an existing item. Warning: Only text and concealed fields are currently supported. Other fields will be permanently lost when you update an item.
 	Update(ctx context.Context, item Item) (Item, error)
+	// Delete an item. Warning:  Information saved in fields other than text and concealed fields will be permanently lost.
 	Delete(ctx context.Context, vaultId string, itemId string) error
 }
 
