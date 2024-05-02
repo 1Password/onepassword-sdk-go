@@ -38,22 +38,40 @@ const (
 	ItemFieldTypeUnsupported ItemFieldType = "Unsupported"
 )
 
+// Stores a field's title and value.
 type ItemField struct {
-	ID        string        `json:"id"`
-	Title     string        `json:"title"`
-	SectionID *string       `json:"section_id,omitempty"`
+	// The field's ID
+	ID string `json:"id"`
+	// The field's title
+	Title string `json:"title"`
+	// The ID of the section containing the field. Designated fields such as usernames and passwords don't need to specify a section.
+	SectionID *string `json:"section_id,omitempty"`
+	// The type of value stored in the field
 	FieldType ItemFieldType `json:"field_type"`
-	Value     string        `json:"value"`
+	// The string representation of the field's value
+	Value string `json:"value"`
 }
+
+// A section groups together multiple fields in an item.
 type ItemSection struct {
-	ID    string `json:"id"`
+	// The section's ID
+	ID string `json:"id"`
+	// The section's name
 	Title string `json:"title"`
 }
+
+// Represents a 1Password item.
 type Item struct {
-	ID       string        `json:"id"`
-	Title    string        `json:"title"`
-	Category ItemCategory  `json:"category"`
-	VaultID  string        `json:"vault_id"`
-	Fields   []ItemField   `json:"fields"`
+	// The item's unique ID
+	ID string `json:"id"`
+	// The item's title
+	Title string `json:"title"`
+	// The item's category
+	Category ItemCategory `json:"category"`
+	// The ID of the vault where the item is saved
+	VaultID string `json:"vault_id"`
+	// The item's fields
+	Fields []ItemField `json:"fields"`
+	// The item's sections
 	Sections []ItemSection `json:"sections"`
 }

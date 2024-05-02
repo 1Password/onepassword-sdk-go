@@ -8,8 +8,16 @@ import (
 	"github.com/1password/onepassword-sdk-go/internal"
 )
 
+// ItemsAPI contains all operations the SDK client can perform on 1Password items.
 type ItemsAPI interface {
-	Get(ctx context.Context, vaultID string, itemID string) (Item, error)
+	// Create a new item
+	Create(ctx context.Context, item Item) (Item, error)
+	// Get an item by vault and item ID
+	Get(ctx context.Context, vaultId string, itemId string) (Item, error)
+	// Update an existing item. Warning: Only text and concealed fields are currently supported. Other fields will be permanently lost when you update an item.
+	Update(ctx context.Context, item Item) (Item, error)
+	// Delete an item. Warning:  Information saved in fields other than text and concealed fields will be permanently lost.
+	Delete(ctx context.Context, vaultId string, itemId string) error
 }
 
 type ItemsSource struct {
@@ -20,11 +28,10 @@ func NewItemsSource(inner internal.InnerClient) *ItemsSource {
 	return &ItemsSource{inner}
 }
 
-func (s ItemsSource) Get(ctx context.Context, vaultID string, itemID string) (Item, error) {
+func (s ItemsSource) Create(ctx context.Context, item Item) (Item, error) {
 
-	resultString, err := clientInvoke(ctx, s.InnerClient, "Get", map[string]interface{}{
-		"vault_id": vaultID,
-		"item_id":  itemID,
+	resultString, err := clientInvoke(ctx, s.InnerClient, "Create", map[string]interface{}{
+		"item": item,
 	})
 	if err != nil {
 		return Item{}, err
@@ -35,4 +42,46 @@ func (s ItemsSource) Get(ctx context.Context, vaultID string, itemID string) (It
 		return Item{}, err
 	}
 	return result, nil
+}
+
+func (s ItemsSource) Get(ctx context.Context, vaultId string, itemId string) (Item, error) {
+
+	resultString, err := clientInvoke(ctx, s.InnerClient, "Get", map[string]interface{}{
+		"vault_id": vaultId,
+		"item_id":  itemId,
+	})
+	if err != nil {
+		return Item{}, err
+	}
+	var result Item
+	err = json.Unmarshal([]byte(*resultString), &result)
+	if err != nil {
+		return Item{}, err
+	}
+	return result, nil
+}
+
+func (s ItemsSource) Update(ctx context.Context, item Item) (Item, error) {
+
+	resultString, err := clientInvoke(ctx, s.InnerClient, "Update", map[string]interface{}{
+		"item": item,
+	})
+	if err != nil {
+		return Item{}, err
+	}
+	var result Item
+	err = json.Unmarshal([]byte(*resultString), &result)
+	if err != nil {
+		return Item{}, err
+	}
+	return result, nil
+}
+
+func (s ItemsSource) Delete(ctx context.Context, vaultId string, itemId string) error {
+
+	_, err := clientInvoke(ctx, s.InnerClient, "Delete", map[string]interface{}{
+		"vault_id": vaultId,
+		"item_id":  itemId,
+	})
+	return err
 }
