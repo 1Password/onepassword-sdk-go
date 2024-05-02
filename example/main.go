@@ -3,8 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
-	onepassword "github.com/1password/onepassword-sdk-go"
 	"os"
+
+	onepassword "github.com/1password/onepassword-sdk-go"
 )
 
 func main() {
