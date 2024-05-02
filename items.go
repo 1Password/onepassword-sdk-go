@@ -9,7 +9,10 @@ import (
 )
 
 type ItemsAPI interface {
-	Get(ctx context.Context, vaultID string, itemID string) (Item, error)
+	Create(ctx context.Context, item Item) (Item, error)
+	Get(ctx context.Context, vaultId string, itemId string) (Item, error)
+	Update(ctx context.Context, item Item) (Item, error)
+	Delete(ctx context.Context, vaultId string, itemId string) error
 }
 
 type ItemsSource struct {
@@ -20,11 +23,10 @@ func NewItemsSource(inner internal.InnerClient) *ItemsSource {
 	return &ItemsSource{inner}
 }
 
-func (s ItemsSource) Get(ctx context.Context, vaultID string, itemID string) (Item, error) {
+func (s ItemsSource) Create(ctx context.Context, item Item) (Item, error) {
 
-	resultString, err := clientInvoke(ctx, s.InnerClient, "Get", map[string]interface{}{
-		"vault_id": vaultID,
-		"item_id":  itemID,
+	resultString, err := clientInvoke(ctx, s.InnerClient, "Create", map[string]interface{}{
+		"item": item,
 	})
 	if err != nil {
 		return Item{}, err
@@ -35,4 +37,46 @@ func (s ItemsSource) Get(ctx context.Context, vaultID string, itemID string) (It
 		return Item{}, err
 	}
 	return result, nil
+}
+
+func (s ItemsSource) Get(ctx context.Context, vaultId string, itemId string) (Item, error) {
+
+	resultString, err := clientInvoke(ctx, s.InnerClient, "Get", map[string]interface{}{
+		"vault_id": vaultId,
+		"item_id":  itemId,
+	})
+	if err != nil {
+		return Item{}, err
+	}
+	var result Item
+	err = json.Unmarshal([]byte(*resultString), &result)
+	if err != nil {
+		return Item{}, err
+	}
+	return result, nil
+}
+
+func (s ItemsSource) Update(ctx context.Context, item Item) (Item, error) {
+
+	resultString, err := clientInvoke(ctx, s.InnerClient, "Update", map[string]interface{}{
+		"item": item,
+	})
+	if err != nil {
+		return Item{}, err
+	}
+	var result Item
+	err = json.Unmarshal([]byte(*resultString), &result)
+	if err != nil {
+		return Item{}, err
+	}
+	return result, nil
+}
+
+func (s ItemsSource) Delete(ctx context.Context, vaultId string, itemId string) error {
+
+	_, err := clientInvoke(ctx, s.InnerClient, "Delete", map[string]interface{}{
+		"vault_id": vaultId,
+		"item_id":  itemId,
+	})
+	return err
 }
