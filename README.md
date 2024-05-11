@@ -100,9 +100,9 @@ func main() {
 
 Inside ```onepassword.WithIntegrationInfo(...)```, pass the name of your application and the version of your application as arguments.
 
-Make sure to use [secret reference URIs](https://developer.1password.com/docs/cli/secret-references/) with the syntax `op://vault/item/field` to securely load secrets from 1Password into your code.
+Make sure to use [secret reference URIs](https://developer.1password.com/docs/cli/secrets-reference-syntax/) with the syntax `op://vault/item/field` to securely load secrets from 1Password into your code.
 
-## Learn more
+## 📖 Learn more
 
 - [Load secrets with 1Password SDKs](https://developer.1password.com/docs/sdks/load-secrets)
 - [Manage items with 1Password SDKs](https://developer.1password.com/docs/sdks/manage-items)
