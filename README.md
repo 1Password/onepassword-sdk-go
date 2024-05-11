@@ -69,34 +69,7 @@ To use the 1Password Go SDK in your project:
     go get github.com/1password/onepassword-sdk-go
     ```
 
-4. Import the Go SDK in your project:
-
-    ```go
-    import (
-    "github.com/1password/onepassword-sdk-go"
-    )
-    ```
-
-5. Initalize the Go SDK. Provision your service account token and use `integration_name` and `integration_version` to specify a name and version for your application.
-
-    ```go
-    func main() {
-        // Gets your service account token from the OP_SERVICE_ACCOUNT_TOKEN environment variable.
-        token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
-
-        // Authenticates with your service account token and connects to 1Password.
-        client, err := onepassword.NewClient(context.Background(),
-            onepassword.WithServiceAccountToken(token),
-            onepassword.WithIntegrationInfo("My 1Password Integration", "v1.0.0"),
-        )
-        if err != nil {
-            panic(err)
-        }
-    }
-    ```
- 	
-
-### Example
+4. Use the Go SDK in your project:
 
 ```go
 import (
@@ -125,6 +98,8 @@ func main() {
 }
 ```
 
+Inside ```onepassword.WithIntegrationInfo(...)```, pass the name of your application and the version of your application as arguments.
+
 Make sure to use [secret reference URIs](https://developer.1password.com/docs/cli/secret-references/) with the syntax `op://vault/item/field` to securely load secrets from 1Password into your code.
 
 ## Learn more
@@ -132,6 +107,3 @@ Make sure to use [secret reference URIs](https://developer.1password.com/docs/cl
 - [Load secrets with 1Password SDKs](https://developer.1password.com/docs/sdks/load-secrets)
 - [Manage items with 1Password SDKs](https://developer.1password.com/docs/sdks/manage-items)
 - [1Password SDK concepts](https://developer.1password.com/docs/sdks/concepts)
-
-
-Inside ```onepassword.WithIntegrationInfo(...)```, pass the name of your application and the version of your application as arguments.
