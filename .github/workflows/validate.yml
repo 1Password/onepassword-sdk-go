@@ -47,4 +47,4 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Lint with golanci-lint
-        uses: golangci/golangci-lint-action@v4
+        uses: golangci/golangci-lint-action@v6
