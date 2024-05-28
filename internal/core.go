@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	SDKSemverVersion      = "0010001" // v0.1.0
+	SDKSemverVersion      = "0010009" // v0.1.0-beta.9
 	SDKLanguage           = "Go"
 	DefaultRequestLibrary = "net/http"
 )
