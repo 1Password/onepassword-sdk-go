@@ -70,7 +70,7 @@ func main() {
     client, err := onepassword.NewClient(
                 context.TODO(),
                 onepassword.WithServiceAccountToken(token),
-				// TODO: Set the following to your own integration name and version.
+                // TODO: Set the following to your own integration name and version.
                 onepassword.WithIntegrationInfo("My 1Password Integration", "v1.0.0"),
     )
     if err != nil {
