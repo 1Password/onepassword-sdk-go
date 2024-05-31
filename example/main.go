@@ -15,6 +15,7 @@ func main() {
 	// Authenticates with your service account token and connects to 1Password.
 	client, err := onepassword.NewClient(context.Background(),
 		onepassword.WithServiceAccountToken(token),
+		// TODO: Set the following to your own integration name and version.
 		onepassword.WithIntegrationInfo("My 1Password Integration", "v1.0.0"),
 	)
 	if err != nil {

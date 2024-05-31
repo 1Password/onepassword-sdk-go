@@ -70,20 +70,19 @@ func main() {
     client, err := onepassword.NewClient(
                 context.TODO(),
                 onepassword.WithServiceAccountToken(token),
+                // TODO: Set the following to your own integration name and version.
                 onepassword.WithIntegrationInfo("My 1Password Integration", "v1.0.0"),
     )
     if err != nil {
 	// handle err
     }
-    secret, err := client.Secrets.Resolve("op://vault/item/field")
+    secret, err := client.Secrets.Resolve(context.TODO(), "op://vault/item/field")
     if err != nil {
         // handle err
     }
     // do something with the secret
 }
 ```
-
-Inside `onepassword.WithIntegrationInfo(...)`, pass the name of your application and the version of your application as arguments.
 
 Make sure to use [secret reference URIs](https://developer.1password.com/docs/cli/secrets-reference-syntax/) with the syntax `op://vault/item/field` to securely load secrets from 1Password into your code.
 
