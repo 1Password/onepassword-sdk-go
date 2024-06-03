@@ -8,10 +8,10 @@ import (
 	"github.com/1password/onepassword-sdk-go/internal"
 )
 
+// Secrets point to fields in 1Password. They have the following format: op://<vault-name>/<item-name>[/<section-name>]/<field-name>
+// Read more about secrets: https://developer.1password.com/docs/cli/secret-references
 type SecretsAPI interface {
 	// Resolve returns the secret the provided secret reference points to.
-	// Secret references point to fields in 1Password. They have the following format: op://<vault-name>/<item-name>[/<section-name>]/<field-name>
-	// Read more about secret references: https://developer.1password.com/docs/cli/secret-references
 	Resolve(ctx context.Context, secretReference string) (string, error)
 }
 
@@ -24,8 +24,6 @@ func NewSecretsSource(inner internal.InnerClient) *SecretsSource {
 }
 
 // Resolve returns the secret the provided secret reference points to.
-// Secret references point to fields in 1Password. They have the following format: op://<vault-name>/<item-name>[/<section-name>]/<field-name>
-// Read more about secret references: https://developer.1password.com/docs/cli/secret-references
 func (s SecretsSource) Resolve(ctx context.Context, secretReference string) (string, error) {
 
 	resultString, err := clientInvoke(ctx, s.InnerClient, "Resolve", map[string]interface{}{

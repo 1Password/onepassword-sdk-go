@@ -8,7 +8,7 @@ import (
 	"github.com/1password/onepassword-sdk-go/internal"
 )
 
-// ItemsAPI contains all operations the SDK client can perform on 1Password items.
+// The Items API holds all operations the SDK client can perform on 1Password items.
 type ItemsAPI interface {
 	// Create a new item
 	Create(ctx context.Context, item Item) (Item, error)
@@ -16,7 +16,7 @@ type ItemsAPI interface {
 	Get(ctx context.Context, vaultId string, itemId string) (Item, error)
 	// Update an existing item. You can currently only edit text and concealed fields.
 	Update(ctx context.Context, item Item) (Item, error)
-	// Delete an item. 
+	// Delete an item.
 	Delete(ctx context.Context, vaultId string, itemId string) error
 }
 
@@ -28,6 +28,7 @@ func NewItemsSource(inner internal.InnerClient) *ItemsSource {
 	return &ItemsSource{inner}
 }
 
+// Create a new item
 func (s ItemsSource) Create(ctx context.Context, item Item) (Item, error) {
 
 	resultString, err := clientInvoke(ctx, s.InnerClient, "Create", map[string]interface{}{
@@ -44,6 +45,7 @@ func (s ItemsSource) Create(ctx context.Context, item Item) (Item, error) {
 	return result, nil
 }
 
+// Get an item by vault and item ID
 func (s ItemsSource) Get(ctx context.Context, vaultId string, itemId string) (Item, error) {
 
 	resultString, err := clientInvoke(ctx, s.InnerClient, "Get", map[string]interface{}{
@@ -61,6 +63,7 @@ func (s ItemsSource) Get(ctx context.Context, vaultId string, itemId string) (It
 	return result, nil
 }
 
+// Update an existing item. You can currently only edit text and concealed fields.
 func (s ItemsSource) Update(ctx context.Context, item Item) (Item, error) {
 
 	resultString, err := clientInvoke(ctx, s.InnerClient, "Update", map[string]interface{}{
@@ -77,6 +80,7 @@ func (s ItemsSource) Update(ctx context.Context, item Item) (Item, error) {
 	return result, nil
 }
 
+// Delete an item.
 func (s ItemsSource) Delete(ctx context.Context, vaultId string, itemId string) error {
 
 	_, err := clientInvoke(ctx, s.InnerClient, "Delete", map[string]interface{}{
