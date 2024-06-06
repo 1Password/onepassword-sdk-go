@@ -19,6 +19,7 @@ jobs:
           RELEASE_NOTES: ${{ github.event.inputs.changelog }}
           GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         run: |
+          # Replace \n with actual newlines
           RELEASE_NOTES=$(printf "%b" "${RELEASE_NOTES//\\n/\\n}")
   
           # Correct the format of RELEASE_NOTES so gh release create won't be angry

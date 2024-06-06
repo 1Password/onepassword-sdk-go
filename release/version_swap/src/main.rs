@@ -1,3 +1,5 @@
+/// Helper script to swap the version and build numbers to the ones located in .version and .version-build
+
 use std::fs;
 use std::io::{self, BufRead, Write};
 
@@ -17,7 +19,7 @@ fn write_file_lines(path: &str, lines: &[String]) -> io::Result<()> {
     Ok(())
 }
 
-// Function to replace the version number and build number in the defaults.py
+// Function to replace the version number and build number in the core.go
 fn replace_version_number(lines: &[String], new_version: &str, new_build_number: &str) -> Vec<String> {
     lines
         .iter()
@@ -37,7 +39,7 @@ fn main() -> io::Result<()> {
     let version_file_path = "../../.version";
     let build_number_file_path = "../../.version-build";
 
-    // Read the original file and the version file
+    // Acquire the lines of the core.go file and grab the new version/build numbers
     let core_lines = read_file_lines(core_file_path)?;
     let new_version = read_file_lines(version_file_path)?
         .get(0)
@@ -51,7 +53,7 @@ fn main() -> io::Result<()> {
         .trim()
         .to_string();
 
-    // Replace version number and build number in defaults.py
+    // Replace version number and build number in core.go
     let updated_core_lines = replace_version_number(&core_lines, &new_version, &new_build_number);
     write_file_lines(core_file_path, &updated_core_lines)?;
 

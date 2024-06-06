@@ -1,5 +1,5 @@
 #!/bin/bash
-# Helper script to prepare a Python Release for the SDKs.
+# Helper script to prepare a Go Release for the SDKs.
 
 set -e
 
@@ -33,7 +33,7 @@ if ! test -e "$SDK_BUILD_FILE"; then
   exit 1
 fi
 
-# Swap the version numbers with the updated ones
+# Swap the version/build numbers with the updated ones
 make version_swap
 
 # Stash changes
@@ -48,5 +48,5 @@ git checkout -b "${SDK_NAME}-rc/${SDK_VERSION}"
 # Restore version changes
 git stash pop
 
-# Push changes
+# Push updated version/build changes to new branch
 git push origin "${SDK_NAME}-rc/${SDK_VERSION}"
