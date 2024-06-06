@@ -13,6 +13,5 @@ prep-go:
 version_swap:
 	cd version_swap/src && cargo run -r main.rs
 
-# The changelog is empty here as it expects manual input from GitHub
 sdk-release-go:
 	release-scripts/sdk-release.sh
