@@ -1,0 +1,17 @@
+name: Prepare Go Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  prepare_release:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+        
+      - name: Prepare Go Publish
+        run: |
+              cd release
+              make prep-go
