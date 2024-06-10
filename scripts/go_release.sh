@@ -44,15 +44,6 @@ while true; do
    fi
 done
 
-# Replace version number with new version number
-awk -v build="$build_number" -v version="$version_number" '
-  /SDKSemverVersion/ && !done {
-    print "   SDKSemverVersion      =", "\"" build "\" // v" version;
-    done = 1;
-    next;
-  } 
-  { print }' internal/core.go > tmpfile && mv tmpfile internal/core.go
-
 # Prompt the user to input multiline text
 echo "Enter your multiline text (press Ctrl+D when finished):"
 changelog_content=""
@@ -64,14 +55,27 @@ done
 
 git tag -a -s  "v${version_number}" -m "${version_number}"
 git status
-git add internal/core.go 
+
+# Get Current Branch Name
+BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+
+# If on branch with other changes, than add all of the changes
+if [[ "$BRANCH" != "main" ]]; then
+    git add .
+else
+    git stash
+    git fetch origin
+    git checkout -b rc/"${version_number}"
+    git stash pop
+    git add internal/version.txt
+fi
+
 git commit -m "Release for ${version_number}"
-git push 
+git push origin $BRANCH
 
 # Login with Github CLI
-gh auth login --with-token <<< ${GIT_TOKEN} 
+gh auth login --with-token <<< ${GITHUB_TOKEN} 
 
-gh release create "${version_number}" --title "Release ${version_number}" --notes "${changelog_content}" --repo github.com/1Password/onepassword-sdk-go
+# Create a release with the tag and changelog
+gh release create "${version_number}" --title "Release ${version_number}" --notes "${changelog_content}" --repo github.com/MOmarMiraj/onepassword-sdk-go
  
-
-

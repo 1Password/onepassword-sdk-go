@@ -2,14 +2,17 @@ package internal
 
 import (
 	"context"
+	_ "embed"
 	"runtime"
 )
 
 const (
-	SDKSemverVersion      = "0010009" // v0.1.0-beta.9
 	SDKLanguage           = "Go"
 	DefaultRequestLibrary = "net/http"
 )
+
+//go:embed version.txt
+var SDKSemverVersion string
 
 type Core interface {
 	InitClient(ctx context.Context, config ClientConfig) (*uint64, error)
