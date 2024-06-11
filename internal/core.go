@@ -11,7 +11,7 @@ const (
 	DefaultRequestLibrary = "net/http"
 )
 
-//go:embed version-build.txt
+//go:embed version-build
 var SDKSemverVersion string
 
 type Core interface {
