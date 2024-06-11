@@ -1,5 +1,6 @@
 ## How to Prepare a Release for the Go SDK
-   Step 1. Make any changes to the SDK as required
+
+Step 1. Make any changes to the SDK as required
 
 Step 2. Go to the root of the repo and run 
 ```
