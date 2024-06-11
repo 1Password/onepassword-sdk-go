@@ -86,7 +86,6 @@ git push origin ${branch}
 if [ -z "${GITHUB_CLI_TOKEN}" ]; then
   echo "GITHUB_CLI_TOKEN environment variable is not set."
   exit 1
-
 fi
 
 # Login with Github CLI
