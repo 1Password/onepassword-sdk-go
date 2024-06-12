@@ -15,6 +15,12 @@ if ! command -v gh &> /dev/null; then
 	exit 1;\
 fi
 
+# Ensure GITHUB_TOKEN env var is set
+if [ -z "${GITHUB_TOKEN}" ]; then
+  echo "GITHUB_TOKEN environment variable is not set."
+  exit 1
+fi
+
 git tag -a -s  "v${version}" -m "${version}"
 
 # Get Current Branch Name
@@ -33,10 +39,5 @@ git add .
 git commit -m "Release v${version}"
 git push origin ${branch}
 
-# Ensure GITHUB_TOKEN env var is set
-if [ -z "${GITHUB_TOKEN}" ]; then
-  echo "GITHUB_TOKEN environment variable is not set."
-  exit 1
-fi
-
 gh release create "v${version}" --title "Release ${version}" --notes "${changelog}" --repo github.com/1Password/onepassword-sdk-go
+

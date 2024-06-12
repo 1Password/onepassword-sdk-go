@@ -2,16 +2,22 @@
 
 # Helper script to prepare a release for the Go SDK.
 
-# Read the version number and build number from the respective files
-current_version_number=$(< internal/version)
+# Read the current build number from version-build to make sure the build number has been updated
 current_build_number=$(< internal/version-build)
 
 version_file="internal/version"
 build_file="internal/version-build"
 
-# Function to validate the version number format x.y.z(-beta.w)
-validate_and_update_version_number() {
+enforce_latest_code() {
+    if [[ -n "$(git status --porcelain=v1)" ]]; then
+        echo "ERROR: working directory is not clean."
+        echo "Please stash your changes and try again."
+        exit 1
+    fi
+}
 
+# Function to validate the version number format x.y.z(-beta.w)
+validate_and_update_version() {
     while true; do
         # Prompt the user to input the version number
         read -p "Enter the version number (format: x.y.z(-beta.w)): " version
@@ -31,7 +37,7 @@ validate_and_update_version_number() {
 
 # Function to validate the build number format.
 # SEMVER Format: Mmmppbb - 7 Digits 
-update_and_validate_build_number() {
+update_and_validate_build() {
     while true; do
         # Prompt the user to input the build number
         read -p "Enter the build number (format: Mmmppbb): " build
@@ -49,11 +55,14 @@ update_and_validate_build_number() {
     done
 }
 
-# Update and Validate the version number
-validate_and_update_version_number
+# Ensure that the current working directory is clean
+enforce_latest_code
 
-# Update and Validate the build number
-update_and_validate_build_number 
+# Update and validate the version number
+validate_and_update_version
+
+# Update and validate the build number
+update_and_validate_build 
 
 if [[ "$current_build_number" == "$build" ]]; then
     echo "Build version hasn't changed. Stopping." >&2
@@ -71,13 +80,7 @@ done
 changelog_file="internal/changelogs/"${version}"-"${build}""
 
 # Store the changelog input into a file
-{
-   echo "Release Notes for: v"${version}""
-   echo ""
-   echo "${changelog_content}"
-   echo "[${build}]"
-   echo ""
-} >> "${changelog_file}"
+echo "${changelog_content}" >> "${changelog_file}"
 
 echo "Release has been prepared..
 Make sure to double check version/build numbers in their appropriate files and
