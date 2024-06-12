@@ -12,8 +12,5 @@ Step 3. Ensure that the correct files have been updated - i.e. version/build fil
 
 Step 4. Ensure your GITHUB_TOKEN environment variable is set as this will allow you to create the tags/release and push it.
 
-Step 5. If everything looks good, at the root of the repo, run this
-```
-make release
-```
+Step 5. If everything looks good, at the root of the repo, run:
 Step 6. Congratulations, you have released the newest Go SDK!

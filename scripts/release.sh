@@ -30,7 +30,7 @@ fi
 
 # Add changes and commit/push to branch
 git add .
-git commit -m "Release for ${version}"
+git commit -m "Release v${version}"
 git push origin ${branch}
 
 # Ensure GITHUB_TOKEN env var is set

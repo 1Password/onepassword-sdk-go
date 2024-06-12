@@ -82,4 +82,4 @@ changelog_file="internal/changelogs/"${version}"-"${build}""
 echo "Release has been prepared..
 Make sure to double check version/build numbers in their appropriate files and
 changelog is correctly filled out.
-Once confirmed, run make release to release the SDK!"
+Once confirmed, run `make release` to release the SDK!"
