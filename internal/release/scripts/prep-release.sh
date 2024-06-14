@@ -3,10 +3,10 @@
 # Helper script to prepare a release for the Go SDK.
 
 # Read the current build number from version-build to make sure the build number has been updated
-current_build_number=$(< internal/version-build)
+current_build_number=$(< internal/release/version-build)
 
-version_file="internal/version"
-build_file="internal/version-build"
+version_file="internal/release/version"
+build_file="internal/release/version-build"
 
 enforce_latest_code() {
     if [[ -n "$(git status --porcelain=v1)" ]]; then
@@ -64,8 +64,8 @@ update_and_validate_version
 # Update and validate the build number
 update_and_validate_build 
 
-if [[ "$current_build_number" == "$build" ]]; then
-    echo "Build version hasn't changed. Stopping." >&2
+if [[ "$current_build_number" -ge "$build" ]]; then
+    echo "Build version hasn't changed or is lower than current build version. Stopping." >&2
     exit 1
 fi
 
@@ -77,10 +77,21 @@ while IFS= read -r line; do
     changelog_content+="${line}"$'\n' # Append each line to the variable with a newline character
 done
 
-changelog_file="internal/changelogs/"${version}"-"${build}""
+changelog_file="internal/release/changelogs/"${version}"-"${build}""
 
 # Store the changelog input into a file
 echo "${changelog_content}" >> "${changelog_file}"
+
+# Get Current Branch Name
+branch="$(git rev-parse --abbrev-ref HEAD)"
+
+# if on main, then stash changes and create RC branch
+if [[ "${branch}" = "main" ]]; then
+    git stash
+    git fetch origin
+    git checkout -b rc/"${version}"
+    git stash pop
+fi
 
 echo "Release has been prepared..
 Make sure to double check version/build numbers in their appropriate files and
