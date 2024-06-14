@@ -69,18 +69,11 @@ if [[ "$current_build_number" -ge "$build" ]]; then
     exit 1
 fi
 
-echo "Enter your changelog for the release (press Ctrl+D when finished):"
-
-# Read changelog input from the user until Ctrl+D is pressed
-changelog_content=""
-while IFS= read -r line; do
-    changelog_content+="${line}"$'\n' # Append each line to the variable with a newline character
-done
-
 changelog_file="internal/release/changelogs/"${version}"-"${build}""
 
-# Store the changelog input into a file
-echo "${changelog_content}" >> "${changelog_file}"
+printf "Press ENTER to edit the CHANGELOG in your default editor...\n"
+read -r _ignore
+${EDITOR:-nano} "$changelog_file"
 
 # Get Current Branch Name
 branch="$(git rev-parse --abbrev-ref HEAD)"
