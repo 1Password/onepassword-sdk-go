@@ -5,7 +5,7 @@ go 1.21
 require (
 	github.com/extism/go-sdk v1.2.0
 	github.com/stretchr/testify v1.9.0
-	github.com/tetratelabs/wazero v1.7.2
+	github.com/tetratelabs/wazero v1.7.3
 )
 
 require (
