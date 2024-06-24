@@ -45,7 +45,7 @@ update_and_validate_version() {
                 echo "New version number is: ${version}"
                 return 0
             else
-                echo "Version hasn't changed or is less than current version."
+                echo "Version hasn't changed."
             fi        
         else
             echo "Invalid version number format: ${version}"
@@ -69,7 +69,7 @@ update_and_validate_build() {
                 echo "New build number is: ${build}"
                 return 0
             else
-                echo "Build version hasn't changed or is less than current build version."
+                echo "New build version should be higher than current build version."
             fi
         else
             echo "Invalid build number format: ${build}"
