@@ -2,11 +2,25 @@
 
 # Helper script to prepare a release for the Go SDK.
 
-# Read the current build number from version-build to make sure the build number has been updated
-current_build_number=$(< internal/release/version-build)
+# Read current build and version for backup as well as comparison to new build
+current_build=$(< internal/release/version-build)
+current_version=$(< internal/release/version)
 
 version_file="internal/release/version"
 build_file="internal/release/version-build"
+
+# Function to execute upon exit
+cleanup() {
+    echo "Performing cleanup tasks..."
+    # Remove changelog file if it exists
+    rm -f "${changelog_file}"
+    # Revert changes to file if any
+    echo "${current_version}" > "${version_file}"
+    echo "${current_build}" > "${build_file}"   
+}
+
+# Set the trap to call the cleanup function on exit
+trap cleanup EXIT
 
 enforce_latest_code() {
     if [[ -n "$(git status --porcelain=v1)" ]]; then
@@ -44,10 +58,15 @@ update_and_validate_build() {
 
         # Validate the build number format
         if [[ "${build}" =~ ^[0-9]{7}$ ]]; then
-            # Write the valid build number to the file
-            echo "${build}" > "${build_file}"
-            echo "New build number is: ${build}"
-            return 0
+            if (( 10#$current_build < 10#$build )); then
+                # Write the valid build number to the file
+                echo "${build}" > "${build_file}"
+                echo "New build number is: ${build}"
+                return 0
+            else
+                echo "Build version hasn't changed or is less than current build version. Stopping." >&2
+                exit 1
+            fi
         else
             echo "Invalid build number format: ${build}"
             echo "Please enter a build number in the 'Mmmppbb' format."
@@ -63,11 +82,6 @@ update_and_validate_version
 
 # Update and validate the build number
 update_and_validate_build 
-
-if (( 10#$current_build_number >= 10#$build )); then
-    echo "Build version hasn't changed or is less than current build version. Stopping." >&2
-    exit 1
-fi
 
 changelog_file="internal/release/changelogs/"${version}"-"${build}""
 
