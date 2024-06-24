@@ -20,7 +20,7 @@ cleanup() {
 }
 
 # Set the trap to call the cleanup function on exit
-trap cleanup EXIT
+trap cleanup EXIT ERR
 
 enforce_latest_code() {
     if [[ -n "$(git status --porcelain=v1)" ]]; then
