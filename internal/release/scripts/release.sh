@@ -7,7 +7,7 @@ set -e
 # Read the contents of the files into variables
 version=$(< internal/release/version)
 build=$(< internal/release/version-build)
-release-notes=$(< internal/release/RELEASE-NOTES)
+release_notes=$(< internal/release/RELEASE-NOTES)
 
 # Check if Github CLI is installed
 if ! command -v gh &> /dev/null; then
@@ -26,5 +26,5 @@ git tag -a -s  "v${version}" -m "${version}"
 # Push the tag to the branch
 git push origin tag "v${version}"
 
-gh release create "v${version}" --title "Release ${version}" --notes "${release-notes}" --repo github.com/1Password/onepassword-sdk-go
+gh release create "v${version}" --title "Release ${version}" --notes "${release_notes}" --repo github.com/1Password/onepassword-sdk-go
 
