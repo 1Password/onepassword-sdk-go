@@ -12,8 +12,6 @@ build_file="internal/release/version-build"
 # Function to execute upon exit
 cleanup() {
     echo "Performing cleanup tasks..."
-    # Remove changelog file if it exists
-    rm -f "${changelog_file}"
     # Revert changes to file if any
     echo "${current_version}" > "${version_file}"
     echo "${current_build}" > "${build_file}"
@@ -87,11 +85,9 @@ update_and_validate_version
 # Update and validate the build number
 update_and_validate_build 
 
-changelog_file="internal/release/changelogs/"${version}"-"${build}""
-
-printf "Press ENTER to edit the CHANGELOG in your default editor...\n"
+printf "Press ENTER to edit the RELEASE-NOTES in your default editor...\n"
 read -r _ignore
-${EDITOR:-nano} "$changelog_file"
+${EDITOR:-nano} "internal/release/RELEASE-NOTES"
 
 # Get Current Branch Name
 branch="$(git rev-parse --abbrev-ref HEAD)"
