@@ -16,11 +16,7 @@
 
 The 1Password Go SDK offers programmatic access to your secrets in 1Password with Go. During the beta, you can create, retrieve, update, and delete items and resolve secret references.
 
-## 🔑 Authentication
-
 1Password SDKs support authentication with [1Password Service Accounts](https://developer.1password.com/docs/service-accounts/get-started/). 
-
-Before you get started, [create a service account](https://developer.1password.com/docs/service-accounts/get-started/#create-a-service-account) and give it the appropriate permissions in the vaults where the items you want to use with the SDK are saved.
 
 ## ❗ Limitations
 
@@ -34,7 +30,8 @@ When managing items with 1Password SDKs, you must use [unique identifiers (IDs)]
 
 To use the 1Password Go SDK in your project:
 
-1. Provision your [service account](#authentication) token. We recommend provisioning your token from the environment. For example, to export your token to the `OP_SERVICE_ACCOUNT_TOKEN` environment variable:
+1. [Create a service account](https://start.1password.com/developer-tools/infrastructure-secrets) and give it the appropriate permissions in the vaults where the items you want to use with the SDK are saved.
+2. Provision your service account token. We recommend provisioning your token from the environment. For example, to export your token to the `OP_SERVICE_ACCOUNT_TOKEN` environment variable:
 
    **macOS or Linux**
 
@@ -48,13 +45,13 @@ To use the 1Password Go SDK in your project:
    $Env:OP_SERVICE_ACCOUNT_TOKEN = "<your-service-account-token>"
    ```
 
-2. Install the 1Password Go SDK in your project:
+3. Install the 1Password Go SDK in your project:
 
    ```bash
    go get github.com/1password/onepassword-sdk-go
    ```
 
-3. Use the Go SDK in your project:
+4. Use the Go SDK in your project:
 
 ```go
 import (
