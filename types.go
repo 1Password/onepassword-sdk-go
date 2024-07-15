@@ -11,7 +11,7 @@ const (
 	ItemCategoryIdentity             ItemCategory = "Identity"
 	ItemCategoryPassword             ItemCategory = "Password"
 	ItemCategoryDocument             ItemCategory = "Document"
-	ItemCategoryApiCredentials       ItemCategory = "ApiCredentials"
+	ItemCategoryAPICredentials       ItemCategory = "ApiCredentials"
 	ItemCategoryBankAccount          ItemCategory = "BankAccount"
 	ItemCategoryDatabase             ItemCategory = "Database"
 	ItemCategoryDriverLicense        ItemCategory = "DriverLicense"
@@ -23,7 +23,7 @@ const (
 	ItemCategoryRewards              ItemCategory = "Rewards"
 	ItemCategoryRouter               ItemCategory = "Router"
 	ItemCategoryServer               ItemCategory = "Server"
-	ItemCategorySshKey               ItemCategory = "SshKey"
+	ItemCategorySSHKey               ItemCategory = "SshKey"
 	ItemCategorySocialSecurityNumber ItemCategory = "SocialSecurityNumber"
 	ItemCategorySoftwareLicense      ItemCategory = "SoftwareLicense"
 	ItemCategoryPerson               ItemCategory = "Person"
@@ -33,20 +33,23 @@ const (
 type ItemFieldType string
 
 const (
-	ItemFieldTypeText        ItemFieldType = "Text"
-	ItemFieldTypeConcealed   ItemFieldType = "Concealed"
-	ItemFieldTypeUnsupported ItemFieldType = "Unsupported"
+	ItemFieldTypeText           ItemFieldType = "Text"
+	ItemFieldTypeConcealed      ItemFieldType = "Concealed"
+	ItemFieldTypeCreditCardType ItemFieldType = "CreditCardType"
+	ItemFieldTypePhone          ItemFieldType = "Phone"
+	ItemFieldTypeURL            ItemFieldType = "Url"
+	ItemFieldTypeUnsupported    ItemFieldType = "Unsupported"
 )
 
-// Stores a field's title and value.
+// Represents a field within an item.
 type ItemField struct {
 	// The field's ID
 	ID string `json:"id"`
 	// The field's title
 	Title string `json:"title"`
-	// The ID of the section containing the field. Designated fields such as usernames and passwords don't need to specify a section.
+	// The ID of the section containing the field. Built-in fields such as usernames and passwords don't require a section.
 	SectionID *string `json:"section_id,omitempty"`
-	// The type of value stored in the field
+	// The field's type
 	FieldType ItemFieldType `json:"field_type"`
 	// The string representation of the field's value
 	Value string `json:"value"`
@@ -54,15 +57,15 @@ type ItemField struct {
 
 // A section groups together multiple fields in an item.
 type ItemSection struct {
-	// The section's ID
+	// The section's unique ID
 	ID string `json:"id"`
-	// The section's name
+	// The section's title
 	Title string `json:"title"`
 }
 
 // Represents a 1Password item.
 type Item struct {
-	// The item's unique ID
+	// The item's ID
 	ID string `json:"id"`
 	// The item's title
 	Title string `json:"title"`
