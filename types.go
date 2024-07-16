@@ -11,7 +11,7 @@ const (
 	ItemCategoryIdentity             ItemCategory = "Identity"
 	ItemCategoryPassword             ItemCategory = "Password"
 	ItemCategoryDocument             ItemCategory = "Document"
-	ItemCategoryAPICredentials       ItemCategory = "ApiCredentials"
+	ItemCategoryApiCredentials       ItemCategory = "ApiCredentials"
 	ItemCategoryBankAccount          ItemCategory = "BankAccount"
 	ItemCategoryDatabase             ItemCategory = "Database"
 	ItemCategoryDriverLicense        ItemCategory = "DriverLicense"
@@ -23,7 +23,7 @@ const (
 	ItemCategoryRewards              ItemCategory = "Rewards"
 	ItemCategoryRouter               ItemCategory = "Router"
 	ItemCategoryServer               ItemCategory = "Server"
-	ItemCategorySSHKey               ItemCategory = "SshKey"
+	ItemCategorySshKey               ItemCategory = "SshKey"
 	ItemCategorySocialSecurityNumber ItemCategory = "SocialSecurityNumber"
 	ItemCategorySoftwareLicense      ItemCategory = "SoftwareLicense"
 	ItemCategoryPerson               ItemCategory = "Person"
@@ -33,23 +33,20 @@ const (
 type ItemFieldType string
 
 const (
-	ItemFieldTypeText           ItemFieldType = "Text"
-	ItemFieldTypeConcealed      ItemFieldType = "Concealed"
-	ItemFieldTypeCreditCardType ItemFieldType = "CreditCardType"
-	ItemFieldTypePhone          ItemFieldType = "Phone"
-	ItemFieldTypeURL            ItemFieldType = "Url"
-	ItemFieldTypeUnsupported    ItemFieldType = "Unsupported"
+	ItemFieldTypeText        ItemFieldType = "Text"
+	ItemFieldTypeConcealed   ItemFieldType = "Concealed"
+	ItemFieldTypeUnsupported ItemFieldType = "Unsupported"
 )
 
-// Represents a field within an item.
+// Stores a field's title and value.
 type ItemField struct {
 	// The field's ID
 	ID string `json:"id"`
 	// The field's title
 	Title string `json:"title"`
-	// The ID of the section containing the field. Built-in fields such as usernames and passwords don't require a section.
+	// The ID of the section containing the field. Designated fields such as usernames and passwords don't need to specify a section.
 	SectionID *string `json:"section_id,omitempty"`
-	// The field's type
+	// The type of value stored in the field
 	FieldType ItemFieldType `json:"field_type"`
 	// The string representation of the field's value
 	Value string `json:"value"`
@@ -57,15 +54,15 @@ type ItemField struct {
 
 // A section groups together multiple fields in an item.
 type ItemSection struct {
-	// The section's unique ID
+	// The section's ID
 	ID string `json:"id"`
-	// The section's title
+	// The section's name
 	Title string `json:"title"`
 }
 
 // Represents a 1Password item.
 type Item struct {
-	// The item's ID
+	// The item's unique ID
 	ID string `json:"id"`
 	// The item's title
 	Title string `json:"title"`
