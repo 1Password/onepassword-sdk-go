@@ -108,7 +108,7 @@ func resolveSecretReference(client *onepassword.Client, vaultID, itemID, fieldID
 
 func createAndGetItem(client *onepassword.Client) onepassword.Item {
 	sectionID := "extraDetails"
-	item := onepassword.Item{
+	params := onepassword.ItemCreateParams{
 		Title:    "Login created with the SDK",
 		Category: onepassword.ItemCategoryLogin,
 		VaultID:  "xw33qlvug6moegr3wkk5zkenoa",
@@ -142,7 +142,7 @@ func createAndGetItem(client *onepassword.Client) onepassword.Item {
 	}
 
 	// Creates a new item based on the structure definition above
-	createdItem, err := client.Items.Create(context.Background(), item)
+	createdItem, err := client.Items.Create(context.Background(), params)
 	if err != nil {
 		panic(err)
 	}
