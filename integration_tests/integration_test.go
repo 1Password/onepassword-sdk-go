@@ -97,7 +97,7 @@ func TestInvalidInvoke(t *testing.T) {
 		},
 	}
 	_, err1 := core.Invoke(context.Background(), invocation1)
-	assert.EqualError(t, err1, "internal error: invalid client id")
+	assert.EqualError(t, err1, "an internal error occurred, please contact 1Password at support@1password.com or https://developer.1password.com/joinslack: invalid client id")
 
 	// invalid method name
 	invocation2 := internal.InvokeConfig{
@@ -136,7 +136,7 @@ func TestClientReleasedSuccessfully(t *testing.T) {
 		},
 	}
 	_, err = core.Invoke(context.Background(), invocation)
-	assert.EqualError(t, err, "internal error: invalid client id")
+	assert.EqualError(t, err, "an internal error occurred, please contact 1Password at support@1password.com or https://developer.1password.com/joinslack: invalid client id")
 }
 
 func TestConcurrentCallsFromOneClient(t *testing.T) {
