@@ -20,7 +20,7 @@ The 1Password Go SDK offers programmatic access to your secrets in 1Password wit
 
 ## ❗ Limitations
 
-1Password SDKs don't yet support using secret references with query parameters, so you can't retrieve file attachments or SSH keys, or get more information about field metadata.
+1Password SDKs don't yet support using secret references to retrieve file attachments or SSH keys, or using query parameters with secret references to get more information about field and file attributes.
 
 1Password SDKs currently only support operations on text and concealed fields. As a result, you can't edit items that include information saved in other types of fields.
 
