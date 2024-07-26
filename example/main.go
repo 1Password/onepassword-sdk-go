@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	onepassword "github.com/1password/onepassword-sdk-go"
+	"github.com/1password/onepassword-sdk-go"
 )
 
 func main() {
@@ -43,7 +43,7 @@ func getAndUpdateItem(client *onepassword.Client, existingVaultID, existingItemI
 	}
 	item.Title = "New Title"
 
-	updatedItem, err := client.Items.Update(context.Background(), item)
+	updatedItem, err := client.Items.Put(context.Background(), item)
 	if err != nil {
 		panic(err)
 	}
@@ -89,7 +89,7 @@ func updateItem(client *onepassword.Client, existingVaultID, existingID string) 
 		},
 	}
 
-	_, err := client.Items.Update(context.Background(), newItem)
+	_, err := client.Items.Put(context.Background(), newItem)
 	if err != nil {
 		panic(err)
 	}
@@ -108,7 +108,7 @@ func resolveSecretReference(client *onepassword.Client, vaultID, itemID, fieldID
 
 func createAndGetItem(client *onepassword.Client) onepassword.Item {
 	sectionID := "extraDetails"
-	item := onepassword.Item{
+	itemParams := onepassword.ItemCreateParams{
 		Title:    "Login created with the SDK",
 		Category: onepassword.ItemCategoryLogin,
 		VaultID:  "xw33qlvug6moegr3wkk5zkenoa",
@@ -124,6 +124,12 @@ func createAndGetItem(client *onepassword.Client) onepassword.Item {
 				Title:     "password",
 				Value:     "my_weak_password123",
 				FieldType: onepassword.ItemFieldTypeConcealed,
+			},
+			{
+				ID:        "onetimepassword",
+				Title:     "one-time password",
+				Value:     "cdfmgdnrjsihnfihrgmncwbu",
+				FieldType: onepassword.ItemFieldTypeTOTP,
 			},
 			{
 				ID:        "uniqueId",
@@ -142,7 +148,7 @@ func createAndGetItem(client *onepassword.Client) onepassword.Item {
 	}
 
 	// Creates a new item based on the structure definition above
-	createdItem, err := client.Items.Create(context.Background(), item)
+	createdItem, err := client.Items.Create(context.Background(), itemParams)
 	if err != nil {
 		panic(err)
 	}
@@ -151,6 +157,18 @@ func createAndGetItem(client *onepassword.Client) onepassword.Item {
 	login, err := client.Items.Get(context.Background(), createdItem.VaultID, createdItem.ID)
 	if err != nil {
 		panic(err)
+	}
+
+	// Retrieve TOTP code from an item
+	for _, f := range login.Fields {
+		if f.FieldType == onepassword.ItemFieldTypeTOTP {
+			OTPFieldDetails := f.Details.OTP()
+			if OTPFieldDetails.ErrorMessage == nil {
+				print(*OTPFieldDetails.Code)
+			} else {
+				panic(*OTPFieldDetails.ErrorMessage)
+			}
+		}
 	}
 
 	return login
