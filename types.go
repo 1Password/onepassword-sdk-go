@@ -69,7 +69,7 @@ func (i *ItemFieldDetails) UnmarshalJSON(data []byte) error {
 	i.Type = enum.Tag
 	switch i.Type {
 	case ItemFieldDetailsTypeVariantOTP:
-		var res OtpFieldDetails
+		var res OTPFieldDetails
 		i.content = &res
 
 	}
@@ -90,12 +90,12 @@ func (i ItemFieldDetails) MarshalJSON() ([]byte, error) {
 	return json.Marshal(enum)
 }
 
-func (i ItemFieldDetails) OTP() *OtpFieldDetails {
-	res, _ := i.content.(*OtpFieldDetails)
+func (i ItemFieldDetails) OTP() *OTPFieldDetails {
+	res, _ := i.content.(*OTPFieldDetails)
 	return res
 }
 
-func NewItemFieldDetailsTypeVariantOTP(content *OtpFieldDetails) ItemFieldDetails {
+func NewItemFieldDetailsTypeVariantOTP(content *OTPFieldDetails) ItemFieldDetails {
 	return ItemFieldDetails{
 		Type:    ItemFieldDetailsTypeVariantOTP,
 		content: content,
