@@ -129,6 +129,7 @@ func createAndGetItem(client *onepassword.Client) onepassword.Item {
 				ID:        "onetimepassword",
 				Title:     "one-time password",
 				Value:     "cdfmgdnrjsihnfihrgmncwbu",
+				SectionID: &sectionID,
 				FieldType: onepassword.ItemFieldTypeTOTP,
 			},
 			{
