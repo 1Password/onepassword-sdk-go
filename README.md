@@ -83,6 +83,12 @@ func main() {
 
 Make sure to use [secret reference URIs](https://developer.1password.com/docs/cli/secrets-reference-syntax/) with the syntax `op://vault/item/field` to securely load secrets from 1Password into your code.
 
+## 💙 Community & Support
+
+- File or upvote an [issue](https://github.com/1Password/terraform-provider-onepassword/issues) for bugs and feature requests.
+- Join the [Developer Slack workspace](https://join.slack.com/t/1password-devs/shared_invite/zt-1halo11ps-6o9pEv96xZ3LtX_VE0fJQA).
+- Subscribe to the [Developer Newsletter](https://1password.com/dev-subscribe/).
+
 ## 📖 Learn more
 
 - [Load secrets with 1Password SDKs](https://developer.1password.com/docs/sdks/load-secrets)
