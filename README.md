@@ -33,10 +33,13 @@ Item/field Types:
 - [x] Passwords
 - [x] Logins
 - [x] Notes
+- [x] SSH Private Keys
+- [ ] SSH Public Keys
 - [ ] TOTP codes ([#93](https://github.com/1Password/onepassword-sdk-go/issues/93))
-- [ ] SSH Keys
 - [ ] Files / Documents ([#108](https://github.com/1Password/onepassword-sdk-go/issues/108))
-
+- [x] URLs
+- [x] Credit card number & type
+- [x] Phone numbers
 
 ### Vault Management
 - [ ] Retrieve Vaults
