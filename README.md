@@ -60,7 +60,7 @@ Item/field Types:
 ### Compliance & Reporting
 - [ ] WatchTower Insights
 - [ ] Travel Mode
-- [ ] Events. For now, check out using [1Password Events Reporting API](https://developer.1password.com/docs/events-api/) directly.
+- [ ] Events ([#76](https://github.com/1Password/onepassword-sdk-go/issues/76)). For now, check out using [1Password Events Reporting API](https://developer.1password.com/docs/events-api/) directly.
 
 ### Authentication
 
