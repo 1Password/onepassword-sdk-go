@@ -69,7 +69,7 @@ func (i *ItemFieldDetails) UnmarshalJSON(data []byte) error {
 	i.Type = enum.Tag
 	switch i.Type {
 	case ItemFieldDetailsTypeVariantOTP:
-		var res OTPFieldDetails
+		var res OtpFieldDetails
 		i.content = &res
 
 	}
@@ -90,12 +90,12 @@ func (i ItemFieldDetails) MarshalJSON() ([]byte, error) {
 	return json.Marshal(enum)
 }
 
-func (i ItemFieldDetails) OTP() *OTPFieldDetails {
-	res, _ := i.content.(*OTPFieldDetails)
+func (i ItemFieldDetails) OTP() *OtpFieldDetails {
+	res, _ := i.content.(*OtpFieldDetails)
 	return res
 }
 
-func NewItemFieldDetailsTypeVariantOTP(content *OTPFieldDetails) ItemFieldDetails {
+func NewItemFieldDetailsTypeVariantOTP(content *OtpFieldDetails) ItemFieldDetails {
 	return ItemFieldDetails{
 		Type:    ItemFieldDetailsTypeVariantOTP,
 		content: content,
@@ -136,17 +136,28 @@ type Item struct {
 	Category ItemCategory `json:"category"`
 	// The ID of the vault where the item is saved
 	VaultID string `json:"vault_id"`
+	// The item's tags
+	Tags []string `json:"tags"`
 	// The item's fields
 	Fields []ItemField `json:"fields"`
 	// The item's sections
 	Sections []ItemSection `json:"sections"`
+	// The item's version
+	Version uint32 `json:"version"`
 }
 type ItemCreateParams struct {
-	Category ItemCategory  `json:"category"`
-	VaultID  string        `json:"vault_id"`
-	Title    string        `json:"title"`
-	Fields   []ItemField   `json:"fields"`
+	// The item's category
+	Category ItemCategory `json:"category"`
+	// The ID of the vault where the item is saved
+	VaultID string `json:"vault_id"`
+	// The item's title
+	Title string `json:"title"`
+	// The item's fields
+	Fields []ItemField `json:"fields"`
+	// The item's sections
 	Sections []ItemSection `json:"sections"`
+	// The item's tags
+	Tags []string `json:"tags"`
 }
 
 // Additional attributes for OTP fields.
