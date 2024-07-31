@@ -14,17 +14,56 @@
 
 ---
 
-The 1Password Go SDK offers programmatic access to your secrets in 1Password with Go. During the beta, you can create, retrieve, update, and delete items and resolve secret references.
+## Supported Functionality
 
-1Password SDKs support authentication with [1Password Service Accounts](https://developer.1password.com/docs/service-accounts/get-started/). 
+1Password SDKs are in active development. We're keen to hear what you'd like to see next. Let us know by [upvoting](https://github.com/1Password/onepassword-sdk-go/issues) or [filing](https://github.com/1Password/onepassword-sdk-go/issues/new/choose) an issue.
 
-## ❗ Limitations
+### Item Management
+Operations:
+- [x] [Retrieve secrets](https://developer.1password.com/docs/sdks/load-secrets)
+- [x] [Retrieve Items](https://developer.1password.com/docs/sdks/manage-items#get-an-item)
+- [x] [Create Items](https://developer.1password.com/docs/sdks/manage-items#create-an-item)
+- [x] [Update Items](https://developer.1password.com/docs/sdks/manage-items#edit-an-item)
+- [x] [Delete Items](https://developer.1password.com/docs/sdks/manage-items#delete-an-item)
+- [ ] List Items
+- [ ] Add & Update tags on items ([#86](https://github.com/1Password/onepassword-sdk-go/issues/86))
 
-1Password SDKs don't yet support using secret references with query parameters, so you can't retrieve file attachments or SSH keys, or get more information about field metadata.
+Item/field Types:
+- [x] API Keys
+- [x] Passwords
+- [x] Logins
+- [x] Notes
+- [ ] TOTP codes ([#93](https://github.com/1Password/onepassword-sdk-go/issues/93))
+- [ ] SSH Keys
+- [ ] Files / Documents ([#108](https://github.com/1Password/onepassword-sdk-go/issues/108))
 
-1Password SDKs currently only support operations on text and concealed fields. As a result, you can't edit items that include information saved in other types of fields.
 
-When managing items with 1Password SDKs, you must use [unique identifiers (IDs)](https://developer.1password.com/docs/sdks/concepts#unique-identifiers) in place of vault, item, and field names.
+### Vault Management
+- [ ] Retrieve Vaults
+- [ ] Create Vaults
+- [ ] Update Vaults
+- [ ] Delete Vaults
+- [ ] List Vaults
+
+### User & Access Management
+- [ ] Provision Users
+- [ ] Retrieve Users
+- [ ] List Users
+- [ ] Suspend Users
+- [ ] Create Groups
+- [ ] Update Group Membership
+- [ ] Update Vault Access & Permissions
+
+### Compliance & Reporting
+- [ ] WatchTower Insights
+- [ ] Travel Mode
+- [ ] Events. For now, check out using [1Password Events Reporting API](https://developer.1password.com/docs/events-api/) directly.
+
+### Authentication
+
+- [x] [1Password Service Accounts](https://developer.1password.com/docs/service-accounts/get-started/)
+- [ ] User Authentication
+- [ ] 1Password Connect. For now, use [1Password/connect-sdk-go](https://github.com/1Password/connect-sdk-go)
 
 ## 🚀 Get started
 
