@@ -1,1 +1,1 @@
-This release fixes a bug where the `Secrets.Resolve` function was not be able to resolve secret references containing periods.
+s a bug where the `Secrets.Resolve` function was n able to resolve secret references containing periods.
