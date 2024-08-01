@@ -82,7 +82,7 @@ update_and_validate_build() {
     done
 }
 
-# Ensure that the current working directory is clean and release is made of latest main
+# Ensure that the current working directory is clean and release is made off of latest main
 enforce_latest_code
 
 # Update and validate the version number
