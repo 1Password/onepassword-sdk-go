@@ -39,7 +39,7 @@ update_and_validate_version() {
             # TODO: Check the less than case as well.
             if [[ "${current_version}" != "${version}" ]]; then        
                 # Write the valid version number to the file
-                echo "${version}" > "${version_file}"
+                echo -n "${version}" > "${version_file}"
                 echo "New version number is: ${version}"
                 return 0
             else
@@ -63,7 +63,7 @@ update_and_validate_build() {
         if [[ "${build}" =~ ^[0-9]{7}$ ]]; then
             if (( 10#$current_build < 10#$build )); then
                 # Write the valid build number to the file
-                echo "${build}" > "${build_file}"
+                echo -n "${build}" > "${build_file}"
                 echo "New build number is: ${build}"
                 return 0
             else
