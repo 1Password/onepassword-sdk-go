@@ -33,7 +33,7 @@ Item/field Types:
 - [x] Passwords
 - [x] Logins
 - [x] Notes
-- [x] SSH Private Keys
+- [x] SSH Private Keys (partially supported: supported in resolving secret references, not yet supported in item create/get/update)
 - [ ] SSH Public Keys
 - [ ] TOTP codes ([#93](https://github.com/1Password/onepassword-sdk-go/issues/93))
 - [ ] Files / Documents ([#108](https://github.com/1Password/onepassword-sdk-go/issues/108))
