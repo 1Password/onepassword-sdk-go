@@ -28,13 +28,14 @@ Operations:
 - [ ] List items
 - [ ] Add & update tags on items ([#86](https://github.com/1Password/onepassword-sdk-go/issues/86))
 
-Item/field types:
+Field types:
 - [x] API Keys
 - [x] Passwords
-- [x] Logins
+- [x] Concealed fields
+- [x] Text fields
 - [x] Notes
 - [x] SSH private keys (partially supported: supported in resolving secret references, not yet supported in item create/get/update)
-- [ ] SSH public keys
+- [ ] SSH public keys, fingerprint and key type
 - [ ] One-time passwords ([#93](https://github.com/1Password/onepassword-sdk-go/issues/93))
 - [ ] Files attachments and Document items ([#108](https://github.com/1Password/onepassword-sdk-go/issues/108))
 - [x] URLs
