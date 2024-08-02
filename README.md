@@ -14,59 +14,59 @@
 
 ---
 
-## Supported Functionality
+## Supported functionality
 
 1Password SDKs are in active development. We're keen to hear what you'd like to see next. Let us know by [upvoting](https://github.com/1Password/onepassword-sdk-go/issues) or [filing](https://github.com/1Password/onepassword-sdk-go/issues/new/choose) an issue.
 
-### Item Management
+### Item management
 Operations:
 - [x] [Retrieve secrets](https://developer.1password.com/docs/sdks/load-secrets)
-- [x] [Retrieve Items](https://developer.1password.com/docs/sdks/manage-items#get-an-item)
-- [x] [Create Items](https://developer.1password.com/docs/sdks/manage-items#create-an-item)
-- [x] [Update Items](https://developer.1password.com/docs/sdks/manage-items#edit-an-item)
-- [x] [Delete Items](https://developer.1password.com/docs/sdks/manage-items#delete-an-item)
-- [ ] List Items
-- [ ] Add & Update tags on items ([#86](https://github.com/1Password/onepassword-sdk-go/issues/86))
+- [x] [Retrieve items](https://developer.1password.com/docs/sdks/manage-items#get-an-item)
+- [x] [Create items](https://developer.1password.com/docs/sdks/manage-items#create-an-item)
+- [x] [Update items](https://developer.1password.com/docs/sdks/manage-items#edit-an-item)
+- [x] [Delete items](https://developer.1password.com/docs/sdks/manage-items#delete-an-item)
+- [ ] List items
+- [ ] Add & update tags on items ([#86](https://github.com/1Password/onepassword-sdk-go/issues/86))
 
-Item/field Types:
+Item/field types:
 - [x] API Keys
 - [x] Passwords
 - [x] Logins
 - [x] Notes
-- [x] SSH Private Keys (partially supported: supported in resolving secret references, not yet supported in item create/get/update)
-- [ ] SSH Public Keys
-- [ ] TOTP codes ([#93](https://github.com/1Password/onepassword-sdk-go/issues/93))
-- [ ] Files / Documents ([#108](https://github.com/1Password/onepassword-sdk-go/issues/108))
+- [x] SSH private keys (partially supported: supported in resolving secret references, not yet supported in item create/get/update)
+- [ ] SSH public keys
+- [ ] One-time passwords ([#93](https://github.com/1Password/onepassword-sdk-go/issues/93))
+- [ ] Files attachments and Document items ([#108](https://github.com/1Password/onepassword-sdk-go/issues/108))
 - [x] URLs
 - [x] Credit card number & type
 - [x] Phone numbers
 
-### Vault Management
-- [ ] Retrieve Vaults
-- [ ] Create Vaults
-- [ ] Update Vaults
-- [ ] Delete Vaults
-- [ ] List Vaults
+### Vault management
+- [ ] Retrieve vaults
+- [ ] Create vaults
+- [ ] Update vaults
+- [ ] Delete vaults
+- [ ] List vaults
 
-### User & Access Management
-- [ ] Provision Users
-- [ ] Retrieve Users
-- [ ] List Users
-- [ ] Suspend Users
-- [ ] Create Groups
-- [ ] Update Group Membership
-- [ ] Update Vault Access & Permissions
+### User & access management
+- [ ] Provision users
+- [ ] Retrieve users
+- [ ] List users
+- [ ] Suspend users
+- [ ] Create groups
+- [ ] Update group membership
+- [ ] Update vault access & permissions
 
-### Compliance & Reporting
-- [ ] WatchTower Insights
-- [ ] Travel Mode
-- [ ] Events ([#76](https://github.com/1Password/onepassword-sdk-go/issues/76)). For now, check out using [1Password Events Reporting API](https://developer.1password.com/docs/events-api/) directly.
+### Compliance & reporting
+- [ ] Watchtower insights
+- [ ] Travel mode
+- [ ] Events ([#76](https://github.com/1Password/onepassword-sdk-go/issues/76)). For now, use [1Password Events Reporting API](https://developer.1password.com/docs/events-api/) directly.
 
 ### Authentication
 
 - [x] [1Password Service Accounts](https://developer.1password.com/docs/service-accounts/get-started/)
-- [ ] User Authentication
-- [ ] 1Password Connect. For now, use [1Password/connect-sdk-go](https://github.com/1Password/connect-sdk-go)
+- [ ] User authentication
+- [ ] 1Password Connect. For now, use [1Password/connect-sdk-go](https://github.com/1Password/connect-sdk-go).
 
 ## 🚀 Get started
 
