@@ -38,8 +38,9 @@ Field types:
 - [ ] SSH public keys, fingerprint and key type
 - [x] One-time passwords 
 - [x] URLs
-- [x] Credit card number & type
 - [x] Phone numbers
+- [x] Credit card types
+- [ ] Credit card numbers
 - [ ] Files attachments and Document items ([#108](https://github.com/1Password/onepassword-sdk-go/issues/108))
 
 ### Vault management
