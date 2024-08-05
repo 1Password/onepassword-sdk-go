@@ -25,8 +25,8 @@ Operations:
 - [x] [Create items](https://developer.1password.com/docs/sdks/manage-items#create-an-item)
 - [x] [Update items](https://developer.1password.com/docs/sdks/manage-items#edit-an-item)
 - [x] [Delete items](https://developer.1password.com/docs/sdks/manage-items#delete-an-item)
-- [ ] List items
-- [ ] Add & update tags on items ([#86](https://github.com/1Password/onepassword-sdk-go/issues/86))
+- [x] [List items](https://developer.1password.com/docs/sdks/list-vaults-items/)
+- [x] Add & update tags on items 
 
 Field types:
 - [x] API Keys
@@ -36,18 +36,18 @@ Field types:
 - [x] Notes
 - [x] SSH private keys (partially supported: supported in resolving secret references, not yet supported in item create/get/update)
 - [ ] SSH public keys, fingerprint and key type
-- [ ] One-time passwords ([#93](https://github.com/1Password/onepassword-sdk-go/issues/93))
-- [ ] Files attachments and Document items ([#108](https://github.com/1Password/onepassword-sdk-go/issues/108))
+- [x] One-time passwords 
 - [x] URLs
 - [x] Credit card number & type
 - [x] Phone numbers
+- [ ] Files attachments and Document items ([#108](https://github.com/1Password/onepassword-sdk-go/issues/108))
 
 ### Vault management
 - [ ] Retrieve vaults
 - [ ] Create vaults
 - [ ] Update vaults
 - [ ] Delete vaults
-- [ ] List vaults
+- [x] [List vaults](https://developer.1password.com/docs/sdks/list-vaults-items/)
 
 ### User & access management
 - [ ] Provision users
