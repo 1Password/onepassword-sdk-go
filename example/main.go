@@ -100,7 +100,7 @@ func createAndGetItem(client *onepassword.Client) onepassword.Item {
 	itemParams := onepassword.ItemCreateParams{
 		Title:    "Login created with the SDK",
 		Category: onepassword.ItemCategoryLogin,
-		VaultID:  "xw33qlvug6moegr3wkk5zkenoa",
+		VaultID:  "7turaasywpymt3jecxoxk5roli",
 		Fields: []onepassword.ItemField{
 			{
 				ID:        "username",
@@ -154,7 +154,7 @@ func createAndGetItem(client *onepassword.Client) onepassword.Item {
 		if f.FieldType == onepassword.ItemFieldTypeTOTP {
 			OTPFieldDetails := f.Details.OTP()
 			if OTPFieldDetails.ErrorMessage == nil {
-				print(*OTPFieldDetails.Code)
+				fmt.Println(*OTPFieldDetails.Code)
 			} else {
 				panic(*OTPFieldDetails.ErrorMessage)
 			}
