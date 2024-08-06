@@ -90,15 +90,15 @@ func (i ItemFieldDetails) MarshalJSON() ([]byte, error) {
 	return json.Marshal(enum)
 }
 
-func (i ItemFieldDetails) OTP() *OTPFieldDetails {
+func (i ItemFieldDetails) OTP() OTPFieldDetails {
 	res, _ := i.content.(*OTPFieldDetails)
-	return res
+	return *res
 }
 
-func NewItemFieldDetailsTypeVariantOTP(content *OTPFieldDetails) ItemFieldDetails {
+func NewItemFieldDetailsTypeVariantOTP(content OTPFieldDetails) ItemFieldDetails {
 	return ItemFieldDetails{
 		Type:    ItemFieldDetailsTypeVariantOTP,
-		content: content,
+		content: &content,
 	}
 }
 
@@ -136,8 +136,6 @@ type Item struct {
 	Category ItemCategory `json:"category"`
 	// The ID of the vault where the item is saved
 	VaultID string `json:"vaultId"`
-	// The item's tags
-	Tags []string `json:"tags"`
 	// The item's fields
 	Fields []ItemField `json:"fields"`
 	// The item's sections
@@ -156,8 +154,6 @@ type ItemCreateParams struct {
 	Fields []ItemField `json:"fields"`
 	// The item's sections
 	Sections []ItemSection `json:"sections"`
-	// The item's tags
-	Tags []string `json:"tags"`
 }
 
 // Represents a decrypted 1Password item.
