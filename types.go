@@ -90,15 +90,15 @@ func (i ItemFieldDetails) MarshalJSON() ([]byte, error) {
 	return json.Marshal(enum)
 }
 
-func (i ItemFieldDetails) OTP() OTPFieldDetails {
+func (i ItemFieldDetails) OTP() *OTPFieldDetails {
 	res, _ := i.content.(*OTPFieldDetails)
-	return *res
+	return res
 }
 
-func NewItemFieldDetailsTypeVariantOTP(content OTPFieldDetails) ItemFieldDetails {
+func NewItemFieldDetailsTypeVariantOTP(content *OTPFieldDetails) ItemFieldDetails {
 	return ItemFieldDetails{
 		Type:    ItemFieldDetailsTypeVariantOTP,
-		content: &content,
+		content: content,
 	}
 }
 
