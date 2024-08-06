@@ -82,7 +82,7 @@ func TestInvalidInvoke(t *testing.T) {
 	require.NoError(t, err)
 
 	validClientID := uint64(0)
-	validMethodName := "Resolve"
+	validMethodName := "SecretsResolve"
 	validParams := map[string]interface{}{"secret_reference": "op://gowwbvgow7kxocrfmfvtwni6vi/6ydrn7ne6mwnqc2prsbqx4i4aq/password"}
 	invalidClientID := uint64(1)
 	invalidMethodName := "InvalidName"
@@ -131,7 +131,7 @@ func TestClientReleasedSuccessfully(t *testing.T) {
 	invocation := internal.InvokeConfig{
 		ClientID: 0, // this client id should be invalid because the client has been cleaned up by GC
 		Invocation: internal.Invocation{
-			MethodName:       "Resolve",
+			MethodName:       "SecretsResolve",
 			SerializedParams: map[string]interface{}{"secret_reference": "op://foo/bar/baz"},
 		},
 	}
