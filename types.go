@@ -136,8 +136,6 @@ type Item struct {
 	Category ItemCategory `json:"category"`
 	// The ID of the vault where the item is saved
 	VaultID string `json:"vaultId"`
-	// The item's tags
-	Tags []string `json:"tags"`
 	// The item's fields
 	Fields []ItemField `json:"fields"`
 	// The item's sections
@@ -156,8 +154,6 @@ type ItemCreateParams struct {
 	Fields []ItemField `json:"fields"`
 	// The item's sections
 	Sections []ItemSection `json:"sections"`
-	// The item's tags
-	Tags []string `json:"tags"`
 }
 
 // Represents a decrypted 1Password item.
