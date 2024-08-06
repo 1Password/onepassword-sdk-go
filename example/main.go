@@ -44,7 +44,9 @@ func listVaultsAndItems(client *onepassword.Client) {
 
 		fmt.Printf("%s %s\n", vault.ID, vault.Title)
 		items, err := client.Items.ListAll(context.Background(), vault.ID)
-
+		if err != nil {
+			panic(err)
+		}
 		for {
 			item, err := items.Next()
 			if errors.Is(err, onepassword.ErrorIteratorDone) {
