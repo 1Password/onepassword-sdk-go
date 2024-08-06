@@ -10,10 +10,12 @@ type Client struct {
 	config  internal.ClientConfig
 	Secrets SecretsAPI
 	Items   ItemsAPI
+	Vaults  VaultsAPI
 }
 
 func initAPIs(client *Client, inner internal.InnerClient) {
 	client.Secrets = NewSecretsSource(inner)
 	client.Items = NewItemsSource(inner)
+	client.Vaults = NewVaultsSource(inner)
 
 }
