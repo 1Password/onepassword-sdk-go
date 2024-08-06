@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 
@@ -23,9 +24,37 @@ func main() {
 	}
 
 	item := createAndGetItem(client)
-	updateItem(client, item.VaultID, item.ID)
 	getAndUpdateItem(client, item.VaultID, item.ID)
+	listVaultsAndItems(client)
 	resolveSecretReference(client, item.VaultID, item.ID, "username")
+}
+
+func listVaultsAndItems(client *onepassword.Client) {
+	vaults, err := client.Vaults.ListAll(context.Background())
+	if err != nil {
+		panic(err)
+	}
+	for {
+		vault, err := vaults.Next()
+		if errors.Is(err, onepassword.ErrorIteratorDone) {
+			break
+		} else if err != nil {
+			panic(err)
+		}
+
+		fmt.Printf("%s %s\n", vault.ID, vault.Title)
+		items, err := client.Items.ListAll(context.Background(), vault.ID)
+
+		for {
+			item, err := items.Next()
+			if errors.Is(err, onepassword.ErrorIteratorDone) {
+				break
+			} else if err != nil {
+				panic(err)
+			}
+			fmt.Printf("%s %s\n", item.ID, item.Title)
+		}
+	}
 }
 
 func getAndUpdateItem(client *onepassword.Client, existingVaultID, existingItemID string) {
@@ -52,46 +81,6 @@ func getAndUpdateItem(client *onepassword.Client, existingVaultID, existingItemI
 		if f.Title == "Details" {
 			doSomethingSecret(f.Value)
 		}
-	}
-}
-
-func updateItem(client *onepassword.Client, existingVaultID, existingID string) {
-	sectionID := "extraDetails"
-	newItem := onepassword.Item{
-		ID:       existingID,
-		Title:    "My Login SDK 1234",
-		Category: onepassword.ItemCategoryLogin,
-		VaultID:  existingVaultID,
-		Fields: []onepassword.ItemField{
-			{
-				ID:        "username",
-				Value:     "Wendy_Appleseed1234",
-				FieldType: onepassword.ItemFieldTypeText,
-			},
-			{
-				ID:        "password",
-				Value:     "my_weak_password1234",
-				FieldType: onepassword.ItemFieldTypeConcealed,
-			},
-			{
-				Title:     "Details",
-				ID:        "myDetailsID",
-				Value:     "Test Item",
-				FieldType: onepassword.ItemFieldTypeText,
-				SectionID: &sectionID,
-			},
-		},
-		Sections: []onepassword.ItemSection{
-			{
-				ID:    sectionID,
-				Title: "Extra Details",
-			},
-		},
-	}
-
-	_, err := client.Items.Put(context.Background(), newItem)
-	if err != nil {
-		panic(err)
 	}
 }
 
