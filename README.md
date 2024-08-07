@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://1password.com">
-      <h1 align="center">1Password Go SDK (beta)</h1>
+      <h1 align="center">1Password Go SDK</h1>
   </a>
 </p>
 
