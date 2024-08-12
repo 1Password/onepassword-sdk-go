@@ -95,6 +95,7 @@ Field types:
 - [ ] SSH public keys, fingerprint and key type
 - [x] One-time passwords 
 - [x] URLs
+- [ ] Websites (used to suggest and autofill logins)
 - [x] Phone numbers
 - [x] Credit card types
 - [ ] Files attachments and Document items ([#108](https://github.com/1Password/onepassword-sdk-go/issues/108))
