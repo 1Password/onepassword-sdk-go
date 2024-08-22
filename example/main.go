@@ -12,6 +12,7 @@ func main() {
 	// Gets your service account token from the OP_SERVICE_ACCOUNT_TOKEN environment variable.
 	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
 
+	//comment
 	// Authenticates with your service account token and connects to 1Password.
 	client, err := onepassword.NewClient(context.Background(),
 		onepassword.WithServiceAccountToken(token),
