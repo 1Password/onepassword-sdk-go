@@ -73,10 +73,12 @@ func WithIntegrationInfo(name string, version string) ClientOption {
 
 func clientInvoke(ctx context.Context, innerClient internal.InnerClient, invocation string, params map[string]interface{}) (*string, error) {
 	invocationResponse, err := innerClient.Core.Invoke(ctx, internal.InvokeConfig{
-		ClientID: innerClient.ID,
 		Invocation: internal.Invocation{
-			MethodName:       invocation,
-			SerializedParams: params,
+			ClientID: &innerClient.ID,
+			Parameters: internal.Parameters{
+				MethodName:       invocation,
+				SerializedParams: params,
+			},
 		},
 	})
 	if err != nil {

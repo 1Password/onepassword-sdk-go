@@ -50,14 +50,18 @@ func NewDefaultConfig() ClientConfig {
 
 // InvokeConfig specifies over the FFI on which client the specified method should be invoked on.
 type InvokeConfig struct {
-	ClientID   uint64     `json:"clientId"`
 	Invocation Invocation `json:"invocation"`
+}
+
+type Parameters struct{
+	MethodName       string                 `json:"name"`
+	SerializedParams map[string]interface{} `json:"parameters"`
 }
 
 // Invocation holds the information required for invoking SDK functionality.
 type Invocation struct {
-	MethodName       string                 `json:"name"`
-	SerializedParams map[string]interface{} `json:"parameters"`
+	ClientID   *uint64     `json:"clientId,omitempty"`
+	Parameters Parameters `json:"parameters"`
 }
 
 // InnerClient represents the sdk-core client on which calls will be made.
