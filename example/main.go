@@ -162,16 +162,16 @@ func createAndGetItem(client *onepassword.Client) onepassword.Item {
 	}
 	// [developer-docs.sdk.go.create-item]-end
 
-	// Retrieves the newly created item
 	// [developer-docs.sdk.go.get-item]-start
+	// Retrieves the newly created item
 	login, err := client.Items.Get(context.Background(), createdItem.VaultID, createdItem.ID)
 	if err != nil {
 		panic(err)
 	}
 	// [developer-docs.sdk.go.get-item]-end
 
-	// Retrieve TOTP code from an item
 	// [developer-docs.sdk.go.get-totp-item-crud]-start
+	// Retrieve TOTP code from an item
 	for _, f := range login.Fields {
 		if f.FieldType == onepassword.ItemFieldTypeTOTP {
 			OTPFieldDetails := f.Details.OTP()

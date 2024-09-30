@@ -126,11 +126,6 @@ type ItemSection struct {
 	Title string `json:"title"`
 }
 
-type FieldsByName map[string]string
-type SectionsByName map[string]struct {
-	FieldsByName FieldsByName
-}
-
 // Represents a 1Password item.
 type Item struct {
 	// The item's ID
@@ -147,15 +142,6 @@ type Item struct {
 	Sections []ItemSection `json:"sections"`
 	// The item's version
 	Version uint32 `json:"version"`
-
-	FieldsByName   FieldsByName
-	SectionsByName SectionsByName
-}
-
-func main() {
-	item := Item{
-
-	}.SectionsByName["hello"].FieldsByName["there"]
 }
 type ItemCreateParams struct {
 	// The item's category
