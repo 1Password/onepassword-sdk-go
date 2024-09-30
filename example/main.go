@@ -5,11 +5,15 @@ import (
 	"errors"
 	"fmt"
 	"os"
-
-	"github.com/1password/onepassword-sdk-go"
 )
 
+// [developer-docs.sdk.go.sdk-import]-start
+import "github.com/1password/onepassword-sdk-go"
+
+// [developer-docs.sdk.go.sdk-import]-end
+
 func main() {
+	// [developer-docs.sdk.go.client-initialization]-start
 	// Gets your service account token from the OP_SERVICE_ACCOUNT_TOKEN environment variable.
 	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
 
@@ -22,14 +26,19 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	// [developer-docs.sdk.go.client-initialization]-end
 
 	item := createAndGetItem(client)
 	getAndUpdateItem(client, item.VaultID, item.ID)
 	listVaultsAndItems(client)
 	resolveSecretReference(client, item.VaultID, item.ID, "username")
+
+	if !listVaultsAndItems(client) {
+
+	}
 }
 
-func listVaultsAndItems(client *onepassword.Client) {
+func listVaultsAndItems(client *onepassword.Client) bool {
 	vaults, err := client.Vaults.ListAll(context.Background())
 	if err != nil {
 		panic(err)
@@ -57,6 +66,7 @@ func listVaultsAndItems(client *onepassword.Client) {
 			fmt.Printf("%s %s\n", item.ID, item.Title)
 		}
 	}
+	return false
 }
 
 func getAndUpdateItem(client *onepassword.Client, existingVaultID, existingItemID string) {
