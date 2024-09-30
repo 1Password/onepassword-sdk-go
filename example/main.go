@@ -30,15 +30,13 @@ func main() {
 
 	item := createAndGetItem(client)
 	getAndUpdateItem(client, item.VaultID, item.ID)
-	listVaultsAndItems(client)
+	listVaultsAndItems(client, item.VaultID)
 	resolveSecretReference(client, item.VaultID, item.ID, "username")
-
-	if !listVaultsAndItems(client) {
-
-	}
+	deleteItem(client, item.VaultID, item.ID)
 }
 
-func listVaultsAndItems(client *onepassword.Client) bool {
+func listVaultsAndItems(client *onepassword.Client, vaultID string) {
+	// [developer-docs.sdk.go.list-vaults]-start
 	vaults, err := client.Vaults.ListAll(context.Background())
 	if err != nil {
 		panic(err)
@@ -52,24 +50,28 @@ func listVaultsAndItems(client *onepassword.Client) bool {
 		}
 
 		fmt.Printf("%s %s\n", vault.ID, vault.Title)
-		items, err := client.Items.ListAll(context.Background(), vault.ID)
-		if err != nil {
+	}
+	// [developer-docs.sdk.go.list-vaults]-end
+
+	// [developer-docs.sdk.go.list-items]-start
+	items, err := client.Items.ListAll(context.Background(), vaultID)
+	if err != nil {
+		panic(err)
+	}
+	for {
+		item, err := items.Next()
+		if errors.Is(err, onepassword.ErrorIteratorDone) {
+			break
+		} else if err != nil {
 			panic(err)
 		}
-		for {
-			item, err := items.Next()
-			if errors.Is(err, onepassword.ErrorIteratorDone) {
-				break
-			} else if err != nil {
-				panic(err)
-			}
-			fmt.Printf("%s %s\n", item.ID, item.Title)
-		}
+		fmt.Printf("%s %s\n", item.ID, item.Title)
 	}
-	return false
+	// [developer-docs.sdk.go.list-items]-end
 }
 
 func getAndUpdateItem(client *onepassword.Client, existingVaultID, existingItemID string) {
+	// [developer-docs.sdk.go.update-item]-start
 	// Retrieves the newly created item
 	item, err := client.Items.Get(context.Background(), existingVaultID, existingItemID)
 	if err != nil {
@@ -88,10 +90,11 @@ func getAndUpdateItem(client *onepassword.Client, existingVaultID, existingItemI
 	if err != nil {
 		panic(err)
 	}
+	// [developer-docs.sdk.go.update-item]-end
 
 	for _, f := range updatedItem.Fields {
 		if f.Title == "Details" {
-			doSomethingSecret(f.Value)
+			fmt.Println(f.Value)
 		}
 	}
 }
@@ -99,15 +102,18 @@ func getAndUpdateItem(client *onepassword.Client, existingVaultID, existingItemI
 func resolveSecretReference(client *onepassword.Client, vaultID, itemID, fieldID string) {
 	// Retrieves a secret from 1Password.
 	// Takes a secret reference as input and returns the secret to which it points.
+	// [developer-docs.sdk.go.resolve-secret]-start
 	secret, err := client.Secrets.Resolve(context.Background(), fmt.Sprintf("op://%s/%s/%s", vaultID, itemID, fieldID))
 	if err != nil {
 		panic(err)
 	}
+	// [developer-docs.sdk.go.resolve-secret]-end
 
-	doSomethingSecret(secret)
+	fmt.Println(secret)
 }
 
 func createAndGetItem(client *onepassword.Client) onepassword.Item {
+	// [developer-docs.sdk.go.create-item]-start
 	sectionID := "extraDetails"
 	itemParams := onepassword.ItemCreateParams{
 		Title:    "Login created with the SDK",
@@ -154,14 +160,18 @@ func createAndGetItem(client *onepassword.Client) onepassword.Item {
 	if err != nil {
 		panic(err)
 	}
+	// [developer-docs.sdk.go.create-item]-end
 
 	// Retrieves the newly created item
+	// [developer-docs.sdk.go.get-item]-start
 	login, err := client.Items.Get(context.Background(), createdItem.VaultID, createdItem.ID)
 	if err != nil {
 		panic(err)
 	}
+	// [developer-docs.sdk.go.get-item]-end
 
 	// Retrieve TOTP code from an item
+	// [developer-docs.sdk.go.get-totp-item-crud]-start
 	for _, f := range login.Fields {
 		if f.FieldType == onepassword.ItemFieldTypeTOTP {
 			OTPFieldDetails := f.Details.OTP()
@@ -172,14 +182,16 @@ func createAndGetItem(client *onepassword.Client) onepassword.Item {
 			}
 		}
 	}
+	// [developer-docs.sdk.go.get-totp-item-crud]-end
 
 	return login
 }
 
-// Exports the secret to the SECRET_ENV_VAR environment variable.
-func doSomethingSecret(secret string) {
-	err := os.Setenv("SECRET_ENV_VAR", secret)
+func deleteItem(client *onepassword.Client, vaultID string, itemID string) {
+	// [developer-docs.sdk.go.delete-item]-start
+	err := client.Items.Delete(context.Background(), vaultID, itemID)
 	if err != nil {
 		panic(err)
 	}
+	// [developer-docs.sdk.go.delete-item]-end
 }
