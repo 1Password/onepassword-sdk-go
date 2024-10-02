@@ -100,16 +100,15 @@ func getAndUpdateItem(client *onepassword.Client, existingVaultID, existingItemI
 }
 
 func resolveSecretReference(client *onepassword.Client, vaultID, itemID, fieldID string) {
+	// [developer-docs.sdk.go.resolve-secret]-start
 	// Retrieves a secret from 1Password.
 	// Takes a secret reference as input and returns the secret to which it points.
-	// [developer-docs.sdk.go.resolve-secret]-start
 	secret, err := client.Secrets.Resolve(context.Background(), fmt.Sprintf("op://%s/%s/%s", vaultID, itemID, fieldID))
 	if err != nil {
 		panic(err)
 	}
-	// [developer-docs.sdk.go.resolve-secret]-end
-
 	fmt.Println(secret)
+	// [developer-docs.sdk.go.resolve-secret]-end
 }
 
 func createAndGetItem(client *onepassword.Client) onepassword.Item {
