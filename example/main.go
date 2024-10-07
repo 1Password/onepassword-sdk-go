@@ -153,6 +153,7 @@ func createAndGetItem(client *onepassword.Client) onepassword.Item {
 				Title: "Extra Details",
 			},
 		},
+		Tags: []string{"test tag1", "test tag 2"},
 	}
 
 	// Creates a new item based on the structure definition above
