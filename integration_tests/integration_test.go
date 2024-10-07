@@ -124,7 +124,7 @@ func TestInvalidInvoke(t *testing.T) {
 	},
 	}
 	_, err3 := core.Invoke(context.Background(), invocation3)
-	assert.EqualError(t, err3, "error resolving secret reference: secret reference is not prefixed with \"op://\"")
+	assert.EqualError(t, err3, "error resolving secret reference: the secret reference could not be parsed: secret reference is not prefixed with \"op://\"")
 }
 
 func TestClientReleasedSuccessfully(t *testing.T) {
