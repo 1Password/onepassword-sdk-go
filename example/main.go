@@ -32,6 +32,7 @@ func main() {
 	item := createAndGetItem(client)
 	getAndUpdateItem(client, item.VaultID, item.ID)
 	listVaultsAndItems(client, item.VaultID)
+	validateSecretReference(item.VaultID,item.ID,"username")
 	resolveSecretReference(client, item.VaultID, item.ID, "username")
 	deleteItem(client, item.VaultID, item.ID)
 }
@@ -110,6 +111,16 @@ func resolveSecretReference(client *onepassword.Client, vaultID, itemID, fieldID
 	}
 	fmt.Println(secret)
 	// [developer-docs.sdk.go.resolve-secret]-end
+}
+
+func validateSecretReference(vaultID, itemID, fieldID string) {
+	// [developer-docs.sdk.go.validate-secret-reference]-start
+	// Validate your secret reference
+	err := onepassword.ValidateSecretReference(context.Background(), fmt.Sprintf("op://%s/%s/%s",vaultID,itemID,fieldID))
+	if err != nil {
+		panic(err)
+	}
+	// [developer-docs.sdk.go.validate-secret-reference]-end
 }
 
 func createAndGetItem(client *onepassword.Client) onepassword.Item {
