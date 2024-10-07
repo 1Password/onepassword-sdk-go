@@ -1,4 +1,4 @@
-This is the v0 release of the 1Password Go SDK.
+This is the v0.1.2 release of the 1Password Go SDK.
 
 The 1Password Go SDK allows you to build secrets management integrations that can programmatically access secrets stored in 1Password. With this SDK, you can:
 
