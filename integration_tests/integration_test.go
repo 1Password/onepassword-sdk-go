@@ -90,10 +90,12 @@ func TestInvalidInvoke(t *testing.T) {
 
 	// invalid client id
 	invocation1 := internal.InvokeConfig{
-		ClientID: invalidClientID,
 		Invocation: internal.Invocation{
-			MethodName:       validMethodName,
-			SerializedParams: validParams,
+			ClientID: &invalidClientID,
+			Parameters: internal.Parameters{
+				MethodName:       validMethodName,
+				SerializedParams: validParams,
+			},
 		},
 	}
 	_, err1 := core.Invoke(context.Background(), invocation1)
@@ -101,21 +103,25 @@ func TestInvalidInvoke(t *testing.T) {
 
 	// invalid method name
 	invocation2 := internal.InvokeConfig{
-		ClientID: validClientID,
 		Invocation: internal.Invocation{
+			ClientID: &validClientID,
+			Parameters: internal.Parameters {
 			MethodName:       invalidMethodName,
 			SerializedParams: invalidParams,
+			},
 		}}
 	_, err2 := core.Invoke(context.Background(), invocation2)
 	assert.NotNil(t, err2, "expected error when sending invocation that doesn't exist")
 
 	// invalid serialized params
 	invocation3 := internal.InvokeConfig{
-		ClientID: validClientID,
 		Invocation: internal.Invocation{
+			ClientID: &validClientID,
+			Parameters: internal.Parameters{
 			MethodName:       validMethodName,
 			SerializedParams: invalidParams,
 		},
+	},
 	}
 	_, err3 := core.Invoke(context.Background(), invocation3)
 	assert.EqualError(t, err3, "error resolving secret reference: secret reference is not prefixed with \"op://\"")
@@ -127,13 +133,15 @@ func TestClientReleasedSuccessfully(t *testing.T) {
 
 	core, err := internal.GetSharedCore()
 	require.NoError(t, err)
-
+	clientID:= uint64(0)
 	invocation := internal.InvokeConfig{
-		ClientID: 0, // this client id should be invalid because the client has been cleaned up by GC
 		Invocation: internal.Invocation{
+			ClientID: &clientID, // this client id should be invalid because the client has been cleaned up by GC
+			Parameters: internal.Parameters{
 			MethodName:       "SecretsResolve",
 			SerializedParams: map[string]interface{}{"secret_reference": "op://foo/bar/baz"},
 		},
+	},
 	}
 	_, err = core.Invoke(context.Background(), invocation)
 	assert.EqualError(t, err, "an internal error occurred, please contact 1Password at support@1password.com or https://developer.1password.com/joinslack: invalid client id")
