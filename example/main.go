@@ -8,7 +8,8 @@ import (
 )
 
 // [developer-docs.sdk.go.sdk-import]-start
-import 	"github.com/1password/onepassword-sdk-go"
+import "github.com/1password/onepassword-sdk-go"
+
 // [developer-docs.sdk.go.sdk-import]-end
 
 func main() {
@@ -30,8 +31,9 @@ func main() {
 	item := createAndGetItem(client)
 	getAndUpdateItem(client, item.VaultID, item.ID)
 	listVaultsAndItems(client, item.VaultID)
-	validateSecretReference(item.VaultID,item.ID,"username")
+	validateSecretReference(item.VaultID, item.ID, "username")
 	resolveSecretReference(client, item.VaultID, item.ID, "username")
+	resolveTOTPSecretReference(client, item.VaultID, item.ID, "TOTP_onetimepassword")
 	deleteItem(client, item.VaultID, item.ID)
 }
 
@@ -111,10 +113,21 @@ func resolveSecretReference(client *onepassword.Client, vaultID, itemID, fieldID
 	// [developer-docs.sdk.go.resolve-secret]-end
 }
 
+func resolveTOTPSecretReference(client *onepassword.Client, vaultID, itemID, fieldID string) {
+	// [developer-docs.sdk.go.resolve-totp-code]-start
+	// Retrieves a TOTP code from 1Password.
+	code, err := client.Secrets.Resolve(context.Background(), fmt.Sprintf("op://%s/%s/%s?attribute=totp", vaultID, itemID, fieldID))
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(code)
+	// [developer-docs.sdk.go.resolve-totp-code]-end
+}
+
 func validateSecretReference(vaultID, itemID, fieldID string) {
 	// [developer-docs.sdk.go.validate-secret-reference]-start
 	// Validate your secret reference
-	err := onepassword.ValidateSecretReference(context.Background(), fmt.Sprintf("op://%s/%s/%s",vaultID,itemID,fieldID))
+	err := onepassword.ValidateSecretReference(context.Background(), fmt.Sprintf("op://%s/%s/%s", vaultID, itemID, fieldID))
 	if err != nil {
 		panic(err)
 	}
