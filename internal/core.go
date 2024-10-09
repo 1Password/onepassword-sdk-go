@@ -51,7 +51,7 @@ func NewDefaultConfig() ClientConfig {
 
 // AsyncInvokeConfig specifies over the FFI on which client the specified method should be asynchronously invoked on.
 type AsyncInvocation struct {
-	ClientID   uint64    `json:"clientId"`
+	ClientID   uint64     `json:"clientId"`
 	Parameters Parameters `json:"parameters"`
 }
 

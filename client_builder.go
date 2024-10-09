@@ -86,16 +86,21 @@ func clientInvoke(ctx context.Context, innerClient internal.InnerClient, invocat
 	return invocationResponse, nil
 }
 
-func clientSyncInvoke(ctx context.Context, innerClient internal.InnerClient, invocation string, params map[string]interface{}) (*string, error) {
-	invocationResponse, err := innerClient.Core.SyncInvoke(ctx, internal.SyncInvocation{
+func clientSyncInvoke(ctx context.Context, invocation string, params map[string]interface{}) (*string, error) {
+	core, err := internal.GetSharedCore()
+	if err != nil {
+		return nil, err
+	}
+
+	syncInvocationResponse, err := core.SyncInvoke(ctx, internal.SyncInvocation{
 		Parameters: internal.Parameters{
 			MethodName:       invocation,
 			SerializedParams: params,
 		},
-	},
-	)
+	})
+
 	if err != nil {
 		return nil, err
 	}
-	return invocationResponse, nil
+	return syncInvocationResponse, nil
 }

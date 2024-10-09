@@ -90,7 +90,7 @@ func (c *SharedCore) SyncInvoke(ctx context.Context, invokeConfig SyncInvocation
 	if err != nil {
 		return nil, err
 	}
-	res, err := c.callWithCtx(ctx,syncinvokeFuncName, input)
+	res, err := c.callWithCtx(ctx, syncinvokeFuncName, input)
 	if err != nil {
 		return nil, err
 	}
