@@ -32,6 +32,7 @@ func main() {
 	getAndUpdateItem(client, item.VaultID, item.ID)
 	listVaultsAndItems(client, item.VaultID)
 	resolveSecretReference(client, item.VaultID, item.ID, "username")
+	resolveTOTPSecretReference(client, item.VaultID, item.ID, "TOTP_onetimepassword")
 	deleteItem(client, item.VaultID, item.ID)
 }
 
@@ -111,6 +112,17 @@ func resolveSecretReference(client *onepassword.Client, vaultID, itemID, fieldID
 	// [developer-docs.sdk.go.resolve-secret]-end
 }
 
+func resolveTOTPSecretReference(client *onepassword.Client, vaultID, itemID, fieldID string) {
+	// [developer-docs.sdk.go.resolve-totp-code]-start
+	// Retrieves a TOTP code from 1Password.
+	code, err := client.Secrets.Resolve(context.Background(), fmt.Sprintf("op://%s/%s/%s?attribute=totp", vaultID, itemID, fieldID))
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(code)
+	// [developer-docs.sdk.go.resolve-totp-code]-end
+}
+
 func createAndGetItem(client *onepassword.Client) onepassword.Item {
 	// [developer-docs.sdk.go.create-item]-start
 	sectionID := "extraDetails"
@@ -152,6 +164,7 @@ func createAndGetItem(client *onepassword.Client) onepassword.Item {
 				Title: "Extra Details",
 			},
 		},
+		Tags: []string{"test tag1", "test tag 2"},
 	}
 
 	// Creates a new item based on the structure definition above

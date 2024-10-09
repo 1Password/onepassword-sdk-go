@@ -83,7 +83,7 @@ Operations:
 - [x] [Update items](https://developer.1password.com/docs/sdks/manage-items#update-an-item)
 - [x] [Delete items](https://developer.1password.com/docs/sdks/manage-items#delete-an-item)
 - [x] [List items](https://developer.1password.com/docs/sdks/list-vaults-items/)
-- [ ] Add & update tags on items 
+- [x] Add & update tags on items 
 
 Field types:
 - [x] API Keys

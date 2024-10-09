@@ -1,7 +1,3 @@
-This is the v0 release of the 1Password Go SDK.
-
-The 1Password Go SDK allows you to build secrets management integrations that can programmatically access secrets stored in 1Password. With this SDK, you can:
-
-- [Securely load secrets](https://developer.1password.com/docs/sdks/load-secrets/) from 1Password into your code with secret references.
-- [Read, write, and update secrets](https://developer.1password.com/docs/sdks/manage-items/) stored in 1Password, including passwords, API keys, and one-time passwords.
-- [List items and vaults](https://developer.1password.com/docs/sdks/list-vaults-items/) in a 1Password account.
+The v0.1.2 release of the Go SDK brings:
+* Support for item tags. You can now create, get, and edit tags within your 1Password items using item CRUD functions.
+* Support for fetching one-time password codes using secret references. You can now fetch your TOTP code with the `Secrets.Resolve` function, using a secret reference for the TOTP field in your item. For example: `op://vault/item/field?=attribute=totp`
