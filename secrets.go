@@ -39,22 +39,3 @@ func (s SecretsSource) Resolve(ctx context.Context, secretReference string) (str
 	}
 	return result, nil
 }
-
-// Validate the secret reference to ensure there are no syntax errors.
-func ValidateSecretReference(ctx context.Context, secretReference string) error {
-	core, err := internal.GetSharedCore()
-	if err != nil {
-		return err
-	}
-
-	_, err = core.Invoke(ctx, internal.InvokeConfig{
-		Invocation: internal.Invocation{
-			Parameters: internal.Parameters{
-				MethodName:       "ValidateSecretReference",
-				SerializedParams: map[string]interface{}{"secret_reference": secretReference},
-			},
-		},
-	})
-
-	return err
-}

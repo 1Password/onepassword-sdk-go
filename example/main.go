@@ -31,7 +31,6 @@ func main() {
 	item := createAndGetItem(client)
 	getAndUpdateItem(client, item.VaultID, item.ID)
 	listVaultsAndItems(client, item.VaultID)
-	validateSecretReference(item.VaultID, item.ID, "username")
 	resolveSecretReference(client, item.VaultID, item.ID, "username")
 	resolveTOTPSecretReference(client, item.VaultID, item.ID, "TOTP_onetimepassword")
 	deleteItem(client, item.VaultID, item.ID)
@@ -122,16 +121,6 @@ func resolveTOTPSecretReference(client *onepassword.Client, vaultID, itemID, fie
 	}
 	fmt.Println(code)
 	// [developer-docs.sdk.go.resolve-totp-code]-end
-}
-
-func validateSecretReference(vaultID, itemID, fieldID string) {
-	// [developer-docs.sdk.go.validate-secret-reference]-start
-	// Validate your secret reference
-	err := onepassword.ValidateSecretReference(context.Background(), fmt.Sprintf("op://%s/%s/%s", vaultID, itemID, fieldID))
-	if err != nil {
-		panic(err)
-	}
-	// [developer-docs.sdk.go.validate-secret-reference]-end
 }
 
 func createAndGetItem(client *onepassword.Client) onepassword.Item {
