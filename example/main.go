@@ -35,10 +35,10 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	// listVaultsAndItems(client, item.VaultID)
-	// resolveSecretReference(client, item.VaultID, item.ID, "username")
-	// resolveTOTPSecretReference(client, item.VaultID, item.ID, "TOTP_onetimepassword")
-	// deleteItem(client, item.VaultID, item.ID)
+	listVaultsAndItems(client, item.VaultID)
+	resolveSecretReference(client, item.VaultID, item.ID, "username")
+	resolveTOTPSecretReference(client, item.VaultID, item.ID, "TOTP_onetimepassword")
+	deleteItem(client, item.VaultID, item.ID)
 }
 
 func listVaultsAndItems(client *onepassword.Client, vaultID string) {
