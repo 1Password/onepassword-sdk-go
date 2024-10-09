@@ -5,10 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"os"
+
+	"github.com/1password/onepassword-sdk-go"
 )
 
 // [developer-docs.sdk.go.sdk-import]-start
-import "github.com/1password/onepassword-sdk-go"
 
 // [developer-docs.sdk.go.sdk-import]-end
 
@@ -30,10 +31,14 @@ func main() {
 
 	item := createAndGetItem(client)
 	getAndUpdateItem(client, item.VaultID, item.ID)
-	listVaultsAndItems(client, item.VaultID)
-	resolveSecretReference(client, item.VaultID, item.ID, "username")
-	resolveTOTPSecretReference(client, item.VaultID, item.ID, "TOTP_onetimepassword")
-	deleteItem(client, item.VaultID, item.ID)
+	err = onepassword.ValidateSecretReference(context.Background(), "op://jep/test/jep")
+	if err != nil {
+		panic(err)
+	}
+	// listVaultsAndItems(client, item.VaultID)
+	// resolveSecretReference(client, item.VaultID, item.ID, "username")
+	// resolveTOTPSecretReference(client, item.VaultID, item.ID, "TOTP_onetimepassword")
+	// deleteItem(client, item.VaultID, item.ID)
 }
 
 func listVaultsAndItems(client *onepassword.Client, vaultID string) {
@@ -129,7 +134,7 @@ func createAndGetItem(client *onepassword.Client) onepassword.Item {
 	itemParams := onepassword.ItemCreateParams{
 		Title:    "Login created with the SDK",
 		Category: onepassword.ItemCategoryLogin,
-		VaultID:  "7turaasywpymt3jecxoxk5roli",
+		VaultID:  "bhld6zk6hkuntyqlsjy3bdawey",
 		Fields: []onepassword.ItemField{
 			{
 				ID:        "username",

@@ -89,40 +89,36 @@ func TestInvalidInvoke(t *testing.T) {
 	invalidParams := map[string]interface{}{"secret_reference": ""}
 
 	// invalid client id
-	invocation1 := internal.InvokeConfig{
-		Invocation: internal.Invocation{
-			ClientID: &invalidClientID,
+	invocation1 := internal.AsyncInvocation{
+			ClientID: invalidClientID,
 			Parameters: internal.Parameters{
 				MethodName:       validMethodName,
 				SerializedParams: validParams,
 			},
-		},
-	}
+		};
+
 	_, err1 := core.Invoke(context.Background(), invocation1)
 	assert.EqualError(t, err1, "an internal error occurred, please contact 1Password at support@1password.com or https://developer.1password.com/joinslack: invalid client id")
 
 	// invalid method name
-	invocation2 := internal.InvokeConfig{
-		Invocation: internal.Invocation{
-			ClientID: &validClientID,
-			Parameters: internal.Parameters {
-			MethodName:       invalidMethodName,
-			SerializedParams: invalidParams,
+	invocation2 := internal.AsyncInvocation{
+			ClientID: validClientID,
+			Parameters: internal.Parameters{
+				MethodName:       invalidMethodName,
+				SerializedParams: invalidParams,
 			},
-		}}
+		}
 	_, err2 := core.Invoke(context.Background(), invocation2)
 	assert.NotNil(t, err2, "expected error when sending invocation that doesn't exist")
 
 	// invalid serialized params
-	invocation3 := internal.InvokeConfig{
-		Invocation: internal.Invocation{
-			ClientID: &validClientID,
+	invocation3 := internal.AsyncInvocation{
+			ClientID: validClientID,
 			Parameters: internal.Parameters{
-			MethodName:       validMethodName,
-			SerializedParams: invalidParams,
-		},
-	},
-	}
+				MethodName:       validMethodName,
+				SerializedParams: invalidParams,
+			},
+		};
 	_, err3 := core.Invoke(context.Background(), invocation3)
 	assert.EqualError(t, err3, "error resolving secret reference: the secret reference could not be parsed: secret reference is not prefixed with \"op://\"")
 }
@@ -133,16 +129,14 @@ func TestClientReleasedSuccessfully(t *testing.T) {
 
 	core, err := internal.GetSharedCore()
 	require.NoError(t, err)
-	clientID:= uint64(0)
-	invocation := internal.InvokeConfig{
-		Invocation: internal.Invocation{
-			ClientID: &clientID, // this client id should be invalid because the client has been cleaned up by GC
+	clientID := uint64(0)
+	invocation := internal.AsyncInvocation{
+			ClientID: clientID, // this client id should be invalid because the client has been cleaned up by GC
 			Parameters: internal.Parameters{
-			MethodName:       "SecretsResolve",
-			SerializedParams: map[string]interface{}{"secret_reference": "op://foo/bar/baz"},
-		},
-	},
-	}
+				MethodName:       "SecretsResolve",
+				SerializedParams: map[string]interface{}{"secret_reference": "op://foo/bar/baz"},
+			},
+		};
 	_, err = core.Invoke(context.Background(), invocation)
 	assert.EqualError(t, err, "an internal error occurred, please contact 1Password at support@1password.com or https://developer.1password.com/joinslack: invalid client id")
 }

@@ -72,15 +72,28 @@ func WithIntegrationInfo(name string, version string) ClientOption {
 }
 
 func clientInvoke(ctx context.Context, innerClient internal.InnerClient, invocation string, params map[string]interface{}) (*string, error) {
-	invocationResponse, err := innerClient.Core.Invoke(ctx, internal.InvokeConfig{
-		Invocation: internal.Invocation{
-			ClientID: &innerClient.ID,
-			Parameters: internal.Parameters{
-				MethodName:       invocation,
-				SerializedParams: params,
-			},
+	invocationResponse, err := innerClient.Core.Invoke(ctx, internal.AsyncInvocation{
+		ClientID: innerClient.ID,
+		Parameters: internal.Parameters{
+			MethodName:       invocation,
+			SerializedParams: params,
 		},
-	})
+	},
+	)
+	if err != nil {
+		return nil, err
+	}
+	return invocationResponse, nil
+}
+
+func clientSyncInvoke(ctx context.Context, innerClient internal.InnerClient, invocation string, params map[string]interface{}) (*string, error) {
+	invocationResponse, err := innerClient.Core.SyncInvoke(ctx, internal.SyncInvocation{
+		Parameters: internal.Parameters{
+			MethodName:       invocation,
+			SerializedParams: params,
+		},
+	},
+	)
 	if err != nil {
 		return nil, err
 	}
