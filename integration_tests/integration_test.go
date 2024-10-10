@@ -89,7 +89,7 @@ func TestInvalidInvoke(t *testing.T) {
 	invalidParams := map[string]interface{}{"secret_reference": ""}
 
 	// invalid client id
-	invocation1 := internal.AsyncInvocation{
+	invocation1 := internal.Invocation{
 		ClientID: invalidClientID,
 		Parameters: internal.Parameters{
 			MethodName:       validMethodName,
@@ -101,7 +101,7 @@ func TestInvalidInvoke(t *testing.T) {
 	assert.EqualError(t, err1, "an internal error occurred, please contact 1Password at support@1password.com or https://developer.1password.com/joinslack: invalid client id")
 
 	// invalid method name
-	invocation2 := internal.AsyncInvocation{
+	invocation2 := internal.Invocation{
 		ClientID: validClientID,
 		Parameters: internal.Parameters{
 			MethodName:       invalidMethodName,
@@ -112,7 +112,7 @@ func TestInvalidInvoke(t *testing.T) {
 	assert.NotNil(t, err2, "expected error when sending invocation that doesn't exist")
 
 	// invalid serialized params
-	invocation3 := internal.AsyncInvocation{
+	invocation3 := internal.Invocation{
 		ClientID: validClientID,
 		Parameters: internal.Parameters{
 			MethodName:       validMethodName,
@@ -130,7 +130,7 @@ func TestClientReleasedSuccessfully(t *testing.T) {
 	core, err := internal.GetSharedCore()
 	require.NoError(t, err)
 	clientID := uint64(0)
-	invocation := internal.AsyncInvocation{
+	invocation := internal.Invocation{
 		ClientID: clientID, // this client id should be invalid because the client has been cleaned up by GC
 		Parameters: internal.Parameters{
 			MethodName:       "SecretsResolve",

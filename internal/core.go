@@ -16,8 +16,7 @@ var SDKSemverVersion string
 
 type Core interface {
 	InitClient(ctx context.Context, config ClientConfig) (*uint64, error)
-	Invoke(ctx context.Context, asyncInvokeConfig AsyncInvocation) (*string, error)
-	SyncInvoke(ctx context.Context, SyncInvokeConfig SyncInvocation) (*string, error)
+	Invoke(ctx context.Context, invokeConfig Invocation) (*string, error)
 	ReleaseClient(clientID uint64)
 }
 
@@ -49,14 +48,9 @@ func NewDefaultConfig() ClientConfig {
 	}
 }
 
-// AsyncInvokeConfig specifies over the FFI on which client the specified method should be asynchronously invoked on.
-type AsyncInvocation struct {
+// Invocation specifies over the FFI on which client the specified method should be asynchronously invoked on.
+type Invocation struct {
 	ClientID   uint64     `json:"clientId"`
-	Parameters Parameters `json:"parameters"`
-}
-
-// SyncInvokeConfig specifies over the FFI on which client the specified method should be synchronously invoked on.
-type SyncInvocation struct {
 	Parameters Parameters `json:"parameters"`
 }
 

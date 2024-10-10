@@ -47,7 +47,7 @@ func ValidateSecretReference(ctx context.Context, secretReference string) error 
 		return err
 	}
 
-	_, err = core.SyncInvoke(ctx, internal.SyncInvocation{
+	_, err = core.Invoke(ctx, internal.Invocation{
 			Parameters: internal.Parameters{
 				MethodName:       "ValidateSecretReference",
 				SerializedParams: map[string]interface{}{"secret_reference": secretReference},

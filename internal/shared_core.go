@@ -15,7 +15,6 @@ var coreWASM []byte
 
 const (
 	invokeFuncName        = "invoke"
-	syncinvokeFuncName    = "sync_invoke"
 	initClientFuncName    = "init_client"
 	releaseClientFuncName = "release_client"
 )
@@ -69,28 +68,12 @@ func (c *SharedCore) InitClient(ctx context.Context, config ClientConfig) (*uint
 }
 
 // Invoke calls asynchronously specified business logic from core
-func (c *SharedCore) Invoke(ctx context.Context, asyncInvokeConfig AsyncInvocation) (*string, error) {
-	input, err := json.Marshal(asyncInvokeConfig)
+func (c *SharedCore) Invoke(ctx context.Context, InvokeConfig Invocation) (*string, error) {
+	input, err := json.Marshal(InvokeConfig)
 	if err != nil {
 		return nil, err
 	}
 	res, err := c.callWithCtx(ctx, invokeFuncName, input)
-	if err != nil {
-		return nil, err
-	}
-
-	response := string(res)
-
-	return &response, nil
-}
-
-// SyncInvoke calls synchronously specified business logic from core
-func (c *SharedCore) SyncInvoke(ctx context.Context, invokeConfig SyncInvocation) (*string, error) {
-	input, err := json.Marshal(invokeConfig)
-	if err != nil {
-		return nil, err
-	}
-	res, err := c.callWithCtx(ctx, syncinvokeFuncName, input)
 	if err != nil {
 		return nil, err
 	}
