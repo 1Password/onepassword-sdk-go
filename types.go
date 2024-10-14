@@ -148,7 +148,7 @@ type Website struct {
 	// The auto-fill behavior of the website
 	//
 	// For more information, visit https://support.1password.com/autofill-behavior/
-	AutofillBehavior AutofillBehavior `json:"autofill_behavior"`
+	AutofillBehavior AutofillBehavior `json:"autofillBehavior"`
 }
 
 // Represents a 1Password item.
