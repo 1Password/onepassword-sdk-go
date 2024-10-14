@@ -126,6 +126,31 @@ type ItemSection struct {
 	Title string `json:"title"`
 }
 
+// Controls the auto-fill behavior of a website.
+//
+// For more information, visit https://support.1password.com/autofill-behavior/
+type AutofillBehavior string
+
+const (
+	// Auto-fill any page that’s part of the website, including subdomains
+	AutofillBehaviorAnywhereOnWebsite AutofillBehavior = "AnywhereOnWebsite"
+	// Auto-fill only if the domain (hostname and port) is an exact match.
+	AutofillBehaviorExactDomain AutofillBehavior = "ExactDomain"
+	// Never auto-fill on this website
+	AutofillBehaviorNever AutofillBehavior = "Never"
+)
+
+type Website struct {
+	// The website URL
+	URL string `json:"url"`
+	// The label of the website, e.g. 'website', 'sign-in address'
+	Label string `json:"label"`
+	// The auto-fill behavior of the website
+	//
+	// For more information, visit https://support.1password.com/autofill-behavior/
+	AutofillBehavior AutofillBehavior `json:"autofillBehavior"`
+}
+
 // Represents a 1Password item.
 type Item struct {
 	// The item's ID
@@ -142,6 +167,8 @@ type Item struct {
 	Sections []ItemSection `json:"sections"`
 	// The item's tags
 	Tags []string `json:"tags"`
+	// The websites used for autofilling for items of the Login and Password categories.
+	Websites []Website `json:"websites"`
 	// The item's version
 	Version uint32 `json:"version"`
 }
@@ -158,6 +185,8 @@ type ItemCreateParams struct {
 	Sections []ItemSection `json:"sections,omitempty"`
 	// The item's tags
 	Tags []string `json:"tags,omitempty"`
+	// The websites used for autofilling for items of the Login and Password categories.
+	Websites []Website `json:"websites,omitempty"`
 }
 
 // Represents a decrypted 1Password item.
@@ -170,6 +199,8 @@ type ItemOverview struct {
 	Category ItemCategory `json:"category"`
 	// The ID of the vault where the item is saved
 	VaultID string `json:"vaultId"`
+	// The websites used for autofilling for items of the Login and Password categories.
+	Websites []Website `json:"websites"`
 }
 
 // Additional attributes for OTP fields.

@@ -105,9 +105,9 @@ func TestInvalidInvoke(t *testing.T) {
 	invocation2 := internal.InvokeConfig{
 		Invocation: internal.Invocation{
 			ClientID: &validClientID,
-			Parameters: internal.Parameters {
-			MethodName:       invalidMethodName,
-			SerializedParams: invalidParams,
+			Parameters: internal.Parameters{
+				MethodName:       invalidMethodName,
+				SerializedParams: invalidParams,
 			},
 		}}
 	_, err2 := core.Invoke(context.Background(), invocation2)
@@ -118,10 +118,10 @@ func TestInvalidInvoke(t *testing.T) {
 		Invocation: internal.Invocation{
 			ClientID: &validClientID,
 			Parameters: internal.Parameters{
-			MethodName:       validMethodName,
-			SerializedParams: invalidParams,
+				MethodName:       validMethodName,
+				SerializedParams: invalidParams,
+			},
 		},
-	},
 	}
 	_, err3 := core.Invoke(context.Background(), invocation3)
 	assert.EqualError(t, err3, "error resolving secret reference: the secret reference could not be parsed: secret reference is not prefixed with \"op://\"")
@@ -133,15 +133,15 @@ func TestClientReleasedSuccessfully(t *testing.T) {
 
 	core, err := internal.GetSharedCore()
 	require.NoError(t, err)
-	clientID:= uint64(0)
+	clientID := uint64(0)
 	invocation := internal.InvokeConfig{
 		Invocation: internal.Invocation{
 			ClientID: &clientID, // this client id should be invalid because the client has been cleaned up by GC
 			Parameters: internal.Parameters{
-			MethodName:       "SecretsResolve",
-			SerializedParams: map[string]interface{}{"secret_reference": "op://foo/bar/baz"},
+				MethodName:       "SecretsResolve",
+				SerializedParams: map[string]interface{}{"secret_reference": "op://foo/bar/baz"},
+			},
 		},
-	},
 	}
 	_, err = core.Invoke(context.Background(), invocation)
 	assert.EqualError(t, err, "an internal error occurred, please contact 1Password at support@1password.com or https://developer.1password.com/joinslack: invalid client id")

@@ -86,6 +86,11 @@ func getAndUpdateItem(client *onepassword.Client, existingVaultID, existingItemI
 		}
 	}
 	item.Title = "New Title"
+	item.Websites = append(item.Websites, onepassword.Website{
+		URL:              "2password.com",
+		Label:            "my second custom website",
+		AutofillBehavior: onepassword.AutofillBehaviorNever,
+	})
 
 	updatedItem, err := client.Items.Put(context.Background(), item)
 	if err != nil {
@@ -150,13 +155,6 @@ func createAndGetItem(client *onepassword.Client) onepassword.Item {
 				SectionID: &sectionID,
 				FieldType: onepassword.ItemFieldTypeTOTP,
 			},
-			{
-				ID:        "uniqueId",
-				Title:     "Web address",
-				Value:     "1password.com",
-				FieldType: onepassword.ItemFieldTypeText,
-				SectionID: &sectionID,
-			},
 		},
 		Sections: []onepassword.ItemSection{
 			{
@@ -165,6 +163,13 @@ func createAndGetItem(client *onepassword.Client) onepassword.Item {
 			},
 		},
 		Tags: []string{"test tag1", "test tag 2"},
+		Websites: []onepassword.Website{
+			{
+				URL:              "1password.com",
+				AutofillBehavior: onepassword.AutofillBehaviorAnywhereOnWebsite,
+				Label:            "my custom website",
+			},
+		},
 	}
 
 	// Creates a new item based on the structure definition above

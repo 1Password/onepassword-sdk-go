@@ -55,11 +55,11 @@ type InvokeConfig struct {
 
 // Invocation holds the information required for invoking SDK functionality.
 type Invocation struct {
-	ClientID   *uint64     `json:"clientId,omitempty"`
+	ClientID   *uint64    `json:"clientId,omitempty"`
 	Parameters Parameters `json:"parameters"`
 }
 
-type Parameters struct{
+type Parameters struct {
 	MethodName       string                 `json:"name"`
 	SerializedParams map[string]interface{} `json:"parameters"`
 }
