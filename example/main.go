@@ -17,7 +17,7 @@ func main() {
 	// Gets your service account token from the OP_SERVICE_ACCOUNT_TOKEN environment variable.
 	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
 
-	// Authenticates with your service account token and connects to 1Password.
+	// Creates an authenticated client.
 	client, err := onepassword.NewClient(context.Background(),
 		onepassword.WithServiceAccountToken(token),
 		// TODO: Set the following to your own integration name and version.
@@ -38,6 +38,7 @@ func main() {
 
 func listVaultsAndItems(client *onepassword.Client, vaultID string) {
 	// [developer-docs.sdk.go.list-vaults]-start
+	// Lists all vaults in an account.
 	vaults, err := client.Vaults.ListAll(context.Background())
 	if err != nil {
 		panic(err)
@@ -55,6 +56,7 @@ func listVaultsAndItems(client *onepassword.Client, vaultID string) {
 	// [developer-docs.sdk.go.list-vaults]-end
 
 	// [developer-docs.sdk.go.list-items]-start
+	// Lists all items in a vault.
 	items, err := client.Items.ListAll(context.Background(), vaultID)
 	if err != nil {
 		panic(err)
@@ -73,13 +75,13 @@ func listVaultsAndItems(client *onepassword.Client, vaultID string) {
 
 func getAndUpdateItem(client *onepassword.Client, existingVaultID, existingItemID string) {
 	// [developer-docs.sdk.go.update-item]-start
-	// Retrieves the newly created item
+	// Retrieves an item.
 	item, err := client.Items.Get(context.Background(), existingVaultID, existingItemID)
 	if err != nil {
 		panic(err)
 	}
 
-	// Finds the field named "Details" and edits its value
+	// Finds the field named "Details" and updates its value.
 	for i := range item.Fields {
 		if item.Fields[i].Title == "Details" {
 			item.Fields[i].Value = "updated details"
@@ -107,8 +109,7 @@ func getAndUpdateItem(client *onepassword.Client, existingVaultID, existingItemI
 
 func resolveSecretReference(client *onepassword.Client, vaultID, itemID, fieldID string) {
 	// [developer-docs.sdk.go.resolve-secret]-start
-	// Retrieves a secret from 1Password.
-	// Takes a secret reference as input and returns the secret to which it points.
+	// Fetches the value of a field in 1Password using a secret reference.
 	secret, err := client.Secrets.Resolve(context.Background(), fmt.Sprintf("op://%s/%s/%s", vaultID, itemID, fieldID))
 	if err != nil {
 		panic(err)
@@ -119,7 +120,7 @@ func resolveSecretReference(client *onepassword.Client, vaultID, itemID, fieldID
 
 func resolveTOTPSecretReference(client *onepassword.Client, vaultID, itemID, fieldID string) {
 	// [developer-docs.sdk.go.resolve-totp-code]-start
-	// Retrieves a TOTP code from 1Password.
+	// Gets a one-time password code using the Resolve function with a secret reference.
 	code, err := client.Secrets.Resolve(context.Background(), fmt.Sprintf("op://%s/%s/%s?attribute=totp", vaultID, itemID, fieldID))
 	if err != nil {
 		panic(err)
@@ -130,6 +131,7 @@ func resolveTOTPSecretReference(client *onepassword.Client, vaultID, itemID, fie
 
 func createAndGetItem(client *onepassword.Client) onepassword.Item {
 	// [developer-docs.sdk.go.create-item]-start
+	// Defines an item with a username, password, one-time password, autofill website, and tags.
 	sectionID := "extraDetails"
 	itemParams := onepassword.ItemCreateParams{
 		Title:    "Login created with the SDK",
@@ -172,7 +174,7 @@ func createAndGetItem(client *onepassword.Client) onepassword.Item {
 		},
 	}
 
-	// Creates a new item based on the structure definition above
+	// Creates a new item based on the structure definition above.
 	createdItem, err := client.Items.Create(context.Background(), itemParams)
 	if err != nil {
 		panic(err)
@@ -180,7 +182,7 @@ func createAndGetItem(client *onepassword.Client) onepassword.Item {
 	// [developer-docs.sdk.go.create-item]-end
 
 	// [developer-docs.sdk.go.get-item]-start
-	// Retrieves the newly created item
+	// Retrieves the item created in the previous step.
 	login, err := client.Items.Get(context.Background(), createdItem.VaultID, createdItem.ID)
 	if err != nil {
 		panic(err)
@@ -188,7 +190,7 @@ func createAndGetItem(client *onepassword.Client) onepassword.Item {
 	// [developer-docs.sdk.go.get-item]-end
 
 	// [developer-docs.sdk.go.get-totp-item-crud]-start
-	// Retrieve TOTP code from an item
+	// Retrieves a one-time password code from an item.
 	for _, f := range login.Fields {
 		if f.FieldType == onepassword.ItemFieldTypeTOTP {
 			OTPFieldDetails := f.Details.OTP()
@@ -206,6 +208,7 @@ func createAndGetItem(client *onepassword.Client) onepassword.Item {
 
 func deleteItem(client *onepassword.Client, vaultID string, itemID string) {
 	// [developer-docs.sdk.go.delete-item]-start
+	// Deletes an item.
 	err := client.Items.Delete(context.Background(), vaultID, itemID)
 	if err != nil {
 		panic(err)
