@@ -75,7 +75,7 @@ func listVaultsAndItems(client *onepassword.Client, vaultID string) {
 
 func getAndUpdateItem(client *onepassword.Client, existingVaultID, existingItemID string) {
 	// [developer-docs.sdk.go.update-item]-start
-	// Gets an item.
+	// Retrieves the newly-created item.
 	item, err := client.Items.Get(context.Background(), existingVaultID, existingItemID)
 	if err != nil {
 		panic(err)
