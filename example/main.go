@@ -190,7 +190,7 @@ func createAndGetItem(client *onepassword.Client) onepassword.Item {
 	// [developer-docs.sdk.go.get-item]-end
 
 	// [developer-docs.sdk.go.get-totp-item-crud]-start
-	// Retrieves a one-time password code from an item.
+	// Gets a one-time password code from an item.
 	for _, f := range login.Fields {
 		if f.FieldType == onepassword.ItemFieldTypeTOTP {
 			OTPFieldDetails := f.Details.OTP()
