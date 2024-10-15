@@ -75,7 +75,7 @@ func listVaultsAndItems(client *onepassword.Client, vaultID string) {
 
 func getAndUpdateItem(client *onepassword.Client, existingVaultID, existingItemID string) {
 	// [developer-docs.sdk.go.update-item]-start
-	// Retrieves an item.
+	// Gets an item.
 	item, err := client.Items.Get(context.Background(), existingVaultID, existingItemID)
 	if err != nil {
 		panic(err)
@@ -120,7 +120,7 @@ func resolveSecretReference(client *onepassword.Client, vaultID, itemID, fieldID
 
 func resolveTOTPSecretReference(client *onepassword.Client, vaultID, itemID, fieldID string) {
 	// [developer-docs.sdk.go.resolve-totp-code]-start
-	// Gets a one-time password code using the Resolve function with a secret reference.
+	// Gets a one-time password code using a secret reference with the totp query parameter.
 	code, err := client.Secrets.Resolve(context.Background(), fmt.Sprintf("op://%s/%s/%s?attribute=totp", vaultID, itemID, fieldID))
 	if err != nil {
 		panic(err)
