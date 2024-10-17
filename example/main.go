@@ -51,7 +51,8 @@ func listVaultsAndGetId(client *onepassword.Client) string {
 		} else if err != nil {
 			panic(err)
 		}
-
+		fmt.Printf("%s %s\n", vault.ID, vault.Title)
+		
 		valId = vault.ID
 	}
 	return valId
