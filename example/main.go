@@ -27,8 +27,8 @@ func main() {
 		panic(err)
 	}
 	// [developer-docs.sdk.go.client-initialization]-end
-
-	item := createAndGetItem(client)
+	vaultID := listVaultsAndGetId(client) // get the vault ID first
+	item := createAndGetItem(client, vaultID) // use it in various places 
 	getAndUpdateItem(client, item.VaultID, item.ID)
 	listVaultsAndItems(client, item.VaultID)
 	resolveSecretReference(client, item.VaultID, item.ID, "username")
@@ -36,9 +36,11 @@ func main() {
 	deleteItem(client, item.VaultID, item.ID)
 }
 
-func listVaultsAndItems(client *onepassword.Client, vaultID string) {
+
+func listVaultsAndGetId(client *onepassword.Client) string {
 	// [developer-docs.sdk.go.list-vaults]-start
 	vaults, err := client.Vaults.ListAll(context.Background())
+	var valId string
 	if err != nil {
 		panic(err)
 	}
@@ -50,10 +52,13 @@ func listVaultsAndItems(client *onepassword.Client, vaultID string) {
 			panic(err)
 		}
 
-		fmt.Printf("%s %s\n", vault.ID, vault.Title)
+		valId = vault.ID
 	}
-	// [developer-docs.sdk.go.list-vaults]-end
+	return valId
+	// [developer-docs.sdk.go.list-vaults]-start
+}
 
+func listVaultsItems(client *onepassword.Client, vaultID string) {
 	// [developer-docs.sdk.go.list-items]-start
 	items, err := client.Items.ListAll(context.Background(), vaultID)
 	if err != nil {
@@ -128,13 +133,13 @@ func resolveTOTPSecretReference(client *onepassword.Client, vaultID, itemID, fie
 	// [developer-docs.sdk.go.resolve-totp-code]-end
 }
 
-func createAndGetItem(client *onepassword.Client) onepassword.Item {
+func createAndGetItem(client *onepassword.Client, vaultID string) onepassword.Item {
 	// [developer-docs.sdk.go.create-item]-start
 	sectionID := "extraDetails"
 	itemParams := onepassword.ItemCreateParams{
 		Title:    "Login created with the SDK",
 		Category: onepassword.ItemCategoryLogin,
-		VaultID:  "7turaasywpymt3jecxoxk5roli",
+		VaultID:  vaultID,
 		Fields: []onepassword.ItemField{
 			{
 				ID:        "username",
