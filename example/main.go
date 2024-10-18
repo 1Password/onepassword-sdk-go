@@ -182,7 +182,7 @@ func createAndGetItem(client *onepassword.Client) onepassword.Item {
 	// [developer-docs.sdk.go.create-item]-end
 
 	// [developer-docs.sdk.go.get-item]-start
-	// Retrieves the item created in the previous step.
+	// Retrieves the newly-created item.
 	login, err := client.Items.Get(context.Background(), createdItem.VaultID, createdItem.ID)
 	if err != nil {
 		panic(err)
