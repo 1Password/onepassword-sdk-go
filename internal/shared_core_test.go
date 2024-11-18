@@ -20,13 +20,13 @@ func TestLoadWASM(t *testing.T) {
 	// check ExportedFunctionsDefinitions names contain init_client, invoke and release_client
 	list := [3]string{"init_client", "invoke", "release_client"}
 	count := 0
-	// Iterate over the list of expected function names
+
 	for _, x := range list {
-    // Check if the function name exists in the exportedFunctions map
-    if _, exists := value.Main.ExportedFunctions()[x]; exists {
-        count++
-    }
-}
+		if _, exists := value.Main.ExportedFunctions()[x]; exists {
+			count++
+		}
+	}
+	
 	assert.Equal(t, 3, count)
 
 	// check AllowedHosts field matches allowed1PHosts
