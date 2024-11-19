@@ -18,11 +18,11 @@ func TestLoadWASM(t *testing.T) {
 	assert.Equal(t, 1, len(value.Modules))
 
 	// check ExportedFunctionsDefinitions names contain init_client, invoke and release_client
-	list := [3]string{"init_client", "invoke", "release_client"}
+	functions := [3]string{"init_client", "invoke", "release_client"}
 	count := 0
 
-	for _, x := range list {
-		if _, exists := value.Main.ExportedFunctions()[x]; exists {
+	for _, function := range functions {
+		if _, exists := value.Main.ExportedFunctions()[function]; exists {
 			count++
 		}
 	}
