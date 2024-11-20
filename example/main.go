@@ -5,11 +5,10 @@ import (
 	"errors"
 	"fmt"
 	"os"
-
-	"github.com/1password/onepassword-sdk-go"
 )
 
 // [developer-docs.sdk.go.sdk-import]-start
+import "github.com/1password/onepassword-sdk-go"
 
 // [developer-docs.sdk.go.sdk-import]-end
 
@@ -107,6 +106,14 @@ func getAndUpdateItem(client *onepassword.Client, existingVaultID, existingItemI
 }
 
 func resolveSecretReference(client *onepassword.Client, vaultID, itemID, fieldID string) {
+	// [developer-docs.sdk.go.validate-secret-reference]-start
+	// Validate your secret reference
+	err := onepassword.Secrets.ValidateSecretReference(context.Background(), fmt.Sprintf("op://%s/%s/%s", vaultID, itemID, fieldID))
+	if err != nil {
+		panic(err)
+	}
+	// [developer-docs.sdk.go.validate-secret-reference]-end
+
 	// [developer-docs.sdk.go.resolve-secret]-start
 	// Retrieves a secret from 1Password.
 	// Takes a secret reference as input and returns the secret to which it points.
