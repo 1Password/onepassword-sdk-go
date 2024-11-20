@@ -26,7 +26,7 @@ func TestLoadWASM(t *testing.T) {
 			count++
 		}
 	}
-	
+
 	assert.Equal(t, 3, count)
 
 	// check AllowedHosts field matches allowed1PHosts

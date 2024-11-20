@@ -24,6 +24,10 @@ func NewSecretsSource(inner internal.InnerClient) *SecretsSource {
 	return &SecretsSource{inner}
 }
 
+type secretsUtil struct{}
+
+var Secrets = secretsUtil{}
+
 // Resolve returns the secret the provided secret reference points to.
 func (s SecretsSource) Resolve(ctx context.Context, secretReference string) (string, error) {
 	resultString, err := clientInvoke(ctx, s.InnerClient, "SecretsResolve", map[string]interface{}{
@@ -38,4 +42,23 @@ func (s SecretsSource) Resolve(ctx context.Context, secretReference string) (str
 		return "", err
 	}
 	return result, nil
+}
+
+// Validate the secret reference to ensure there are no syntax errors.
+func (s secretsUtil) ValidateSecretReference(ctx context.Context, secretReference string) error {
+	core, err := internal.GetSharedCore()
+	if err != nil {
+		return err
+	}
+
+	_, err = core.Invoke(ctx, internal.InvokeConfig{
+		Invocation: internal.Invocation{
+			Parameters: internal.Parameters{
+				MethodName:       "ValidateSecretReference",
+				SerializedParams: map[string]interface{}{"secret_reference": secretReference},
+			},
+		},
+	})
+
+	return err
 }
