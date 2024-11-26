@@ -15,14 +15,10 @@ const (
 
 // NewClient returns a 1Password Go SDK client using the provided ClientOption list.
 func NewClient(ctx context.Context, opts ...ClientOption) (*Client, error) {
-	core, err := internal.GetSharedCore()
-	if err != nil {
-		return nil, err
-	}
-	return createClient(ctx, core, opts...)
+	return createClient(ctx, opts...)
 }
 
-func createClient(ctx context.Context, core internal.Core, opts ...ClientOption) (*Client, error) {
+func createClient(ctx context.Context, opts ...ClientOption) (*Client, error) {
 	client := Client{
 		config: internal.NewDefaultConfig(),
 	}
@@ -32,6 +28,17 @@ func createClient(ctx context.Context, core internal.Core, opts ...ClientOption)
 		if err != nil {
 			return nil, err
 		}
+	}
+
+	var core internal.Core
+	var err error
+	if client.config.UseLocalAuth {
+		core = internal.NewDelegatedCore()
+	} else {
+		core, err = internal.GetSharedCore()
+	}
+	if err != nil {
+		return nil, err
 	}
 
 	clientID, err := core.InitClient(ctx, client.config)
@@ -58,6 +65,14 @@ type ClientOption func(client *Client) error
 func WithServiceAccountToken(token string) ClientOption {
 	return func(c *Client) error {
 		c.config.SAToken = token
+		return nil
+	}
+}
+
+// WithLocalAuth specifies whether desktop app biometric integration will be used.
+func WithLocalAuth() ClientOption {
+	return func(c *Client) error {
+		c.config.UseLocalAuth = true
 		return nil
 	}
 }

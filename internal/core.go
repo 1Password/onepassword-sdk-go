@@ -23,6 +23,7 @@ type Core interface {
 // ClientConfig contains information required for creating a client.
 type ClientConfig struct {
 	SAToken               string `json:"serviceAccountToken"`
+	UseLocalAuth          bool   `json:"useLocalAuth"`
 	Language              string `json:"programmingLanguage"`
 	SDKVersion            string `json:"sdkVersion"`
 	IntegrationName       string `json:"integrationName"`
