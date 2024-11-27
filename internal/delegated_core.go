@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/binary"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net"
 )
@@ -18,7 +19,7 @@ type DelegatedCoreMessage struct {
 }
 
 func NewDelegatedCore() *DelegatedCore {
-	c, err := net.Dial("unix", "/Users/martonsoos/echo.sock")
+	c, err := net.Dial("unix", "/Users/andititu/echo.sock")
 	if err != nil {
 		panic(err)
 	}
@@ -54,6 +55,7 @@ func (c *DelegatedCore) InitClient(ctx context.Context, config ClientConfig) (*u
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println(string(res))
 
 	var id uint64
 	err = json.Unmarshal(res, &id)
