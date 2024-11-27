@@ -23,7 +23,7 @@ func echoServer(c net.Conn) {
 }
 
 func main() {
-	l, err := net.Listen("unix", "/Users/andititu/echo.sock")
+	l, err := net.Listen("unix", "/Users/martonsoos/echo.sock")
 	if err != nil {
 		log.Fatal("listen error:", err)
 	}

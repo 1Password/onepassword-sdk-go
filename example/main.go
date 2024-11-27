@@ -5,10 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"os"
+
+	"github.com/1password/onepassword-sdk-go"
 )
 
 // [developer-docs.sdk.go.sdk-import]-start
-import "github.com/1password/onepassword-sdk-go"
 
 // [developer-docs.sdk.go.sdk-import]-end
 
@@ -20,6 +21,7 @@ func main() {
 	// Authenticates with your service account token and connects to 1Password.
 	client, err := onepassword.NewClient(context.Background(),
 		onepassword.WithServiceAccountToken(token),
+		onepassword.WithLocalAuth(),
 		// TODO: Set the following to your own integration name and version.
 		onepassword.WithIntegrationInfo("My 1Password Integration", "v1.0.0"),
 	)
@@ -28,12 +30,7 @@ func main() {
 	}
 	// [developer-docs.sdk.go.client-initialization]-end
 
-	item := createAndGetItem(client)
-	getAndUpdateItem(client, item.VaultID, item.ID)
-	listVaultsAndItems(client, item.VaultID)
-	resolveSecretReference(client, item.VaultID, item.ID, "username")
-	resolveTOTPSecretReference(client, item.VaultID, item.ID, "TOTP_onetimepassword")
-	deleteItem(client, item.VaultID, item.ID)
+	listVaultsAndItems(client, "rzecdt53bpjwod6r4kk6lgp5jq")
 }
 
 func listVaultsAndItems(client *onepassword.Client, vaultID string) {

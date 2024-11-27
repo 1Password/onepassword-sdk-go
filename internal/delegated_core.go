@@ -2,6 +2,7 @@ package internal
 
 import (
 	"context"
+	"encoding/binary"
 	"encoding/json"
 	"io"
 	"net"
@@ -12,12 +13,12 @@ type DelegatedCore struct {
 }
 
 type DelegatedCoreMessage struct {
-	FFIMethod string          `json:"ffi_method"`
+	FFIMethod string          `json:"ffiMethod"`
 	Payload   json.RawMessage `json:"payload"`
 }
 
 func NewDelegatedCore() *DelegatedCore {
-	c, err := net.Dial("unix", "/Users/andititu/echo.sock")
+	c, err := net.Dial("unix", "/Users/martonsoos/echo.sock")
 	if err != nil {
 		panic(err)
 	}
@@ -34,7 +35,7 @@ func (c *DelegatedCore) InitClient(ctx context.Context, config ClientConfig) (*u
 	}
 
 	message := DelegatedCoreMessage{
-		FFIMethod: "init_client",
+		FFIMethod: "initClient",
 		Payload:   json.RawMessage(marshaledConfig),
 	}
 
@@ -43,6 +44,7 @@ func (c *DelegatedCore) InitClient(ctx context.Context, config ClientConfig) (*u
 		panic(err)
 	}
 
+	serializedMessage = prependLen(serializedMessage)
 	_, err = c.connection.Write(serializedMessage)
 	if err != nil {
 		panic(err)
@@ -78,6 +80,7 @@ func (c *DelegatedCore) Invoke(ctx context.Context, invokeConfig InvokeConfig) (
 		panic(err)
 	}
 
+	serializedMessage = prependLen(serializedMessage)
 	_, err = c.connection.Write(serializedMessage)
 	if err != nil {
 		panic(err)
@@ -101,7 +104,7 @@ func (c *DelegatedCore) ReleaseClient(clientID uint64) {
 	}
 
 	message := DelegatedCoreMessage{
-		FFIMethod: "release_client",
+		FFIMethod: "releaseClient",
 		Payload:   json.RawMessage(marshaledClientID),
 	}
 
@@ -110,6 +113,7 @@ func (c *DelegatedCore) ReleaseClient(clientID uint64) {
 		panic(err)
 	}
 
+	serializedMessage = prependLen(serializedMessage)
 	_, err = c.connection.Write(serializedMessage)
 	if err != nil {
 		panic(err)
@@ -119,4 +123,10 @@ func (c *DelegatedCore) ReleaseClient(clientID uint64) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func prependLen(msg []byte) []byte {
+	l := make([]byte, 4)
+	binary.LittleEndian.PutUint32(l, uint32(len(msg)))
+	return append(l, msg...)
 }
