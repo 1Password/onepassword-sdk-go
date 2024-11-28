@@ -5,7 +5,6 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net"
 )
 
@@ -51,18 +50,36 @@ func (c *DelegatedCore) InitClient(ctx context.Context, config ClientConfig) (*u
 		panic(err)
 	}
 
-	res, err := io.ReadAll(c.connection)
+	rawMessage, err := readMessage(c.connection)
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
-	fmt.Println(string(res))
+
+	fmt.Println(string(rawMessage))
+	fmt.Println(rawMessage)
 
 	var id uint64
-	err = json.Unmarshal(res, &id)
+	err = json.Unmarshal(rawMessage, &id)
+	if err != nil {
+		panic(err)
+	}
+	return &id, nil
+}
+
+func readMessage(connection net.Conn) ([]byte, error) {
+	l := make([]byte, 4)
+	_, err := connection.Read(l)
 	if err != nil {
 		return nil, err
 	}
-	return &id, nil
+	fmt.Println(binary.LittleEndian.Uint32(l))
+
+	message := make([]byte, binary.LittleEndian.Uint32(l))
+	_, err = connection.Read(message)
+	if err != nil {
+		panic(err)
+	}
+	return message, nil
 }
 
 // Invoke calls specified business logic from core
@@ -88,12 +105,12 @@ func (c *DelegatedCore) Invoke(ctx context.Context, invokeConfig InvokeConfig) (
 		panic(err)
 	}
 
-	res, err := io.ReadAll(c.connection)
+	rawMessage, err := readMessage(c.connection)
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 
-	response := string(res)
+	response := string(rawMessage)
 
 	return &response, nil
 }
@@ -117,11 +134,6 @@ func (c *DelegatedCore) ReleaseClient(clientID uint64) {
 
 	serializedMessage = prependLen(serializedMessage)
 	_, err = c.connection.Write(serializedMessage)
-	if err != nil {
-		panic(err)
-	}
-
-	_, err = io.ReadAll(c.connection)
 	if err != nil {
 		panic(err)
 	}
