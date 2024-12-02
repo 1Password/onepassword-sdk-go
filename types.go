@@ -3,6 +3,12 @@ package onepassword
 
 import "encoding/json"
 
+// For future use, if we want to return more information about the generated password.
+// Currently, it only returns the password itself.
+type GeneratePasswordResponse struct {
+	// The generated password.
+	Password string `json:"password"`
+}
 type ItemCategory string
 
 const (
@@ -35,13 +41,14 @@ const (
 type ItemFieldType string
 
 const (
-	ItemFieldTypeText           ItemFieldType = "Text"
-	ItemFieldTypeConcealed      ItemFieldType = "Concealed"
-	ItemFieldTypeCreditCardType ItemFieldType = "CreditCardType"
-	ItemFieldTypePhone          ItemFieldType = "Phone"
-	ItemFieldTypeURL            ItemFieldType = "Url"
-	ItemFieldTypeTOTP           ItemFieldType = "Totp"
-	ItemFieldTypeUnsupported    ItemFieldType = "Unsupported"
+	ItemFieldTypeText             ItemFieldType = "Text"
+	ItemFieldTypeConcealed        ItemFieldType = "Concealed"
+	ItemFieldTypeCreditCardType   ItemFieldType = "CreditCardType"
+	ItemFieldTypeCreditCardNumber ItemFieldType = "CreditCardNumber"
+	ItemFieldTypePhone            ItemFieldType = "Phone"
+	ItemFieldTypeURL              ItemFieldType = "Url"
+	ItemFieldTypeTOTP             ItemFieldType = "Totp"
+	ItemFieldTypeUnsupported      ItemFieldType = "Unsupported"
 )
 
 // Field type-specific attributes.
@@ -218,3 +225,153 @@ type VaultOverview struct {
 	// The vault's title
 	Title string `json:"title"`
 }
+
+// Generated type representing the anonymous struct variant `Memorable` of the `PasswordRecipe` Rust enum
+type PasswordRecipeMemorableInner struct {
+	// The type of separator between chunks.
+	SeparatorType SeparatorType `json:"separatorType"`
+	// Uppercase one randomly selected chunk.
+	Capitalize bool `json:"capitalize"`
+	// The type of word list used.
+	WordListType WordListType `json:"wordListType"`
+	// The number of "words" (words or syllables).
+	WordCount uint32 `json:"wordCount"`
+}
+
+// Generated type representing the anonymous struct variant `Pin` of the `PasswordRecipe` Rust enum
+type PasswordRecipePinInner struct {
+	// Number of digits in the PIN.
+	Length uint32 `json:"length"`
+}
+
+// Generated type representing the anonymous struct variant `Random` of the `PasswordRecipe` Rust enum
+type PasswordRecipeRandomInner struct {
+	// Include at least one digit in the password.
+	IncludeDigits bool `json:"includeDigits"`
+	// Include at least one symbol in the password.
+	IncludeSymbols bool `json:"includeSymbols"`
+	// The length of the password.
+	Length uint32 `json:"length"`
+}
+type PasswordRecipeTypes string
+
+const (
+	PasswordRecipeTypeVariantMemorable PasswordRecipeTypes = "Memorable"
+	PasswordRecipeTypeVariantPin       PasswordRecipeTypes = "Pin"
+	PasswordRecipeTypeVariantRandom    PasswordRecipeTypes = "Random"
+)
+
+type PasswordRecipe struct {
+	Type       PasswordRecipeTypes `json:"type"`
+	parameters interface{}
+}
+
+func (p *PasswordRecipe) UnmarshalJSON(data []byte) error {
+	var enum struct {
+		Tag     PasswordRecipeTypes `json:"type"`
+		Content json.RawMessage     `json:"parameters"`
+	}
+	if err := json.Unmarshal(data, &enum); err != nil {
+		return err
+	}
+
+	p.Type = enum.Tag
+	switch p.Type {
+	case PasswordRecipeTypeVariantMemorable:
+		var res PasswordRecipeMemorableInner
+		p.parameters = &res
+	case PasswordRecipeTypeVariantPin:
+		var res PasswordRecipePinInner
+		p.parameters = &res
+	case PasswordRecipeTypeVariantRandom:
+		var res PasswordRecipeRandomInner
+		p.parameters = &res
+
+	}
+	if err := json.Unmarshal(enum.Content, &p.parameters); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (p PasswordRecipe) MarshalJSON() ([]byte, error) {
+	var enum struct {
+		Tag     PasswordRecipeTypes `json:"type"`
+		Content interface{}         `json:"parameters,omitempty"`
+	}
+	enum.Tag = p.Type
+	enum.Content = p.parameters
+	return json.Marshal(enum)
+}
+
+func (p PasswordRecipe) Memorable() *PasswordRecipeMemorableInner {
+	res, _ := p.parameters.(*PasswordRecipeMemorableInner)
+	return res
+}
+func (p PasswordRecipe) Pin() *PasswordRecipePinInner {
+	res, _ := p.parameters.(*PasswordRecipePinInner)
+	return res
+}
+func (p PasswordRecipe) Random() *PasswordRecipeRandomInner {
+	res, _ := p.parameters.(*PasswordRecipeRandomInner)
+	return res
+}
+
+func NewPasswordRecipeTypeVariantMemorable(content *PasswordRecipeMemorableInner) PasswordRecipe {
+	return PasswordRecipe{
+		Type:       PasswordRecipeTypeVariantMemorable,
+		parameters: content,
+	}
+}
+func NewPasswordRecipeTypeVariantPin(content *PasswordRecipePinInner) PasswordRecipe {
+	return PasswordRecipe{
+		Type:       PasswordRecipeTypeVariantPin,
+		parameters: content,
+	}
+}
+func NewPasswordRecipeTypeVariantRandom(content *PasswordRecipeRandomInner) PasswordRecipe {
+	return PasswordRecipe{
+		Type:       PasswordRecipeTypeVariantRandom,
+		parameters: content,
+	}
+}
+
+type SeparatorType string
+
+const (
+	// Randomly selected digits.
+	// E.g, "`correct4horse0battery1staple`"
+	SeparatorTypeDigits SeparatorType = "digits"
+	// Randomly selected digits and symbols.
+	// This is useful to get word-based passwords to meet complexity requirements
+	// E.g, "`correct4horse-battery1staple`"
+	SeparatorTypeDigitsAndSymbols SeparatorType = "digitsAndSymbols"
+	// Spaces, like the original Diceware.
+	// Great for mobile keyboards, not so great when people can overhear you type the password.
+	// E.g, "`correct horse battery staple`"
+	SeparatorTypeSpaces SeparatorType = "spaces"
+	// Hyphens "`-`".
+	// E.g, "`correct-horse-battery-staple`"
+	SeparatorTypeHyphens SeparatorType = "hyphens"
+	// "`_`".
+	// E.g, "`correct_horse_battery_staple`"
+	SeparatorTypeUnderscores SeparatorType = "underscores"
+	// Period (full stop) "`.`".
+	// E.g, "`correct.horse.battery.staple`"
+	SeparatorTypePeriods SeparatorType = "periods"
+	// Comma "`,`".
+	// E.g, "`correct,horse,battery,staple`"
+	SeparatorTypeCommas SeparatorType = "commas"
+)
+
+type WordListType string
+
+const (
+	// Agile wordlist
+	WordListTypeFullWords WordListType = "fullWords"
+	// English-like syllables
+	WordListTypeSyllables WordListType = "syllables"
+	// Three (random) letter "words"
+	WordListTypeThreeLetters WordListType = "threeLetters"
+)
