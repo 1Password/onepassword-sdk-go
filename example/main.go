@@ -5,12 +5,10 @@ import (
 	"errors"
 	"fmt"
 	"os"
-
-	"github.com/1password/onepassword-sdk-go"
 )
 
 // [developer-docs.sdk.go.sdk-import]-start
-
+import "github.com/1password/onepassword-sdk-go"
 // [developer-docs.sdk.go.sdk-import]-end
 
 func main() {
@@ -32,6 +30,7 @@ func main() {
 	item := createAndGetItem(client)
 	getAndUpdateItem(client, item.VaultID, item.ID)
 	listVaultsAndItems(client, item.VaultID)
+	generateDifferentPasswords()
 	resolveSecretReference(client, item.VaultID, item.ID, "username")
 	resolveTOTPSecretReference(client, item.VaultID, item.ID, "TOTP_onetimepassword")
 	deleteItem(client, item.VaultID, item.ID)
@@ -220,4 +219,33 @@ func deleteItem(client *onepassword.Client, vaultID string, itemID string) {
 		panic(err)
 	}
 	// [developer-docs.sdk.go.delete-item]-end
+}
+
+func generateDifferentPasswords() {
+	pinPassword, err := onepassword.Secrets.GeneratePassword(context.Background(), onepassword.NewPasswordRecipeTypeVariantPin(&onepassword.PasswordRecipePinInner{Length: 10}))
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(pinPassword.Password)
+
+	randomPassword, err := onepassword.Secrets.GeneratePassword(context.Background(), onepassword.NewPasswordRecipeTypeVariantRandom(&onepassword.PasswordRecipeRandomInner {
+		IncludeDigits: true,
+		IncludeSymbols: true,
+		Length: 10,
+	}))
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(randomPassword.Password)
+
+	memorablePassword, err := onepassword.Secrets.GeneratePassword(context.Background(), onepassword.NewPasswordRecipeTypeVariantMemorable(&onepassword.PasswordRecipeMemorableInner {
+		SeparatorType: onepassword.SeparatorTypeCommas,
+		WordListType: onepassword.WordListTypeFullWords,
+		Capitalize: true,
+		WordCount: 10,
+	}))
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(memorablePassword.Password)
 }
