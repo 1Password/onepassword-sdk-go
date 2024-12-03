@@ -9,6 +9,7 @@ import (
 
 // [developer-docs.sdk.go.sdk-import]-start
 import "github.com/1password/onepassword-sdk-go"
+
 // [developer-docs.sdk.go.sdk-import]-end
 
 func main() {
@@ -30,7 +31,7 @@ func main() {
 	item := createAndGetItem(client)
 	getAndUpdateItem(client, item.VaultID, item.ID)
 	listVaultsAndItems(client, item.VaultID)
-	generateDifferentPasswords()
+	generatePasswords()
 	resolveSecretReference(client, item.VaultID, item.ID, "username")
 	resolveTOTPSecretReference(client, item.VaultID, item.ID, "TOTP_onetimepassword")
 	deleteItem(client, item.VaultID, item.ID)
@@ -221,31 +222,37 @@ func deleteItem(client *onepassword.Client, vaultID string, itemID string) {
 	// [developer-docs.sdk.go.delete-item]-end
 }
 
-func generateDifferentPasswords() {
+func generatePasswords() {
+	// [developer-docs.sdk.go.generate-pin-password]-start
 	pinPassword, err := onepassword.Secrets.GeneratePassword(context.Background(), onepassword.NewPasswordRecipeTypeVariantPin(&onepassword.PasswordRecipePinInner{Length: 10}))
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println(pinPassword.Password)
+	// [developer-docs.sdk.go.generate-pin-password]-end
 
-	randomPassword, err := onepassword.Secrets.GeneratePassword(context.Background(), onepassword.NewPasswordRecipeTypeVariantRandom(&onepassword.PasswordRecipeRandomInner {
-		IncludeDigits: true,
+	// [developer-docs.sdk.go.generate-random-password]-start
+	randomPassword, err := onepassword.Secrets.GeneratePassword(context.Background(), onepassword.NewPasswordRecipeTypeVariantRandom(&onepassword.PasswordRecipeRandomInner{
+		IncludeDigits:  true,
 		IncludeSymbols: true,
-		Length: 10,
+		Length:         10,
 	}))
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println(randomPassword.Password)
+	// [developer-docs.sdk.go.generate-random-password]-end
 
-	memorablePassword, err := onepassword.Secrets.GeneratePassword(context.Background(), onepassword.NewPasswordRecipeTypeVariantMemorable(&onepassword.PasswordRecipeMemorableInner {
+	// [developer-docs.sdk.go.generate-memorable-password]-start
+	memorablePassword, err := onepassword.Secrets.GeneratePassword(context.Background(), onepassword.NewPasswordRecipeTypeVariantMemorable(&onepassword.PasswordRecipeMemorableInner{
 		SeparatorType: onepassword.SeparatorTypeCommas,
-		WordListType: onepassword.WordListTypeFullWords,
-		Capitalize: true,
-		WordCount: 10,
+		WordListType:  onepassword.WordListTypeFullWords,
+		Capitalize:    true,
+		WordCount:     10,
 	}))
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println(memorablePassword.Password)
+	// [developer-docs.sdk.go.generate-memorable-password]-end
 }
