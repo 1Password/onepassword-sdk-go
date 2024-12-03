@@ -62,3 +62,33 @@ func (s secretsUtil) ValidateSecretReference(ctx context.Context, secretReferenc
 
 	return err
 }
+
+func (s secretsUtil) GeneratePassword(ctx context.Context, recipe PasswordRecipe) (GeneratePasswordResponse, error) {
+	core, err := internal.GetSharedCore()
+	if err != nil {
+		return GeneratePasswordResponse{}, err
+	}
+
+	resultString, err := core.Invoke(ctx, internal.InvokeConfig{
+		Invocation: internal.Invocation{
+			Parameters: internal.Parameters{
+				MethodName:       "GeneratePassword",
+				SerializedParams: map[string]interface{}{"recipe": recipe},
+			},
+		},
+	})
+
+	if err != nil {
+		return GeneratePasswordResponse{}, err
+	}
+
+	var result GeneratePasswordResponse
+
+	err = json.Unmarshal([]byte(*resultString), &result)
+
+	if err != nil {
+		return GeneratePasswordResponse{}, err
+	}
+
+	return result, nil
+}
