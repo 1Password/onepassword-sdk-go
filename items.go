@@ -5,6 +5,8 @@ package onepassword
 import (
 	"context"
 	"encoding/json"
+	"slices"
+	"strings"
 
 	"github.com/1password/onepassword-sdk-go/internal"
 )
@@ -24,7 +26,7 @@ type ItemsAPI interface {
 	Delete(ctx context.Context, vaultId string, itemId string) error
 
 	// List all items
-	ListAll(ctx context.Context, vaultId string) (*Iterator[ItemOverview], error)
+	ListAll(ctx context.Context, vaultId string, filters ...Filter) (*Iterator[ItemOverview], error)
 }
 
 type ItemsSource struct {
@@ -94,7 +96,7 @@ func (s ItemsSource) Delete(ctx context.Context, vaultId string, itemId string) 
 }
 
 // List all items
-func (s ItemsSource) ListAll(ctx context.Context, vaultId string) (*Iterator[ItemOverview], error) {
+func (s ItemsSource) ListAll(ctx context.Context, vaultId string, filters ...Filter) (*Iterator[ItemOverview], error) {
 	resultString, err := clientInvoke(ctx, s.InnerClient, "ItemsListAll", map[string]interface{}{
 		"vault_id": vaultId,
 	})
@@ -106,5 +108,81 @@ func (s ItemsSource) ListAll(ctx context.Context, vaultId string) (*Iterator[Ite
 	if err != nil {
 		return nil, err
 	}
-	return NewIterator(result), nil
+
+	if len(filters) == 0 {
+		return NewIterator(result), nil
+	}
+
+	var filteredResult []ItemOverview
+	for _, overview := range result {
+		ok, err := applyFilters(s, ctx, overview, filters...)
+		if err != nil {
+			return nil, err
+		}
+		if ok {
+			filteredResult = append(filteredResult, overview)
+		}
+	}
+
+	return NewIterator(filteredResult), nil
+}
+
+func applyFilters(s ItemsSource, ctx context.Context, overview ItemOverview, filters ...Filter) (bool, error) {
+	for _, filter := range filters {
+		ok, err := filter(s, ctx, overview)
+		if err != nil {
+			return false, err
+		}
+		if !ok {
+			return false, nil
+		}
+	}
+	return true, nil
+}
+
+type Filter func(ItemsSource, context.Context, ItemOverview) (bool, error)
+
+func WithTitleSuffix(s string) Filter {
+	return func(_ ItemsSource, ctx context.Context, overview ItemOverview) (bool, error) {
+		return strings.HasSuffix(overview.Title, s), nil
+	}
+}
+
+func WithTitlePrefix(s string) Filter {
+	return func(_ ItemsSource, ctx context.Context, overview ItemOverview) (bool, error) {
+		return strings.HasPrefix(overview.Title, s), nil
+	}
+}
+
+func WithTitleContains(s string) Filter {
+	return func(_ ItemsSource, ctx context.Context, overview ItemOverview) (bool, error) {
+		return strings.Contains(overview.Title, s), nil
+	}
+}
+
+func WithTitle(title string) Filter {
+	return func(_ ItemsSource, ctx context.Context, overview ItemOverview) (bool, error) {
+		return overview.Title == title, nil
+	}
+}
+
+func WithCategory(category ItemCategory) Filter {
+	return func(_ ItemsSource, _ context.Context, overview ItemOverview) (bool, error) {
+		return overview.Category == category, nil
+	}
+}
+
+func WithTags(tags ...string) Filter {
+	return func(s ItemsSource, ctx context.Context, overview ItemOverview) (bool, error) {
+		item, err := s.Get(ctx, overview.VaultID, overview.ID)
+		if err != nil {
+			return false, err
+		}
+		for _, tag := range tags {
+			if !slices.Contains(item.Tags, tag) {
+				return false, nil
+			}
+		}
+		return true, nil
+	}
 }
