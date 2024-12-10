@@ -29,22 +29,51 @@ func GetSharedCore() (*SharedCore, error) {
 		if err != nil {
 			return nil, err
 		}
-		core = &SharedCore{plugin: p}
+		core = &SharedCore{
+			plugin:         p,
+			instByClientID: map[uint64]*pluginInstance{},
+		}
 	}
 
 	return core, nil
 }
 
 func ReleaseCore() {
+	core.plugin.Close(context.Background())
 	core = nil
+}
+
+type pluginInstance struct {
+	// lock is used to synchronize access to the WASM core instance which is single threaded
+	lock sync.Mutex
+
+	// underlying instance of the WASM core
+	plugin *extism.Plugin
 }
 
 // SharedCore implements Core in such a way that all created client instances share the same core resources.
 type SharedCore struct {
-	// lock is used to synchronize access to the shared WASM core which is single threaded
+	// lock is used to synchronize access to the shared WASM compiled core which is single threaded as well as
+	// the map of plugin instances by client ID
 	lock sync.Mutex
+
 	// plugin is the Extism plugin which represents the WASM core loaded into memory
-	plugin *extism.Plugin
+	plugin *extism.CompiledPlugin
+
+	// client instances are the Extism plugin instances spawned from the compiled plugin per client
+	instByClientID map[uint64]*pluginInstance
+}
+
+func (c *SharedCore) spawnInstance(ctx context.Context) (*extism.Plugin, error) {
+	extismConfig := extism.PluginConfig{}
+	i, err := c.plugin.Instance(ctx, extism.PluginInstanceConfig{
+		ModuleConfig: extismConfig.ModuleConfig,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return i, nil
 }
 
 // InitClient creates a client instance in the current core module and returns its unique ID.
@@ -55,7 +84,7 @@ func (c *SharedCore) InitClient(ctx context.Context, config ClientConfig) (*uint
 	}
 
 	// first return parameter is a sys.Exit code, which we don't need since the error is fully recoverable
-	res, err := c.callWithCtx(ctx, initClientFuncName, marshaledConfig)
+	res, inst, err := c.callWithCtx(ctx, initClientFuncName, marshaledConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -64,6 +93,10 @@ func (c *SharedCore) InitClient(ctx context.Context, config ClientConfig) (*uint
 	if err != nil {
 		return nil, err
 	}
+
+	c.lock.Lock()
+	defer c.lock.Unlock()
+	c.instByClientID[id] = &pluginInstance{plugin: inst}
 	return &id, nil
 }
 
@@ -73,7 +106,23 @@ func (c *SharedCore) Invoke(ctx context.Context, invokeConfig InvokeConfig) (*st
 	if err != nil {
 		return nil, err
 	}
-	res, err := c.callWithCtx(ctx, invokeFuncName, input)
+	var res []byte
+	var i *pluginInstance
+	clientID := invokeConfig.Invocation.ClientID
+	if clientID != nil {
+		i = c.instByClientID[*clientID]
+	}
+	if i != nil {
+		i.lock.Lock()
+		defer i.lock.Unlock()
+		_, res, err = i.plugin.CallWithContext(ctx, invokeFuncName, input)
+	} else {
+		c.lock.Lock()
+		defer c.lock.Unlock()
+		var inst *extism.Plugin
+		res, inst, err = c.callWithCtx(ctx, invokeFuncName, input)
+		defer inst.Close(ctx)
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -85,40 +134,34 @@ func (c *SharedCore) Invoke(ctx context.Context, invokeConfig InvokeConfig) (*st
 
 // ReleaseClient releases memory in the core associated with the given client ID.
 func (c *SharedCore) ReleaseClient(clientID uint64) {
-	marshaledClientID, err := json.Marshal(clientID)
-	if err != nil {
-		c.plugin.Log(extism.LogLevelWarn, fmt.Sprintf("memory couldn't be released: %s", err.Error()))
-	}
-	_, err = c.call(releaseClientFuncName, marshaledClientID)
-	if err != nil {
-		c.plugin.Log(extism.LogLevelWarn, "memory couldn't be released")
+	if i, ok := c.instByClientID[clientID]; ok {
+		marshaledClientID, err := json.Marshal(clientID)
+		if err != nil {
+			i.plugin.Log(extism.LogLevelWarn, fmt.Sprintf("memory couldn't be released: %s", err.Error()))
+		}
+		_, _, err = i.plugin.Call(releaseClientFuncName, marshaledClientID)
+		if err != nil {
+			i.plugin.Log(extism.LogLevelWarn, "memory couldn't be released")
+		}
+		delete(c.instByClientID, clientID)
 	}
 }
 
-func (c *SharedCore) callWithCtx(ctx context.Context, functionName string, serializedParameters []byte) ([]byte, error) {
-	c.lock.Lock()
-	defer c.lock.Unlock()
-
-	_, response, err := c.plugin.CallWithContext(ctx, functionName, serializedParameters)
+func (c *SharedCore) callWithCtx(ctx context.Context, functionName string, serializedParameters []byte) ([]byte, *extism.Plugin, error) {
+	i, err := c.spawnInstance(ctx)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return response, nil
-}
 
-func (c *SharedCore) call(functionName string, serializedParameters []byte) ([]byte, error) {
-	c.lock.Lock()
-	defer c.lock.Unlock()
-
-	_, response, err := c.plugin.Call(functionName, serializedParameters)
+	_, response, err := i.CallWithContext(ctx, functionName, serializedParameters)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return response, nil
+	return response, i, nil
 }
 
 // `loadWASM` returns the WASM core loaded into an `extism.Plugin`.
-func loadWASM(ctx context.Context) (*extism.Plugin, error) {
+func loadWASM(ctx context.Context) (*extism.CompiledPlugin, error) {
 	manifest := extism.Manifest{
 		Wasm: []extism.Wasm{
 			extism.WasmData{
@@ -129,9 +172,9 @@ func loadWASM(ctx context.Context) (*extism.Plugin, error) {
 	}
 
 	extismConfig := extism.PluginConfig{}
-	plugin, err := extism.NewPlugin(ctx, manifest, extismConfig, ImportedFunctions())
+	plugin, err := extism.NewCompiledPlugin(ctx, manifest, extismConfig, ImportedFunctions())
 	if err != nil {
-		return nil, fmt.Errorf("Failed to initialize plugin: %v\n", err)
+		return nil, fmt.Errorf("failed to initialize plugin: %v", err)
 	}
 
 	return plugin, nil

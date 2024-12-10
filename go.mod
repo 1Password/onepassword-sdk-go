@@ -5,7 +5,7 @@ go 1.22
 toolchain go1.22.5
 
 require (
-	github.com/extism/go-sdk v1.6.1
+	github.com/extism/go-sdk v1.6.2-0.20241121002538-bef00f39873e
 	github.com/stretchr/testify v1.10.0
 	github.com/tetratelabs/wazero v1.8.2
 )
