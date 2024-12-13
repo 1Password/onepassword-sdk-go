@@ -9,35 +9,18 @@ import (
 	"github.com/1password/onepassword-sdk-go/internal"
 )
 
-// The Items API holds all operations the SDK client can perform on 1Password items.
-type ItemsAPI interface {
-	// Create a new item
-	Create(ctx context.Context, params ItemCreateParams) (Item, error)
-
-	// Get an item by vault and item ID
-	Get(ctx context.Context, vaultId string, itemId string) (Item, error)
-
-	// Update an existing item.
-	Put(ctx context.Context, item Item) (Item, error)
-
-	// Delete an item.
-	Delete(ctx context.Context, vaultId string, itemId string) error
-
-	// List all items
-	ListAll(ctx context.Context, vaultId string) (*Iterator[ItemOverview], error)
-}
-
 type ItemsSource struct {
-	internal.InnerClient
+	innerClient internal.InnerClient
+	Secrets     ItemsSecretsSource
 }
 
 func NewItemsSource(inner internal.InnerClient) *ItemsSource {
-	return &ItemsSource{inner}
+	return &ItemsSource{innerClient: inner, Secrets: *NewItemsSecretsSource(inner)}
 }
 
 // Create a new item
 func (s ItemsSource) Create(ctx context.Context, params ItemCreateParams) (Item, error) {
-	resultString, err := clientInvoke(ctx, s.InnerClient, "ItemsCreate", map[string]interface{}{
+	resultString, err := clientInvoke(ctx, s.innerClient, "ItemsCreate", map[string]interface{}{
 		"params": params,
 	})
 	if err != nil {
@@ -53,7 +36,7 @@ func (s ItemsSource) Create(ctx context.Context, params ItemCreateParams) (Item,
 
 // Get an item by vault and item ID
 func (s ItemsSource) Get(ctx context.Context, vaultId string, itemId string) (Item, error) {
-	resultString, err := clientInvoke(ctx, s.InnerClient, "ItemsGet", map[string]interface{}{
+	resultString, err := clientInvoke(ctx, s.innerClient, "ItemsGet", map[string]interface{}{
 		"vault_id": vaultId,
 		"item_id":  itemId,
 	})
@@ -70,7 +53,7 @@ func (s ItemsSource) Get(ctx context.Context, vaultId string, itemId string) (It
 
 // Update an existing item.
 func (s ItemsSource) Put(ctx context.Context, item Item) (Item, error) {
-	resultString, err := clientInvoke(ctx, s.InnerClient, "ItemsPut", map[string]interface{}{
+	resultString, err := clientInvoke(ctx, s.innerClient, "ItemsPut", map[string]interface{}{
 		"item": item,
 	})
 	if err != nil {
@@ -86,7 +69,7 @@ func (s ItemsSource) Put(ctx context.Context, item Item) (Item, error) {
 
 // Delete an item.
 func (s ItemsSource) Delete(ctx context.Context, vaultId string, itemId string) error {
-	_, err := clientInvoke(ctx, s.InnerClient, "ItemsDelete", map[string]interface{}{
+	_, err := clientInvoke(ctx, s.innerClient, "ItemsDelete", map[string]interface{}{
 		"vault_id": vaultId,
 		"item_id":  itemId,
 	})
@@ -95,7 +78,7 @@ func (s ItemsSource) Delete(ctx context.Context, vaultId string, itemId string) 
 
 // List all items
 func (s ItemsSource) ListAll(ctx context.Context, vaultId string) (*Iterator[ItemOverview], error) {
-	resultString, err := clientInvoke(ctx, s.InnerClient, "ItemsListAll", map[string]interface{}{
+	resultString, err := clientInvoke(ctx, s.innerClient, "ItemsListAll", map[string]interface{}{
 		"vault_id": vaultId,
 	})
 	if err != nil {
