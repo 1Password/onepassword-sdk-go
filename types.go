@@ -48,6 +48,8 @@ const (
 	ItemFieldTypePhone            ItemFieldType = "Phone"
 	ItemFieldTypeURL              ItemFieldType = "Url"
 	ItemFieldTypeTOTP             ItemFieldType = "Totp"
+	ItemFieldTypeEmail            ItemFieldType = "Email"
+	ItemFieldTypeReference        ItemFieldType = "Reference"
 	ItemFieldTypeUnsupported      ItemFieldType = "Unsupported"
 )
 
