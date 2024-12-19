@@ -23,6 +23,9 @@ type ItemsAPI interface {
 	// Delete an item.
 	Delete(ctx context.Context, vaultId string, itemId string) error
 
+	// Archive an item.
+	Archive(ctx context.Context, vaultId string, itemId string) error
+
 	// List all items
 	ListAll(ctx context.Context, vaultId string) (*Iterator[ItemOverview], error)
 }
@@ -87,6 +90,15 @@ func (s ItemsSource) Put(ctx context.Context, item Item) (Item, error) {
 // Delete an item.
 func (s ItemsSource) Delete(ctx context.Context, vaultId string, itemId string) error {
 	_, err := clientInvoke(ctx, s.InnerClient, "ItemsDelete", map[string]interface{}{
+		"vault_id": vaultId,
+		"item_id":  itemId,
+	})
+	return err
+}
+
+// Archive an item.
+func (s ItemsSource) Archive(ctx context.Context, vaultId string, itemId string) error {
+	_, err := clientInvoke(ctx, s.InnerClient, "ItemsArchive", map[string]interface{}{
 		"vault_id": vaultId,
 		"item_id":  itemId,
 	})
