@@ -29,7 +29,7 @@ func randomFillImportedFunc() extism.HostFunction {
 
 // localOffset returns an Extism Function for retrieving the offset of the local time zone in seconds.
 func localOffsetImportedFunc() extism.HostFunction {
-	getOffsetFunc := extism.NewHostFunctionWithStack("local_offset_secs", func(ctx context.Context, p *extism.CurrentPlugin, stack []uint64) {
+	getOffsetFunc := extism.NewHostFunctionWithStack("utc_offset_seconds", func(ctx context.Context, p *extism.CurrentPlugin, stack []uint64) {
 		_, offset := time.Now().Zone()
 		stack[0] = uint64(offset)
 	}, []api.ValueType{}, []api.ValueType{api.ValueTypeI64})
