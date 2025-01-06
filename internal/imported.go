@@ -27,14 +27,12 @@ func randomFillImportedFunc() extism.HostFunction {
 	return randomFillImported
 }
 
-// getTimeFunc returns an Extism Function for retrieving the current UNIX time.
+// localOffset returns an Extism Function for retrieving the offset of the local time zone in seconds.
 func localOffsetImportedFunc() extism.HostFunction {
-	getOffsetFunc := extism.NewHostFunctionWithStack("local_offset_min", func(ctx context.Context, p *extism.CurrentPlugin, stack []uint64) {
+	getOffsetFunc := extism.NewHostFunctionWithStack("local_offset_secs", func(ctx context.Context, p *extism.CurrentPlugin, stack []uint64) {
 		_, offset := time.Now().Zone()
-		offset_min := float64(offset / 60)
-		// offset is in seconds, convert to minutes as required by the API
-		stack[0] = api.EncodeF64(offset_min)
-	}, []api.ValueType{}, []api.ValueType{api.ValueTypeF64})
+		stack[0] = uint64(offset)
+	}, []api.ValueType{}, []api.ValueType{api.ValueTypeI64})
 	getOffsetFunc.SetNamespace("op-time")
 	return getOffsetFunc
 }
@@ -45,6 +43,7 @@ func currentTimeImportedFunc(namespace string) extism.HostFunction {
 		stack[0] = uint64(time.Now().UnixMilli())
 	}, []api.ValueType{}, []api.ValueType{api.ValueTypeI64})
 	getTimeFunc.SetNamespace(namespace)
+
 	return getTimeFunc
 }
 
