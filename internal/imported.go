@@ -12,7 +12,7 @@ import (
 
 // ImportedFunctions returns all functions 1Password SDK core must import.
 func ImportedFunctions() []extism.HostFunction {
-	return []extism.HostFunction{randomFillImportedFunc(), currentTimeImportedFunc("op-now"), currentTimeImportedFunc("zxcvbn")}
+	return []extism.HostFunction{randomFillImportedFunc(), currentTimeImportedFunc("op-now"), currentTimeImportedFunc("zxcvbn"), localOffsetImportedFunc()}
 }
 
 // randomFillImportedFunc returns an Extism Function for generating random byte sequence of a given length that will be imported into the WASM core.
@@ -28,12 +28,23 @@ func randomFillImportedFunc() extism.HostFunction {
 }
 
 // getTimeFunc returns an Extism Function for retrieving the current UNIX time.
+func localOffsetImportedFunc() extism.HostFunction {
+	getOffsetFunc := extism.NewHostFunctionWithStack("local_offset_min", func(ctx context.Context, p *extism.CurrentPlugin, stack []uint64) {
+		_, offset := time.Now().Zone()
+		offset_min := float64(offset / 60)
+		// offset is in seconds, convert to minutes as required by the API
+		stack[0] = api.EncodeF64(offset_min)
+	}, []api.ValueType{}, []api.ValueType{api.ValueTypeF64})
+	getOffsetFunc.SetNamespace("op-time")
+	return getOffsetFunc
+}
+
+// getTimeFunc returns an Extism Function for retrieving the current UNIX time.
 func currentTimeImportedFunc(namespace string) extism.HostFunction {
 	getTimeFunc := extism.NewHostFunctionWithStack("unix_time_milliseconds_imported", func(ctx context.Context, p *extism.CurrentPlugin, stack []uint64) {
 		stack[0] = uint64(time.Now().UnixMilli())
 	}, []api.ValueType{}, []api.ValueType{api.ValueTypeI64})
 	getTimeFunc.SetNamespace(namespace)
-
 	return getTimeFunc
 }
 
