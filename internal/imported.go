@@ -12,7 +12,7 @@ import (
 
 // ImportedFunctions returns all functions 1Password SDK core must import.
 func ImportedFunctions() []extism.HostFunction {
-	return []extism.HostFunction{randomFillImportedFunc(), currentTimeImportedFunc("op-now"), currentTimeImportedFunc("zxcvbn")}
+	return []extism.HostFunction{randomFillImportedFunc(), currentTimeImportedFunc("op-now"), currentTimeImportedFunc("zxcvbn"), localOffsetImportedFunc()}
 }
 
 // randomFillImportedFunc returns an Extism Function for generating random byte sequence of a given length that will be imported into the WASM core.
@@ -25,6 +25,16 @@ func randomFillImportedFunc() extism.HostFunction {
 	randomFillImported.SetNamespace("op-extism-core")
 
 	return randomFillImported
+}
+
+// localOffset returns an Extism Function for retrieving the offset of the local time zone in seconds.
+func localOffsetImportedFunc() extism.HostFunction {
+	getOffsetFunc := extism.NewHostFunctionWithStack("utc_offset_seconds", func(ctx context.Context, p *extism.CurrentPlugin, stack []uint64) {
+		_, offset := time.Now().Zone()
+		stack[0] = uint64(offset)
+	}, []api.ValueType{}, []api.ValueType{api.ValueTypeI64})
+	getOffsetFunc.SetNamespace("op-time")
+	return getOffsetFunc
 }
 
 // getTimeFunc returns an Extism Function for retrieving the current UNIX time.
