@@ -104,7 +104,7 @@ Field types:
 - [x] References to other items
 - [ ] Address
 - [ ] Date / MM/YY
-- [ ] Files attachments and Document items
+- [ ] Files attachments and Document items ([#108](https://github.com/1Password/onepassword-sdk-go/issues/108))
 
 ### Vault management
 - [ ] Retrieve vaults
