@@ -33,6 +33,8 @@ func main() {
 	generatePasswords()
 	resolveSecretReference(client, item.VaultID, item.ID, "username")
 	resolveTOTPSecretReference(client, item.VaultID, item.ID, "TOTP_onetimepassword")
+	sharelink := generateItemSharing(client, item.VaultID, item.ID)
+	fmt.Println(sharelink)
 	deleteItem(client, item.VaultID, item.ID)
 }
 
@@ -214,10 +216,13 @@ func createAndGetItem(client *onepassword.Client) onepassword.Item {
 
 func deleteItem(client *onepassword.Client, vaultID string, itemID string) {
 	// [developer-docs.sdk.go.delete-item]-start
+	// Delete / archive a item from your vault.
 	err := client.Items.Delete(context.Background(), vaultID, itemID)
+	// or to archive: err := client.Items.Archive(context.Background(), vaultID, itemID)
 	if err != nil {
 		panic(err)
 	}
+
 	// [developer-docs.sdk.go.delete-item]-end
 }
 
@@ -254,4 +259,40 @@ func generatePasswords() {
 	}
 	fmt.Println(memorablePassword.Password)
 	// [developer-docs.sdk.go.generate-memorable-password]-end
+}
+
+func generateItemSharing(client *onepassword.Client, vaultID string, itemID string) string {
+	// [developer-docs.sdk.go.item-share-get-item]-start
+	item, err := client.Items.Get(context.Background(), vaultID, itemID)
+	if err != nil {
+		panic(err)
+	}
+	// [developer-docs.sdk.go.item-share-get-item]-end
+
+	// [developer-docs.sdk.go.item-share-get-account-policy]-start
+	accountPolicy, err := client.Items.Shares.GetAccountPolicy(context.Background(), item.VaultID, item.ID)
+	if err != nil {
+		panic(err)
+	}
+	// [developer-docs.sdk.go.item-share-get-account-policy]-end
+	
+	// [developer-docs.sdk.go.item-share-validate-recipients]-start
+	recipients, err := client.Items.Shares.ValidateRecipients(context.Background(), accountPolicy, []string{"<your-email-address>@agilebits.com"})
+	if err != nil {
+		panic(err)
+	}
+	// [developer-docs.sdk.go.item-share-validate-recipients]-end
+
+	// [developer-docs.sdk.go.item-share-create-share]-start
+	shareLink, err := client.Items.Shares.Create(context.Background(), item, accountPolicy, onepassword.ItemShareParams{
+		Recipients: recipients,
+		ExpireAfter: &accountPolicy.DefaultExpiry,
+		OneTimeOnly: false,
+	})
+	if err != nil {
+		panic(err)
+	}
+	// [developer-docs.sdk.go.item-share-create-share]-end
+	
+	return shareLink
 }
