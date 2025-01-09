@@ -5,10 +5,12 @@ import (
 	"errors"
 	"fmt"
 	"os"
+
+	"github.com/1password/onepassword-sdk-go"
 )
 
 // [developer-docs.sdk.go.sdk-import]-start
-import "github.com/1password/onepassword-sdk-go"
+
 // [developer-docs.sdk.go.sdk-import]-end
 
 func main() {
@@ -216,9 +218,8 @@ func createAndGetItem(client *onepassword.Client) onepassword.Item {
 
 func deleteItem(client *onepassword.Client, vaultID string, itemID string) {
 	// [developer-docs.sdk.go.delete-item]-start
-	// Delete / archive a item from your vault.
+	// Delete a item from your vault.
 	err := client.Items.Delete(context.Background(), vaultID, itemID)
-	// or to archive: err := client.Items.Archive(context.Background(), vaultID, itemID)
 	if err != nil {
 		panic(err)
 	}
@@ -259,6 +260,22 @@ func generatePasswords() {
 	}
 	fmt.Println(memorablePassword.Password)
 	// [developer-docs.sdk.go.generate-memorable-password]-end
+}
+
+// NOTE: this is in a separate function to avoid creating a new item
+// NOTE: just for the sake of archiving it. This is because the SDK
+// NOTE: only works with active items, so archiving and then deleting
+// NOTE: is not yet possible.
+func archiveItem(client *onepassword.Client, vaultID string, itemID string) {
+	// [developer-docs.sdk.go.archive-item]-start
+	// Archive a item from your vault.
+	err := client.Items.Archive(context.Background(), vaultID, itemID)
+
+	if err != nil {
+		panic(err)
+	}
+
+	// [developer-docs.sdk.go.archive-item]-end
 }
 
 func generateItemSharing(client *onepassword.Client, vaultID string, itemID string) string {
