@@ -266,6 +266,7 @@ func generatePasswords() {
 // NOTE: just for the sake of archiving it. This is because the SDK
 // NOTE: only works with active items, so archiving and then deleting
 // NOTE: is not yet possible.
+//lint:ignore U1000 
 func archiveItem(client *onepassword.Client, vaultID string, itemID string) {
 	// [developer-docs.sdk.go.archive-item]-start
 	// Archive a item from your vault.
