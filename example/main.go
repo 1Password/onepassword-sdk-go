@@ -277,7 +277,7 @@ func generateItemSharing(client *onepassword.Client, vaultID string, itemID stri
 	// [developer-docs.sdk.go.item-share-get-account-policy]-end
 	
 	// [developer-docs.sdk.go.item-share-validate-recipients]-start
-	recipients, err := client.Items.Shares.ValidateRecipients(context.Background(), accountPolicy, []string{"<your-email-address>@agilebits.com"})
+	recipients, err := client.Items.Shares.ValidateRecipients(context.Background(), accountPolicy, []string{"helloworld@agilebits.com"})
 	if err != nil {
 		panic(err)
 	}
