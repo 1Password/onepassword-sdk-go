@@ -8,7 +8,8 @@ import (
 )
 
 // [developer-docs.sdk.go.sdk-import]-start
-import 	"github.com/1password/onepassword-sdk-go"
+import "github.com/1password/onepassword-sdk-go"
+
 // [developer-docs.sdk.go.sdk-import]-end
 
 func main() {
@@ -119,12 +120,40 @@ func resolveSecretReference(client *onepassword.Client, vaultID, itemID, fieldID
 	// [developer-docs.sdk.go.resolve-secret]-start
 	// Retrieves a secret from 1Password.
 	// Takes a secret reference as input and returns the secret to which it points.
-	secret, err := client.Secrets.Resolve(context.Background(), fmt.Sprintf("op://%s/%s/%s", vaultID, itemID, fieldID))
+	validReference := fmt.Sprintf("op://%s/%s/%s", vaultID, itemID, fieldID)
+	secret, err := client.Secrets.Resolve(context.Background(), validReference)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println(secret)
 	// [developer-docs.sdk.go.resolve-secret]-end
+
+	// [developer-docs.sdk.go.resolve-secrets]-start
+	// Retrieves multiple secrets from 1Password.
+	// Takes multiple secret references as input and returns the secrets to which they point or the encountered error(s).
+	invalidReference := "op:/Vault/Item/field"
+	response, err := client.Secrets.ResolveAll(context.Background(), []string{validReference, invalidReference})
+	if err != nil {
+		panic(err)
+	}
+	for pos, result := range response.IndividualResponses {
+		if result.Error != nil {
+			switch result.Error.Type {
+			case onepassword.ResolveReferenceErrorTypeVariantParsing:
+				unwrappedErr := result.Error.Parsing()
+				// show which parsing error occurred
+				if unwrappedErr == onepassword.ReferenceParsingErrorMissingSecretReferencePrefix {
+					panic(fmt.Errorf("we forgot to write 'op://' at the beginning of the %d-th reference", pos))
+				}
+			}
+		} else {
+			// do something with the secret
+			secret := result.Content
+			fmt.Println(secret)
+		}
+	}
+	// [developer-docs.sdk.go.resolve-secrets]-end
+
 }
 
 func resolveTOTPSecretReference(client *onepassword.Client, vaultID, itemID, fieldID string) {
@@ -264,7 +293,8 @@ func generatePasswords() {
 // NOTE: just for the sake of archiving it. This is because the SDK
 // NOTE: only works with active items, so archiving and then deleting
 // NOTE: is not yet possible.
-//lint:ignore U1000 
+//
+//lint:ignore U1000
 func archiveItem(client *onepassword.Client, vaultID string, itemID string) {
 	// [developer-docs.sdk.go.archive-item]-start
 	// Archive a item from your vault.
@@ -291,7 +321,7 @@ func generateItemSharing(client *onepassword.Client, vaultID string, itemID stri
 		panic(err)
 	}
 	// [developer-docs.sdk.go.item-share-get-account-policy]-end
-	
+
 	// [developer-docs.sdk.go.item-share-validate-recipients]-start
 	recipients, err := client.Items.Shares.ValidateRecipients(context.Background(), accountPolicy, []string{"helloworld@agilebits.com"})
 	if err != nil {
@@ -300,8 +330,8 @@ func generateItemSharing(client *onepassword.Client, vaultID string, itemID stri
 	// [developer-docs.sdk.go.item-share-validate-recipients]-end
 
 	// [developer-docs.sdk.go.item-share-create-share]-start
-	shareLink, err := client.Items.Shares.Create(context.Background(), item, accountPolicy, onepassword.ItemShareParams{
-		Recipients: recipients,
+	shareLink, err := client.Items.Shares.Create(context.Background(), item, accountPolicy, onepassword.ItemsShareParams{
+		Recipients:  recipients,
 		ExpireAfter: &accountPolicy.DefaultExpiry,
 		OneTimeOnly: false,
 	})
@@ -309,6 +339,6 @@ func generateItemSharing(client *onepassword.Client, vaultID string, itemID stri
 		panic(err)
 	}
 	// [developer-docs.sdk.go.item-share-create-share]-end
-	
+
 	return shareLink
 }

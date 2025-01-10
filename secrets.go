@@ -39,6 +39,24 @@ func (s SecretsSource) Resolve(ctx context.Context, secretReference string) (str
 	return result, nil
 }
 
+// ResolveAll retrieves multiple secrets from 1Password.
+// It takes multiple secret references as input and returns the secrets to which they point or the encountered error(s).
+// This function uses the batch item retrieval endpoints, making it faster when retrieving multiple items from the same vault.
+func (s SecretsSource) ResolveAll(ctx context.Context, secretReferences []string) (ResolveAllResponse, error) {
+	resultString, err := clientInvoke(ctx, s.innerClient, "SecretsResolveAll", map[string]interface{}{
+		"secret_references": secretReferences,
+	})
+	if err != nil {
+		return ResolveAllResponse{}, err
+	}
+	var result ResolveAllResponse
+	err = json.Unmarshal([]byte(*resultString), &result)
+	if err != nil {
+		return ResolveAllResponse{}, err
+	}
+	return result, nil
+}
+
 // Validate the secret reference to ensure there are no syntax errors.
 func (s secretsUtil) ValidateSecretReference(ctx context.Context, secretReference string) error {
 	core, err := internal.GetSharedCore()

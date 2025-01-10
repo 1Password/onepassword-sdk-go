@@ -174,8 +174,6 @@ type Item struct {
 	Fields []ItemField `json:"fields"`
 	// The item's sections
 	Sections []ItemSection `json:"sections"`
-	// The notes of the item
-	Notes string `json:"notes"`
 	// The item's tags
 	Tags []string `json:"tags"`
 	// The websites used for autofilling for items of the Login and Password categories.
@@ -194,8 +192,6 @@ type ItemCreateParams struct {
 	Fields []ItemField `json:"fields,omitempty"`
 	// The item's sections
 	Sections []ItemSection `json:"sections,omitempty"`
-	// The item's notes
-	Notes *string `json:"notes,omitempty"`
 	// The item's tags
 	Tags []string `json:"tags,omitempty"`
 	// The websites used for autofilling for items of the Login and Password categories.
@@ -217,19 +213,19 @@ type ItemOverview struct {
 }
 
 // The valid duration options for sharing an item
-type ItemShareDuration string
+type ItemsShareDuration string
 
 const (
 	// The share will expire in one hour
-	ItemShareDurationOneHour ItemShareDuration = "OneHour"
+	ItemsShareDurationOneHour ItemsShareDuration = "OneHour"
 	// The share will expire in one day
-	ItemShareDurationOneDay ItemShareDuration = "OneDay"
+	ItemsShareDurationOneDay ItemsShareDuration = "OneDay"
 	// The share will expire in seven days
-	ItemShareDurationSevenDays ItemShareDuration = "SevenDays"
+	ItemsShareDurationSevenDays ItemsShareDuration = "SevenDays"
 	// The share will expire in fourteen days
-	ItemShareDurationFourteenDays ItemShareDuration = "FourteenDays"
+	ItemsShareDurationFourteenDays ItemsShareDuration = "FourteenDays"
 	// The share will expire in thirty days
-	ItemShareDurationThirtyDays ItemShareDuration = "ThirtyDays"
+	ItemsShareDurationThirtyDays ItemsShareDuration = "ThirtyDays"
 )
 
 // The allowed types of item sharing, enforced by account policy
@@ -254,11 +250,11 @@ const (
 
 // The account policy for sharing items, set by your account owner/admin
 // This policy is enforced server-side when sharing items
-type ItemShareAccountPolicy struct {
+type ItemsShareAccountPolicy struct {
 	// The maximum duration that an item can be shared for
-	MaxExpiry ItemShareDuration `json:"maxExpiry"`
+	MaxExpiry ItemsShareDuration `json:"maxExpiry"`
 	// The default duration that an item is shared for
-	DefaultExpiry ItemShareDuration `json:"defaultExpiry"`
+	DefaultExpiry ItemsShareDuration `json:"defaultExpiry"`
 	// The maximum number of times an item can be viewed. A null value means unlimited views
 	MaxViews *uint32 `json:"maxViews,omitempty"`
 	// The allowed types of item sharing - either "Authenticated" (share to specific users) or "Public" (share to anyone with a link)
@@ -352,11 +348,11 @@ func NewValidRecipientTypeVariantDomain(content *ValidRecipientDomainInner) Vali
 
 // The configuration options for sharing an item
 // These must respect the account policy on item sharing
-type ItemShareParams struct {
+type ItemsShareParams struct {
 	// Emails or domains of the item share recipients. If not provided, everyone with the share link will have access
 	Recipients []ValidRecipient `json:"recipients,omitempty"`
 	// The duration of the share in seconds. If not provided, defaults to the account policy's default expiry
-	ExpireAfter *ItemShareDuration `json:"expireAfter,omitempty"`
+	ExpireAfter *ItemsShareDuration `json:"expireAfter,omitempty"`
 	// Whether the item can only be viewed once per recipient
 	OneTimeOnly bool `json:"oneTimeOnly"`
 }
@@ -367,6 +363,175 @@ type OTPFieldDetails struct {
 	Code *string `json:"code,omitempty"`
 	// The error message, if the OTP code could not be computed
 	ErrorMessage *string `json:"errorMessage,omitempty"`
+}
+type Response[T any, E any] struct {
+	Content *T `json:"content,omitempty"`
+	Error   *E `json:"error,omitempty"`
+}
+type ResolveReferenceErrorTypes string
+
+const (
+	// Error parsing the secret reference
+	ResolveReferenceErrorTypeVariantParsing ResolveReferenceErrorTypes = "Parsing"
+	// The specified reference cannot be found within the item
+	ResolveReferenceErrorTypeVariantFieldNotFound ResolveReferenceErrorTypes = "FieldNotFound"
+	// No vault matched the secret reference query
+	ResolveReferenceErrorTypeVariantVaultNotFound ResolveReferenceErrorTypes = "VaultNotFound"
+	// More than one vault matched the secret reference query
+	ResolveReferenceErrorTypeVariantTooManyVaults ResolveReferenceErrorTypes = "TooManyVaults"
+	// No item matched the secret reference query
+	ResolveReferenceErrorTypeVariantItemNotFound ResolveReferenceErrorTypes = "ItemNotFound"
+	// More than one item matched the secret reference query
+	ResolveReferenceErrorTypeVariantTooManyItems ResolveReferenceErrorTypes = "TooManyItems"
+	// More than one field matched the provided secret reference
+	ResolveReferenceErrorTypeVariantTooManyMatchingFields ResolveReferenceErrorTypes = "TooManyMatchingFields"
+	// No section found within the item for the provided identifier
+	ResolveReferenceErrorTypeVariantNoMatchingSections ResolveReferenceErrorTypes = "NoMatchingSections"
+	// More than one matching section found within the item
+	ResolveReferenceErrorTypeVariantTooManyMatchingSections ResolveReferenceErrorTypes = "TooManyMatchingSections"
+	// Incompatiable TOTP query parameters
+	ResolveReferenceErrorTypeVariantIncompatibleTOTPQueryParameterField ResolveReferenceErrorTypes = "IncompatibleTOTPQueryParameterField"
+	// The totp was not able to be generated
+	ResolveReferenceErrorTypeVariantUnableToGenerateTOTPCode ResolveReferenceErrorTypes = "UnableToGenerateTotpCode"
+	// Couldn't find SSH Key specific attributes
+	ResolveReferenceErrorTypeVariantSSHKeyMetadataNotFound ResolveReferenceErrorTypes = "SSHKeyMetadataNotFound"
+)
+
+type ResolveReferenceError struct {
+	Type    ResolveReferenceErrorTypes `json:"type"`
+	content interface{}
+}
+
+func (r *ResolveReferenceError) UnmarshalJSON(data []byte) error {
+	var enum struct {
+		Tag     ResolveReferenceErrorTypes `json:"type"`
+		Content json.RawMessage            `json:"content"`
+	}
+	if err := json.Unmarshal(data, &enum); err != nil {
+		return err
+	}
+
+	r.Type = enum.Tag
+	switch r.Type {
+	case ResolveReferenceErrorTypeVariantParsing:
+		var res ReferenceParsingError
+		r.content = &res
+	case ResolveReferenceErrorTypeVariantFieldNotFound:
+		return nil
+	case ResolveReferenceErrorTypeVariantVaultNotFound:
+		return nil
+	case ResolveReferenceErrorTypeVariantTooManyVaults:
+		return nil
+	case ResolveReferenceErrorTypeVariantItemNotFound:
+		return nil
+	case ResolveReferenceErrorTypeVariantTooManyItems:
+		return nil
+	case ResolveReferenceErrorTypeVariantTooManyMatchingFields:
+		return nil
+	case ResolveReferenceErrorTypeVariantNoMatchingSections:
+		return nil
+	case ResolveReferenceErrorTypeVariantTooManyMatchingSections:
+		return nil
+	case ResolveReferenceErrorTypeVariantIncompatibleTOTPQueryParameterField:
+		return nil
+	case ResolveReferenceErrorTypeVariantUnableToGenerateTOTPCode:
+		var res TOTPCodeError
+		r.content = &res
+	case ResolveReferenceErrorTypeVariantSSHKeyMetadataNotFound:
+		return nil
+
+	}
+	if err := json.Unmarshal(enum.Content, &r.content); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r ResolveReferenceError) MarshalJSON() ([]byte, error) {
+	var enum struct {
+		Tag     ResolveReferenceErrorTypes `json:"type"`
+		Content interface{}                `json:"content,omitempty"`
+	}
+	enum.Tag = r.Type
+	enum.Content = r.content
+	return json.Marshal(enum)
+}
+
+func (r ResolveReferenceError) Parsing() ReferenceParsingError {
+	res, _ := r.content.(*ReferenceParsingError)
+	return *res
+}
+func (r ResolveReferenceError) UnableToGenerateTOTPCode() TOTPCodeError {
+	res, _ := r.content.(*TOTPCodeError)
+	return *res
+}
+
+func NewResolveReferenceErrorTypeVariantParsing(content ReferenceParsingError) ResolveReferenceError {
+	return ResolveReferenceError{
+		Type:    ResolveReferenceErrorTypeVariantParsing,
+		content: &content,
+	}
+}
+func NewResolveReferenceErrorTypeVariantFieldNotFound() ResolveReferenceError {
+	return ResolveReferenceError{
+		Type: ResolveReferenceErrorTypeVariantFieldNotFound,
+	}
+}
+func NewResolveReferenceErrorTypeVariantVaultNotFound() ResolveReferenceError {
+	return ResolveReferenceError{
+		Type: ResolveReferenceErrorTypeVariantVaultNotFound,
+	}
+}
+func NewResolveReferenceErrorTypeVariantTooManyVaults() ResolveReferenceError {
+	return ResolveReferenceError{
+		Type: ResolveReferenceErrorTypeVariantTooManyVaults,
+	}
+}
+func NewResolveReferenceErrorTypeVariantItemNotFound() ResolveReferenceError {
+	return ResolveReferenceError{
+		Type: ResolveReferenceErrorTypeVariantItemNotFound,
+	}
+}
+func NewResolveReferenceErrorTypeVariantTooManyItems() ResolveReferenceError {
+	return ResolveReferenceError{
+		Type: ResolveReferenceErrorTypeVariantTooManyItems,
+	}
+}
+func NewResolveReferenceErrorTypeVariantTooManyMatchingFields() ResolveReferenceError {
+	return ResolveReferenceError{
+		Type: ResolveReferenceErrorTypeVariantTooManyMatchingFields,
+	}
+}
+func NewResolveReferenceErrorTypeVariantNoMatchingSections() ResolveReferenceError {
+	return ResolveReferenceError{
+		Type: ResolveReferenceErrorTypeVariantNoMatchingSections,
+	}
+}
+func NewResolveReferenceErrorTypeVariantTooManyMatchingSections() ResolveReferenceError {
+	return ResolveReferenceError{
+		Type: ResolveReferenceErrorTypeVariantTooManyMatchingSections,
+	}
+}
+func NewResolveReferenceErrorTypeVariantIncompatibleTOTPQueryParameterField() ResolveReferenceError {
+	return ResolveReferenceError{
+		Type: ResolveReferenceErrorTypeVariantIncompatibleTOTPQueryParameterField,
+	}
+}
+func NewResolveReferenceErrorTypeVariantUnableToGenerateTOTPCode(content TOTPCodeError) ResolveReferenceError {
+	return ResolveReferenceError{
+		Type:    ResolveReferenceErrorTypeVariantUnableToGenerateTOTPCode,
+		content: &content,
+	}
+}
+func NewResolveReferenceErrorTypeVariantSSHKeyMetadataNotFound() ResolveReferenceError {
+	return ResolveReferenceError{
+		Type: ResolveReferenceErrorTypeVariantSSHKeyMetadataNotFound,
+	}
+}
+
+type ResolveAllResponse struct {
+	IndividualResponses []Response[string, ResolveReferenceError] `json:"individualResponses"`
 }
 
 // Represents a decrypted 1Password vault.
@@ -488,6 +653,21 @@ func NewPasswordRecipeTypeVariantRandom(content *PasswordRecipeRandomInner) Pass
 	}
 }
 
+type ReferenceParsingError string
+
+const (
+	// Secret reference is not prefixed with "op://"
+	ReferenceParsingErrorMissingSecretReferencePrefix ReferenceParsingError = "missingSecretReferencePrefix"
+	// Secret reference does not have the "op://<vault>/<item>/[section/]field[?attribute=<attribute-value>]" format
+	ReferenceParsingErrorInvalidSecretReferenceFormat ReferenceParsingError = "invalidSecretReferenceFormat"
+	// Secret reference does not have the correct query parameter key (i.e. attribute)
+	ReferenceParsingErrorInvalidQueryParameterKey ReferenceParsingError = "invalidQueryParameterKey"
+	// Secret reference does not have the correct query parameter value - i.e. otp/totp
+	ReferenceParsingErrorInvalidQueryParameterValue ReferenceParsingError = "invalidQueryParameterValue"
+	// Secret reference has an invalid character
+	ReferenceParsingErrorInvalidSecretReferenceCharacter ReferenceParsingError = "invalidSecretReferenceCharacter"
+)
+
 type SeparatorType string
 
 const (
@@ -514,6 +694,29 @@ const (
 	// Comma "`,`".
 	// E.g, "`correct,horse,battery,staple`"
 	SeparatorTypeCommas SeparatorType = "commas"
+)
+
+type TOTPCodeError string
+
+const (
+	// The number of digits specified in the TOTP URL is invalid.
+	TOTPCodeErrorInvalidDigits TOTPCodeError = "invalidDigits"
+	// The "host" part of the URI doesn't indicate TOTP.
+	TOTPCodeErrorInvalidUriHost TOTPCodeError = "invalidUriHost"
+	// The period in the TOTP URL is invalid.
+	TOTPCodeErrorInvalidPeriod TOTPCodeError = "invalidPeriod"
+	// The algorithm in the TOTP URL is invalid.
+	TOTPCodeErrorInvalidAlgorithm TOTPCodeError = "invalidAlgorithm"
+	// The scheme of the TOTP URL is invalid.
+	TOTPCodeErrorInvalidScheme TOTPCodeError = "invalidScheme"
+	// The secret in the TOTP URL is missing or invalid.
+	TOTPCodeErrorNoSecret TOTPCodeError = "noSecret"
+	// The TOTP secret is too short.
+	TOTPCodeErrorSecretTooShort TOTPCodeError = "secretTooShort"
+	// The TOTP secret contains non-Base32 characters.
+	TOTPCodeErrorSecretNotBase32 TOTPCodeError = "secretNotBase32"
+	// Parse error constructing TOTP url
+	TOTPCodeErrorTOTPParseFailure TOTPCodeError = "totpParseFailure"
 )
 
 type WordListType string
