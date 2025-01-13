@@ -174,6 +174,8 @@ type Item struct {
 	Fields []ItemField `json:"fields"`
 	// The item's sections
 	Sections []ItemSection `json:"sections"`
+	// The notes of the item
+	Notes string `json:"notes"`
 	// The item's tags
 	Tags []string `json:"tags"`
 	// The websites used for autofilling for items of the Login and Password categories.
@@ -192,6 +194,8 @@ type ItemCreateParams struct {
 	Fields []ItemField `json:"fields,omitempty"`
 	// The item's sections
 	Sections []ItemSection `json:"sections,omitempty"`
+	// The item's notes
+	Notes *string `json:"notes,omitempty"`
 	// The item's tags
 	Tags []string `json:"tags,omitempty"`
 	// The websites used for autofilling for items of the Login and Password categories.
@@ -213,19 +217,19 @@ type ItemOverview struct {
 }
 
 // The valid duration options for sharing an item
-type ItemsShareDuration string
+type ItemShareDuration string
 
 const (
 	// The share will expire in one hour
-	ItemsShareDurationOneHour ItemsShareDuration = "OneHour"
+	ItemShareDurationOneHour ItemShareDuration = "OneHour"
 	// The share will expire in one day
-	ItemsShareDurationOneDay ItemsShareDuration = "OneDay"
+	ItemShareDurationOneDay ItemShareDuration = "OneDay"
 	// The share will expire in seven days
-	ItemsShareDurationSevenDays ItemsShareDuration = "SevenDays"
+	ItemShareDurationSevenDays ItemShareDuration = "SevenDays"
 	// The share will expire in fourteen days
-	ItemsShareDurationFourteenDays ItemsShareDuration = "FourteenDays"
+	ItemShareDurationFourteenDays ItemShareDuration = "FourteenDays"
 	// The share will expire in thirty days
-	ItemsShareDurationThirtyDays ItemsShareDuration = "ThirtyDays"
+	ItemShareDurationThirtyDays ItemShareDuration = "ThirtyDays"
 )
 
 // The allowed types of item sharing, enforced by account policy
@@ -250,11 +254,11 @@ const (
 
 // The account policy for sharing items, set by your account owner/admin
 // This policy is enforced server-side when sharing items
-type ItemsShareAccountPolicy struct {
+type ItemShareAccountPolicy struct {
 	// The maximum duration that an item can be shared for
-	MaxExpiry ItemsShareDuration `json:"maxExpiry"`
+	MaxExpiry ItemShareDuration `json:"maxExpiry"`
 	// The default duration that an item is shared for
-	DefaultExpiry ItemsShareDuration `json:"defaultExpiry"`
+	DefaultExpiry ItemShareDuration `json:"defaultExpiry"`
 	// The maximum number of times an item can be viewed. A null value means unlimited views
 	MaxViews *uint32 `json:"maxViews,omitempty"`
 	// The allowed types of item sharing - either "Authenticated" (share to specific users) or "Public" (share to anyone with a link)
@@ -348,11 +352,11 @@ func NewValidRecipientTypeVariantDomain(content *ValidRecipientDomainInner) Vali
 
 // The configuration options for sharing an item
 // These must respect the account policy on item sharing
-type ItemsShareParams struct {
+type ItemShareParams struct {
 	// Emails or domains of the item share recipients. If not provided, everyone with the share link will have access
 	Recipients []ValidRecipient `json:"recipients,omitempty"`
 	// The duration of the share in seconds. If not provided, defaults to the account policy's default expiry
-	ExpireAfter *ItemsShareDuration `json:"expireAfter,omitempty"`
+	ExpireAfter *ItemShareDuration `json:"expireAfter,omitempty"`
 	// Whether the item can only be viewed once per recipient
 	OneTimeOnly bool `json:"oneTimeOnly"`
 }

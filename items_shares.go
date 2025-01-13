@@ -18,24 +18,24 @@ func NewItemsSharesSource(inner internal.InnerClient) *ItemsSharesSource {
 }
 
 // Get the item sharing policy of your account.
-func (i ItemsSharesSource) GetAccountPolicy(ctx context.Context, vaultID string, itemID string) (ItemsShareAccountPolicy, error) {
+func (i ItemsSharesSource) GetAccountPolicy(ctx context.Context, vaultID string, itemID string) (ItemShareAccountPolicy, error) {
 	resultString, err := clientInvoke(ctx, i.innerClient, "ItemsSharesGetAccountPolicy", map[string]interface{}{
 		"vault_id": vaultID,
 		"item_id":  itemID,
 	})
 	if err != nil {
-		return ItemsShareAccountPolicy{}, err
+		return ItemShareAccountPolicy{}, err
 	}
-	var result ItemsShareAccountPolicy
+	var result ItemShareAccountPolicy
 	err = json.Unmarshal([]byte(*resultString), &result)
 	if err != nil {
-		return ItemsShareAccountPolicy{}, err
+		return ItemShareAccountPolicy{}, err
 	}
 	return result, nil
 }
 
 // Validate the recipients of an item sharing link.
-func (i ItemsSharesSource) ValidateRecipients(ctx context.Context, policy ItemsShareAccountPolicy, recipients []string) ([]ValidRecipient, error) {
+func (i ItemsSharesSource) ValidateRecipients(ctx context.Context, policy ItemShareAccountPolicy, recipients []string) ([]ValidRecipient, error) {
 	resultString, err := clientInvoke(ctx, i.innerClient, "ItemsSharesValidateRecipients", map[string]interface{}{
 		"policy":     policy,
 		"recipients": recipients,
@@ -52,7 +52,7 @@ func (i ItemsSharesSource) ValidateRecipients(ctx context.Context, policy ItemsS
 }
 
 // Create a new item sharing link.
-func (i ItemsSharesSource) Create(ctx context.Context, item Item, policy ItemsShareAccountPolicy, params ItemsShareParams) (string, error) {
+func (i ItemsSharesSource) Create(ctx context.Context, item Item, policy ItemShareAccountPolicy, params ItemShareParams) (string, error) {
 	resultString, err := clientInvoke(ctx, i.innerClient, "ItemsSharesCreate", map[string]interface{}{
 		"item":   item,
 		"policy": policy,

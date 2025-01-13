@@ -330,7 +330,7 @@ func generateItemSharing(client *onepassword.Client, vaultID string, itemID stri
 	// [developer-docs.sdk.go.item-share-validate-recipients]-end
 
 	// [developer-docs.sdk.go.item-share-create-share]-start
-	shareLink, err := client.Items.Shares.Create(context.Background(), item, accountPolicy, onepassword.ItemsShareParams{
+	shareLink, err := client.Items.Shares.Create(context.Background(), item, accountPolicy, onepassword.ItemShareParams{
 		Recipients:  recipients,
 		ExpireAfter: &accountPolicy.DefaultExpiry,
 		OneTimeOnly: false,
