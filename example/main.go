@@ -147,8 +147,8 @@ func resolveSecretReference(client *onepassword.Client, vaultID, itemID, fieldID
 				}
 			}
 		} else {
-			// do something with the secret
-			secret := result.Content
+			// do something with the secret. Deref is safe since it's guaranteed that when no error occurs, then the content is present.
+			secret := *result.Content
 			fmt.Println(secret)
 		}
 	}
