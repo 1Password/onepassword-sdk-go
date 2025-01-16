@@ -1,4 +1,4 @@
-# 1Password Go SDK v0.1.7-beta.2
+# 1Password Go SDK v0.1.7-beta.3
 
 ## NEW:
 * Support for resolving multiple references: You can now retrieve multiple secrets in batch.
