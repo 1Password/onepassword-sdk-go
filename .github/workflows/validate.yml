@@ -41,6 +41,9 @@ jobs:
       - name: Unit Test
         run: go test -v ./internal/...
 
+      - name: Example Test
+        run: go run example/main.go
+
   golangci:
     name: Lint
     runs-on: ubuntu-latest

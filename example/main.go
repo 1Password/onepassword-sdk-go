@@ -139,12 +139,14 @@ func resolveTOTPSecretReference(client *onepassword.Client, vaultID, itemID, fie
 }
 
 func createAndGetItem(client *onepassword.Client) onepassword.Item {
+	vaultID := os.Getenv("OP_VAULT_ID")
+
 	// [developer-docs.sdk.go.create-item]-start
 	sectionID := "extraDetails"
 	itemParams := onepassword.ItemCreateParams{
 		Title:    "Login created with the SDK",
 		Category: onepassword.ItemCategoryLogin,
-		VaultID:  "7turaasywpymt3jecxoxk5roli",
+		VaultID:  vaultID,
 		Fields: []onepassword.ItemField{
 			{
 				ID:        "username",
@@ -264,7 +266,7 @@ func generatePasswords() {
 // NOTE: just for the sake of archiving it. This is because the SDK
 // NOTE: only works with active items, so archiving and then deleting
 // NOTE: is not yet possible.
-//lint:ignore U1000 
+//lint:ignore U1000
 func archiveItem(client *onepassword.Client, vaultID string, itemID string) {
 	// [developer-docs.sdk.go.archive-item]-start
 	// Archive a item from your vault.
@@ -301,7 +303,7 @@ func generateItemSharing(client *onepassword.Client, vaultID string, itemID stri
 
 	// [developer-docs.sdk.go.item-share-create-share]-start
 	shareLink, err := client.Items.Shares.Create(context.Background(), item, accountPolicy, onepassword.ItemShareParams{
-		Recipients: recipients,
+		Recipients:  recipients,
 		ExpireAfter: &accountPolicy.DefaultExpiry,
 		OneTimeOnly: false,
 	})
