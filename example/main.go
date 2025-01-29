@@ -266,7 +266,6 @@ func generatePasswords() {
 // NOTE: just for the sake of archiving it. This is because the SDK
 // NOTE: only works with active items, so archiving and then deleting
 // NOTE: is not yet possible.
-//
 //lint:ignore U1000
 func archiveItem(client *onepassword.Client, vaultID string, itemID string) {
 	// [developer-docs.sdk.go.archive-item]-start
@@ -294,7 +293,7 @@ func generateItemSharing(client *onepassword.Client, vaultID string, itemID stri
 		panic(err)
 	}
 	// [developer-docs.sdk.go.item-share-get-account-policy]-end
-
+	
 	// [developer-docs.sdk.go.item-share-validate-recipients]-start
 	recipients, err := client.Items.Shares.ValidateRecipients(context.Background(), accountPolicy, []string{"helloworld@agilebits.com"})
 	if err != nil {
@@ -312,6 +311,6 @@ func generateItemSharing(client *onepassword.Client, vaultID string, itemID stri
 		panic(err)
 	}
 	// [developer-docs.sdk.go.item-share-create-share]-end
-
+	
 	return shareLink
 }

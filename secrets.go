@@ -55,11 +55,7 @@ func (s secretsUtil) ValidateSecretReference(ctx context.Context, secretReferenc
 		},
 	})
 
-	if err != nil {
-		return unmarshalError(err.Error())
-	}
-
-	return nil
+	return err
 }
 
 func (s secretsUtil) GeneratePassword(ctx context.Context, recipe PasswordRecipe) (GeneratePasswordResponse, error) {
@@ -78,7 +74,7 @@ func (s secretsUtil) GeneratePassword(ctx context.Context, recipe PasswordRecipe
 	})
 
 	if err != nil {
-		return GeneratePasswordResponse{}, unmarshalError(err.Error())
+		return GeneratePasswordResponse{}, err
 	}
 
 	var result GeneratePasswordResponse
