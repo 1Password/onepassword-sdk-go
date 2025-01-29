@@ -36,7 +36,7 @@ func createClient(ctx context.Context, core internal.Core, opts ...ClientOption)
 
 	clientID, err := core.InitClient(ctx, client.config)
 	if err != nil {
-		return nil, fmt.Errorf("error initializing client: %w", err)
+		return nil, fmt.Errorf("error initializing client: %w", unmarshalError(err.Error()))
 	}
 
 	inner := internal.InnerClient{
@@ -82,7 +82,7 @@ func clientInvoke(ctx context.Context, innerClient internal.InnerClient, invocat
 		},
 	})
 	if err != nil {
-		return nil, err
+		return nil, unmarshalError(err.Error())
 	}
 	return invocationResponse, nil
 }

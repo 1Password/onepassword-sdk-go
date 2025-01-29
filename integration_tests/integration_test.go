@@ -99,7 +99,7 @@ func TestInvalidInvoke(t *testing.T) {
 		},
 	}
 	_, err1 := core.Invoke(context.Background(), invocation1)
-	assert.EqualError(t, err1, "an internal error occurred, please contact 1Password at support@1password.com or https://developer.1password.com/joinslack: invalid client id")
+	assert.EqualError(t, err1, "{\"name\":\"Internal\",\"message\":\"an internal error occurred, please contact 1Password at support@1password.com or https://developer.1password.com/joinslack: invalid client id\"}")
 
 	// invalid method name
 	invocation2 := internal.InvokeConfig{
@@ -124,7 +124,7 @@ func TestInvalidInvoke(t *testing.T) {
 		},
 	}
 	_, err3 := core.Invoke(context.Background(), invocation3)
-	assert.EqualError(t, err3, "error resolving secret reference: the secret reference could not be parsed: secret reference is not prefixed with \"op://\"")
+	assert.EqualError(t, err3, "{\"name\":\"ResolvingSecretReference\",\"message\":\"error resolving secret reference: the secret reference could not be parsed: secret reference is not prefixed with \\\"op://\\\"\"}")
 }
 
 func TestClientReleasedSuccessfully(t *testing.T) {
@@ -144,7 +144,7 @@ func TestClientReleasedSuccessfully(t *testing.T) {
 		},
 	}
 	_, err = core.Invoke(context.Background(), invocation)
-	assert.EqualError(t, err, "an internal error occurred, please contact 1Password at support@1password.com or https://developer.1password.com/joinslack: invalid client id")
+	assert.EqualError(t, err, "{\"name\":\"Internal\",\"message\":\"an internal error occurred, please contact 1Password at support@1password.com or https://developer.1password.com/joinslack: invalid client id\"}")
 }
 
 func TestConcurrentCallsFromOneClient(t *testing.T) {
