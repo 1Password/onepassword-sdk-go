@@ -9,3 +9,7 @@ This folder contains a code snippet that demonstrates how to use the 1Password G
 	```bash
 	export OP_SERVICE_ACCOUNT_TOKEN="<your token>"
 	```
+3. Make sure to export a valid vault uuid. For example:
+    ```bash
+    export OP_VAULT_ID="<your vault uuid>"
+    ```
