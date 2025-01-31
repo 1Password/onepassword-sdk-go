@@ -44,8 +44,8 @@ jobs:
       - name: Example Test
         run: go run example/main.go
         env:
-          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.TEST_SA_TOKEN }}
-          OP_VAULT_ID: ${{ secrets.TEST_SA_VAULT_ID }}
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.EXAMPLE_TESTS_OP_SERVICE_ACCOUNT_TOKEN }}
+          OP_VAULT_ID: ${{ secrets.EXAMPLE_TESTS_OP_VAULT_ID }}
 
   golangci:
     name: Lint
