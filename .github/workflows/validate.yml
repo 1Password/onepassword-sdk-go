@@ -19,6 +19,7 @@ jobs:
         # supported versions at the time of writing (Oct. 4th, 2024)
         # https://go.dev/dl/
         go-version: [ '1.22', '1.23' ]
+      max-parallel: 1
 
     runs-on: ubuntu-latest
     steps:
