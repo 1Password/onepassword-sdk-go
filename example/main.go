@@ -139,12 +139,14 @@ func resolveTOTPSecretReference(client *onepassword.Client, vaultID, itemID, fie
 }
 
 func createAndGetItem(client *onepassword.Client) onepassword.Item {
+	vaultID := os.Getenv("OP_VAULT_ID")
+
 	// [developer-docs.sdk.go.create-item]-start
 	sectionID := "extraDetails"
 	itemParams := onepassword.ItemCreateParams{
 		Title:    "Login created with the SDK",
 		Category: onepassword.ItemCategoryLogin,
-		VaultID:  "7turaasywpymt3jecxoxk5roli",
+		VaultID:  vaultID,
 		Fields: []onepassword.ItemField{
 			{
 				ID:        "username",

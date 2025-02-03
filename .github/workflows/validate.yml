@@ -19,6 +19,7 @@ jobs:
         # supported versions at the time of writing (Oct. 4th, 2024)
         # https://go.dev/dl/
         go-version: [ '1.22', '1.23' ]
+      max-parallel: 1
 
     runs-on: ubuntu-latest
     steps:
@@ -40,6 +41,12 @@ jobs:
 
       - name: Unit Test
         run: go test -v ./internal/...
+
+      - name: Example Test
+        run: go run example/main.go
+        env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.EXAMPLE_TESTS_OP_SERVICE_ACCOUNT_TOKEN }}
+          OP_VAULT_ID: ${{ secrets.EXAMPLE_TESTS_OP_VAULT_ID }}
 
   golangci:
     name: Lint
