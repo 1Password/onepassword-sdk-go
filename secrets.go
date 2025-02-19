@@ -39,6 +39,22 @@ func (s SecretsSource) Resolve(ctx context.Context, secretReference string) (str
 	return result, nil
 }
 
+// Resolve takes in a list of secret references and returns the secrets they point to or errors if any.
+func (s SecretsSource) ResolveAll(ctx context.Context, secretReferences []string) (ResolveAllResponse, error) {
+	resultString, err := clientInvoke(ctx, s.innerClient, "SecretsResolveAll", map[string]interface{}{
+		"secret_references": secretReferences,
+	})
+	if err != nil {
+		return ResolveAllResponse{}, err
+	}
+	var result ResolveAllResponse
+	err = json.Unmarshal([]byte(*resultString), &result)
+	if err != nil {
+		return ResolveAllResponse{}, err
+	}
+	return result, nil
+}
+
 // Validate the secret reference to ensure there are no syntax errors.
 func (s secretsUtil) ValidateSecretReference(ctx context.Context, secretReference string) error {
 	core, err := internal.GetSharedCore()

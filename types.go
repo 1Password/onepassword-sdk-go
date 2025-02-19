@@ -3,6 +3,8 @@ package onepassword
 
 import "encoding/json"
 
+type ErrorMessage string
+
 // For future use, if we want to return more information about the generated password.
 // Currently, it only returns the password itself.
 type GeneratePasswordResponse struct {
@@ -50,6 +52,7 @@ const (
 	ItemFieldTypeTOTP             ItemFieldType = "Totp"
 	ItemFieldTypeEmail            ItemFieldType = "Email"
 	ItemFieldTypeReference        ItemFieldType = "Reference"
+	ItemFieldTypeSSHKey           ItemFieldType = "SshKey"
 	ItemFieldTypeUnsupported      ItemFieldType = "Unsupported"
 )
 
@@ -59,6 +62,8 @@ type ItemFieldDetailsTypes string
 const (
 	// The computed OTP code and other details
 	ItemFieldDetailsTypeVariantOTP ItemFieldDetailsTypes = "Otp"
+	// Computed SSH Key attributes
+	ItemFieldDetailsTypeVariantSSHKey ItemFieldDetailsTypes = "SshKey"
 )
 
 type ItemFieldDetails struct {
@@ -79,6 +84,9 @@ func (i *ItemFieldDetails) UnmarshalJSON(data []byte) error {
 	switch i.Type {
 	case ItemFieldDetailsTypeVariantOTP:
 		var res OTPFieldDetails
+		i.content = &res
+	case ItemFieldDetailsTypeVariantSSHKey:
+		var res *SSHKeyAttributes
 		i.content = &res
 
 	}
@@ -103,11 +111,21 @@ func (i ItemFieldDetails) OTP() *OTPFieldDetails {
 	res, _ := i.content.(*OTPFieldDetails)
 	return res
 }
+func (i ItemFieldDetails) SSHKey() *SSHKeyAttributes {
+	res, _ := i.content.(**SSHKeyAttributes)
+	return *res
+}
 
 func NewItemFieldDetailsTypeVariantOTP(content *OTPFieldDetails) ItemFieldDetails {
 	return ItemFieldDetails{
 		Type:    ItemFieldDetailsTypeVariantOTP,
 		content: content,
+	}
+}
+func NewItemFieldDetailsTypeVariantSSHKey(content *SSHKeyAttributes) ItemFieldDetails {
+	return ItemFieldDetails{
+		Type:    ItemFieldDetailsTypeVariantSSHKey,
+		content: &content,
 	}
 }
 
@@ -367,6 +385,228 @@ type OTPFieldDetails struct {
 	Code *string `json:"code,omitempty"`
 	// The error message, if the OTP code could not be computed
 	ErrorMessage *string `json:"errorMessage,omitempty"`
+}
+type Response[T any, E any] struct {
+	Content *T `json:"content,omitempty"`
+	Error   *E `json:"error,omitempty"`
+}
+type ResolveReferenceErrorTypes string
+
+const (
+	// Error parsing the secret reference
+	ResolveReferenceErrorTypeVariantParsing ResolveReferenceErrorTypes = "Parsing"
+	// The specified reference cannot be found within the item
+	ResolveReferenceErrorTypeVariantFieldNotFound ResolveReferenceErrorTypes = "FieldNotFound"
+	// No vault matched the secret reference query
+	ResolveReferenceErrorTypeVariantVaultNotFound ResolveReferenceErrorTypes = "VaultNotFound"
+	// More than one vault matched the secret reference query
+	ResolveReferenceErrorTypeVariantTooManyVaults ResolveReferenceErrorTypes = "TooManyVaults"
+	// No item matched the secret reference query
+	ResolveReferenceErrorTypeVariantItemNotFound ResolveReferenceErrorTypes = "ItemNotFound"
+	// More than one item matched the secret reference query
+	ResolveReferenceErrorTypeVariantTooManyItems ResolveReferenceErrorTypes = "TooManyItems"
+	// More than one field matched the provided secret reference
+	ResolveReferenceErrorTypeVariantTooManyMatchingFields ResolveReferenceErrorTypes = "TooManyMatchingFields"
+	// No section found within the item for the provided identifier
+	ResolveReferenceErrorTypeVariantNoMatchingSections ResolveReferenceErrorTypes = "NoMatchingSections"
+	// More than one matching section found within the item
+	ResolveReferenceErrorTypeVariantTooManyMatchingSections ResolveReferenceErrorTypes = "TooManyMatchingSections"
+	// Incompatiable TOTP query parameters
+	ResolveReferenceErrorTypeVariantIncompatibleTOTPQueryParameterField ResolveReferenceErrorTypes = "IncompatibleTOTPQueryParameterField"
+	// The totp was not able to be generated
+	ResolveReferenceErrorTypeVariantUnableToGenerateTOTPCode ResolveReferenceErrorTypes = "UnableToGenerateTotpCode"
+	// Couldn't find attributes specific to an SSH Key field
+	ResolveReferenceErrorTypeVariantSSHKeyMetadataNotFound ResolveReferenceErrorTypes = "SSHKeyMetadataNotFound"
+	// Currently only support text files
+	ResolveReferenceErrorTypeVariantUnsupportedFileFormat ResolveReferenceErrorTypes = "UnsupportedFileFormat"
+	// Trying to convert a non-private key to a private key format
+	ResolveReferenceErrorTypeVariantIncompatibleSSHKeyQueryParameterField ResolveReferenceErrorTypes = "IncompatibleSshKeyQueryParameterField"
+	// Unable to properly parse a private key string to convert to an internal Private Key type
+	ResolveReferenceErrorTypeVariantUnableToParsePrivateKey ResolveReferenceErrorTypes = "UnableToParsePrivateKey"
+	// Unable to format a private key to OpenSSH format
+	ResolveReferenceErrorTypeVariantUnableToFormatPrivateKeyToOpenSSH ResolveReferenceErrorTypes = "UnableToFormatPrivateKeyToOpenSsh"
+	// Other type
+	ResolveReferenceErrorTypeVariantOther ResolveReferenceErrorTypes = "Other"
+)
+
+type ResolveReferenceError struct {
+	Type    ResolveReferenceErrorTypes `json:"type"`
+	message interface{}
+}
+
+func (r *ResolveReferenceError) UnmarshalJSON(data []byte) error {
+	var enum struct {
+		Tag     ResolveReferenceErrorTypes `json:"type"`
+		Content json.RawMessage            `json:"message"`
+	}
+	if err := json.Unmarshal(data, &enum); err != nil {
+		return err
+	}
+
+	r.Type = enum.Tag
+	switch r.Type {
+	case ResolveReferenceErrorTypeVariantParsing:
+		var res ErrorMessage
+		r.message = &res
+	case ResolveReferenceErrorTypeVariantFieldNotFound:
+		return nil
+	case ResolveReferenceErrorTypeVariantVaultNotFound:
+		return nil
+	case ResolveReferenceErrorTypeVariantTooManyVaults:
+		return nil
+	case ResolveReferenceErrorTypeVariantItemNotFound:
+		return nil
+	case ResolveReferenceErrorTypeVariantTooManyItems:
+		return nil
+	case ResolveReferenceErrorTypeVariantTooManyMatchingFields:
+		return nil
+	case ResolveReferenceErrorTypeVariantNoMatchingSections:
+		return nil
+	case ResolveReferenceErrorTypeVariantTooManyMatchingSections:
+		return nil
+	case ResolveReferenceErrorTypeVariantIncompatibleTOTPQueryParameterField:
+		return nil
+	case ResolveReferenceErrorTypeVariantUnableToGenerateTOTPCode:
+		var res ErrorMessage
+		r.message = &res
+	case ResolveReferenceErrorTypeVariantSSHKeyMetadataNotFound:
+		return nil
+	case ResolveReferenceErrorTypeVariantUnsupportedFileFormat:
+		return nil
+	case ResolveReferenceErrorTypeVariantIncompatibleSSHKeyQueryParameterField:
+		return nil
+	case ResolveReferenceErrorTypeVariantUnableToParsePrivateKey:
+		return nil
+	case ResolveReferenceErrorTypeVariantUnableToFormatPrivateKeyToOpenSSH:
+		return nil
+	case ResolveReferenceErrorTypeVariantOther:
+		return nil
+
+	}
+	if err := json.Unmarshal(enum.Content, &r.message); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r ResolveReferenceError) MarshalJSON() ([]byte, error) {
+	var enum struct {
+		Tag     ResolveReferenceErrorTypes `json:"type"`
+		Content interface{}                `json:"message,omitempty"`
+	}
+	enum.Tag = r.Type
+	enum.Content = r.message
+	return json.Marshal(enum)
+}
+
+func (r ResolveReferenceError) Parsing() ErrorMessage {
+	res, _ := r.message.(*ErrorMessage)
+	return *res
+}
+func (r ResolveReferenceError) UnableToGenerateTOTPCode() ErrorMessage {
+	res, _ := r.message.(*ErrorMessage)
+	return *res
+}
+
+func NewResolveReferenceErrorTypeVariantParsing(content ErrorMessage) ResolveReferenceError {
+	return ResolveReferenceError{
+		Type:    ResolveReferenceErrorTypeVariantParsing,
+		message: &content,
+	}
+}
+func NewResolveReferenceErrorTypeVariantFieldNotFound() ResolveReferenceError {
+	return ResolveReferenceError{
+		Type: ResolveReferenceErrorTypeVariantFieldNotFound,
+	}
+}
+func NewResolveReferenceErrorTypeVariantVaultNotFound() ResolveReferenceError {
+	return ResolveReferenceError{
+		Type: ResolveReferenceErrorTypeVariantVaultNotFound,
+	}
+}
+func NewResolveReferenceErrorTypeVariantTooManyVaults() ResolveReferenceError {
+	return ResolveReferenceError{
+		Type: ResolveReferenceErrorTypeVariantTooManyVaults,
+	}
+}
+func NewResolveReferenceErrorTypeVariantItemNotFound() ResolveReferenceError {
+	return ResolveReferenceError{
+		Type: ResolveReferenceErrorTypeVariantItemNotFound,
+	}
+}
+func NewResolveReferenceErrorTypeVariantTooManyItems() ResolveReferenceError {
+	return ResolveReferenceError{
+		Type: ResolveReferenceErrorTypeVariantTooManyItems,
+	}
+}
+func NewResolveReferenceErrorTypeVariantTooManyMatchingFields() ResolveReferenceError {
+	return ResolveReferenceError{
+		Type: ResolveReferenceErrorTypeVariantTooManyMatchingFields,
+	}
+}
+func NewResolveReferenceErrorTypeVariantNoMatchingSections() ResolveReferenceError {
+	return ResolveReferenceError{
+		Type: ResolveReferenceErrorTypeVariantNoMatchingSections,
+	}
+}
+func NewResolveReferenceErrorTypeVariantTooManyMatchingSections() ResolveReferenceError {
+	return ResolveReferenceError{
+		Type: ResolveReferenceErrorTypeVariantTooManyMatchingSections,
+	}
+}
+func NewResolveReferenceErrorTypeVariantIncompatibleTOTPQueryParameterField() ResolveReferenceError {
+	return ResolveReferenceError{
+		Type: ResolveReferenceErrorTypeVariantIncompatibleTOTPQueryParameterField,
+	}
+}
+func NewResolveReferenceErrorTypeVariantUnableToGenerateTOTPCode(content ErrorMessage) ResolveReferenceError {
+	return ResolveReferenceError{
+		Type:    ResolveReferenceErrorTypeVariantUnableToGenerateTOTPCode,
+		message: &content,
+	}
+}
+func NewResolveReferenceErrorTypeVariantSSHKeyMetadataNotFound() ResolveReferenceError {
+	return ResolveReferenceError{
+		Type: ResolveReferenceErrorTypeVariantSSHKeyMetadataNotFound,
+	}
+}
+func NewResolveReferenceErrorTypeVariantUnsupportedFileFormat() ResolveReferenceError {
+	return ResolveReferenceError{
+		Type: ResolveReferenceErrorTypeVariantUnsupportedFileFormat,
+	}
+}
+func NewResolveReferenceErrorTypeVariantIncompatibleSSHKeyQueryParameterField() ResolveReferenceError {
+	return ResolveReferenceError{
+		Type: ResolveReferenceErrorTypeVariantIncompatibleSSHKeyQueryParameterField,
+	}
+}
+func NewResolveReferenceErrorTypeVariantUnableToParsePrivateKey() ResolveReferenceError {
+	return ResolveReferenceError{
+		Type: ResolveReferenceErrorTypeVariantUnableToParsePrivateKey,
+	}
+}
+func NewResolveReferenceErrorTypeVariantUnableToFormatPrivateKeyToOpenSSH() ResolveReferenceError {
+	return ResolveReferenceError{
+		Type: ResolveReferenceErrorTypeVariantUnableToFormatPrivateKeyToOpenSSH,
+	}
+}
+func NewResolveReferenceErrorTypeVariantOther() ResolveReferenceError {
+	return ResolveReferenceError{
+		Type: ResolveReferenceErrorTypeVariantOther,
+	}
+}
+
+type ResolveAllResponse struct {
+	IndividualResponses []Response[string, ResolveReferenceError] `json:"individualResponses"`
+}
+type SSHKeyAttributes struct {
+	// The public part of the SSH Key
+	PublicKey string `json:"publicKey"`
+	// The fingerprint of the SSH Key
+	Fingerprint string `json:"fingerprint"`
+	// The key type ("Ed25519" or "RSA, {length}-bit")
+	KeyType string `json:"keyType"`
 }
 
 // Represents a decrypted 1Password vault.
