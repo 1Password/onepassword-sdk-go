@@ -50,6 +50,7 @@ const (
 	ItemFieldTypeTOTP             ItemFieldType = "Totp"
 	ItemFieldTypeEmail            ItemFieldType = "Email"
 	ItemFieldTypeReference        ItemFieldType = "Reference"
+	ItemFieldTypeSSHKey           ItemFieldType = "SshKey"
 	ItemFieldTypeUnsupported      ItemFieldType = "Unsupported"
 )
 
@@ -59,6 +60,8 @@ type ItemFieldDetailsTypes string
 const (
 	// The computed OTP code and other details
 	ItemFieldDetailsTypeVariantOTP ItemFieldDetailsTypes = "Otp"
+	// Computed SSH Key attributes
+	ItemFieldDetailsTypeVariantSSHKey ItemFieldDetailsTypes = "SshKey"
 )
 
 type ItemFieldDetails struct {
@@ -79,6 +82,9 @@ func (i *ItemFieldDetails) UnmarshalJSON(data []byte) error {
 	switch i.Type {
 	case ItemFieldDetailsTypeVariantOTP:
 		var res OTPFieldDetails
+		i.content = &res
+	case ItemFieldDetailsTypeVariantSSHKey:
+		var res *SSHKeyAttributes
 		i.content = &res
 
 	}
@@ -103,11 +109,21 @@ func (i ItemFieldDetails) OTP() *OTPFieldDetails {
 	res, _ := i.content.(*OTPFieldDetails)
 	return res
 }
+func (i ItemFieldDetails) SSHKey() *SSHKeyAttributes {
+	res, _ := i.content.(**SSHKeyAttributes)
+	return *res
+}
 
 func NewItemFieldDetailsTypeVariantOTP(content *OTPFieldDetails) ItemFieldDetails {
 	return ItemFieldDetails{
 		Type:    ItemFieldDetailsTypeVariantOTP,
 		content: content,
+	}
+}
+func NewItemFieldDetailsTypeVariantSSHKey(content *SSHKeyAttributes) ItemFieldDetails {
+	return ItemFieldDetails{
+		Type:    ItemFieldDetailsTypeVariantSSHKey,
+		content: &content,
 	}
 }
 
@@ -367,6 +383,14 @@ type OTPFieldDetails struct {
 	Code *string `json:"code,omitempty"`
 	// The error message, if the OTP code could not be computed
 	ErrorMessage *string `json:"errorMessage,omitempty"`
+}
+type SSHKeyAttributes struct {
+	// The public part of the SSH Key
+	PublicKey string `json:"publicKey"`
+	// The fingerprint of the SSH Key
+	Fingerprint string `json:"fingerprint"`
+	// The key type ("Ed25519" or "RSA, {length}-bit")
+	KeyType string `json:"keyType"`
 }
 
 // Represents a decrypted 1Password vault.
