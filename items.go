@@ -9,14 +9,27 @@ import (
 	"github.com/1password/onepassword-sdk-go/internal"
 )
 
+type ItemsAPI interface {
+	// API functions
+	Create(ctx context.Context, params ItemCreateParams) (Item, error)
+	Get(ctx context.Context, vaultID string, itemID string) (Item, error)
+	Put(ctx context.Context, item Item) (Item, error)
+	Delete(ctx context.Context, vaultID string, itemID string) error
+	Archive(ctx context.Context, vaultID string, itemID string) error
+	ListAll(ctx context.Context, vaultID string) (*Iterator[ItemOverview], error)
+
+	// Child APIs
+	Shares() ItemsSharesAPI
+}
+
 // The Items API holds all operations the SDK client can perform on 1Password items.
 type ItemsSource struct {
 	innerClient internal.InnerClient
-	Shares      ItemsSharesSource
+	SharesAPI      ItemsSharesAPI
 }
 
-func NewItemsSource(inner internal.InnerClient) *ItemsSource {
-	return &ItemsSource{innerClient: inner, Shares: *NewItemsSharesSource(inner)}
+func NewItemsSource(inner internal.InnerClient) ItemsAPI {
+	return &ItemsSource{innerClient: inner, SharesAPI: NewItemsSharesSource(inner)}
 }
 
 // Create a new item.
@@ -100,4 +113,8 @@ func (i ItemsSource) ListAll(ctx context.Context, vaultID string) (*Iterator[Ite
 		return nil, err
 	}
 	return NewIterator(result), nil
+}
+
+func (i ItemsSource) Shares() ItemsSharesAPI {
+	return NewItemsSharesSource(i.innerClient)
 }

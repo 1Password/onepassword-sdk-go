@@ -9,12 +9,16 @@ import (
 	"github.com/1password/onepassword-sdk-go/internal"
 )
 
+type VaultsAPI interface {
+	ListAll(ctx context.Context) (*Iterator[VaultOverview], error)
+}
+
 // The Vaults API holds all the operations the SDK client can perform on 1Password vaults.
 type VaultsSource struct {
 	innerClient internal.InnerClient
 }
 
-func NewVaultsSource(inner internal.InnerClient) *VaultsSource {
+func NewVaultsSource(inner internal.InnerClient) VaultsAPI {
 	return &VaultsSource{innerClient: inner}
 }
 

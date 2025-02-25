@@ -9,11 +9,17 @@ import (
 	"github.com/1password/onepassword-sdk-go/internal"
 )
 
+type ItemsSharesAPI interface {
+	GetAccountPolicy(ctx context.Context, vaultID string, itemID string) (ItemShareAccountPolicy, error)
+	ValidateRecipients(ctx context.Context, policy ItemShareAccountPolicy, recipients []string) ([]ValidRecipient, error)
+	Create(ctx context.Context, item Item, policy ItemShareAccountPolicy, params ItemShareParams) (string, error)
+}
+
 type ItemsSharesSource struct {
 	innerClient internal.InnerClient
 }
 
-func NewItemsSharesSource(inner internal.InnerClient) *ItemsSharesSource {
+func NewItemsSharesSource(inner internal.InnerClient) ItemsSharesAPI {
 	return &ItemsSharesSource{innerClient: inner}
 }
 

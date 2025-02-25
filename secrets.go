@@ -9,13 +9,17 @@ import (
 	"github.com/1password/onepassword-sdk-go/internal"
 )
 
+type SecretsAPI interface {
+	Resolve(ctx context.Context, secretReference string) (string, error)
+}
+
 // The Secrets API includes all operations the SDK client can perform on secrets.
 // Use secret reference URIs to securely load secrets from 1Password: op://<vault-name>/<item-name>[/<section-name>]/<field-name>
 type SecretsSource struct {
 	innerClient internal.InnerClient
 }
 
-func NewSecretsSource(inner internal.InnerClient) *SecretsSource {
+func NewSecretsSource(inner internal.InnerClient) SecretsAPI {
 	return &SecretsSource{innerClient: inner}
 }
 

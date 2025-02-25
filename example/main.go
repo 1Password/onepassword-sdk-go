@@ -5,10 +5,12 @@ import (
 	"errors"
 	"fmt"
 	"os"
+
+	"github.com/1password/onepassword-sdk-go"
 )
 
 // [developer-docs.sdk.go.sdk-import]-start
-import 	"github.com/1password/onepassword-sdk-go"
+
 // [developer-docs.sdk.go.sdk-import]-end
 
 func main() {
@@ -271,7 +273,7 @@ func generatePasswords() {
 func archiveItem(client *onepassword.Client, vaultID string, itemID string) {
 	// [developer-docs.sdk.go.archive-item]-start
 	// Archive a item from your vault.
-	err := client.Items.Archive(context.Background(), vaultID, itemID)
+	err := client.Items().Archive(context.Background(), vaultID, itemID)
 
 	if err != nil {
 		panic(err)
