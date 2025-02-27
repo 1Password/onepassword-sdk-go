@@ -42,7 +42,7 @@ func main() {
 
 func listVaultsAndItems(client *onepassword.Client, vaultID string) {
 	// [developer-docs.sdk.go.list-vaults]-start
-	vaults, err := client.Vaults.ListAll(context.Background())
+	vaults, err := client.Vaults().ListAll(context.Background())
 	if err != nil {
 		panic(err)
 	}
@@ -59,7 +59,7 @@ func listVaultsAndItems(client *onepassword.Client, vaultID string) {
 	// [developer-docs.sdk.go.list-vaults]-end
 
 	// [developer-docs.sdk.go.list-items]-start
-	items, err := client.Items.ListAll(context.Background(), vaultID)
+	items, err := client.Items().ListAll(context.Background(), vaultID)
 	if err != nil {
 		panic(err)
 	}
@@ -78,7 +78,7 @@ func listVaultsAndItems(client *onepassword.Client, vaultID string) {
 func getAndUpdateItem(client *onepassword.Client, existingVaultID, existingItemID string) {
 	// [developer-docs.sdk.go.update-item]-start
 	// Retrieves the newly created item
-	item, err := client.Items.Get(context.Background(), existingVaultID, existingItemID)
+	item, err := client.Items().Get(context.Background(), existingVaultID, existingItemID)
 	if err != nil {
 		panic(err)
 	}
@@ -96,7 +96,7 @@ func getAndUpdateItem(client *onepassword.Client, existingVaultID, existingItemI
 		AutofillBehavior: onepassword.AutofillBehaviorNever,
 	})
 
-	updatedItem, err := client.Items.Put(context.Background(), item)
+	updatedItem, err := client.Items().Put(context.Background(), item)
 	if err != nil {
 		panic(err)
 	}
@@ -121,7 +121,7 @@ func resolveSecretReference(client *onepassword.Client, vaultID, itemID, fieldID
 	// [developer-docs.sdk.go.resolve-secret]-start
 	// Retrieves a secret from 1Password.
 	// Takes a secret reference as input and returns the secret to which it points.
-	secret, err := client.Secrets.Resolve(context.Background(), fmt.Sprintf("op://%s/%s/%s", vaultID, itemID, fieldID))
+	secret, err := client.Secrets().Resolve(context.Background(), fmt.Sprintf("op://%s/%s/%s", vaultID, itemID, fieldID))
 	if err != nil {
 		panic(err)
 	}
@@ -132,7 +132,7 @@ func resolveSecretReference(client *onepassword.Client, vaultID, itemID, fieldID
 func resolveTOTPSecretReference(client *onepassword.Client, vaultID, itemID, fieldID string) {
 	// [developer-docs.sdk.go.resolve-totp-code]-start
 	// Retrieves a TOTP code from 1Password.
-	code, err := client.Secrets.Resolve(context.Background(), fmt.Sprintf("op://%s/%s/%s?attribute=totp", vaultID, itemID, fieldID))
+	code, err := client.Secrets().Resolve(context.Background(), fmt.Sprintf("op://%s/%s/%s?attribute=totp", vaultID, itemID, fieldID))
 	if err != nil {
 		panic(err)
 	}
@@ -187,7 +187,7 @@ func createAndGetItem(client *onepassword.Client) onepassword.Item {
 	}
 
 	// Creates a new item based on the structure definition above
-	createdItem, err := client.Items.Create(context.Background(), itemParams)
+	createdItem, err := client.Items().Create(context.Background(), itemParams)
 	if err != nil {
 		panic(err)
 	}
@@ -195,7 +195,7 @@ func createAndGetItem(client *onepassword.Client) onepassword.Item {
 
 	// [developer-docs.sdk.go.get-item]-start
 	// Retrieves the newly created item
-	login, err := client.Items.Get(context.Background(), createdItem.VaultID, createdItem.ID)
+	login, err := client.Items().Get(context.Background(), createdItem.VaultID, createdItem.ID)
 	if err != nil {
 		panic(err)
 	}
@@ -221,7 +221,7 @@ func createAndGetItem(client *onepassword.Client) onepassword.Item {
 func deleteItem(client *onepassword.Client, vaultID string, itemID string) {
 	// [developer-docs.sdk.go.delete-item]-start
 	// Delete a item from your vault.
-	err := client.Items.Delete(context.Background(), vaultID, itemID)
+	err := client.Items().Delete(context.Background(), vaultID, itemID)
 	if err != nil {
 		panic(err)
 	}
@@ -269,11 +269,11 @@ func generatePasswords() {
 // NOTE: only works with active items, so archiving and then deleting
 // NOTE: is not yet possible.
 //
-//lint:ignore U1000
+//lint:ignore U1000 just to show how to archive an Item
 func archiveItem(client *onepassword.Client, vaultID string, itemID string) {
 	// [developer-docs.sdk.go.archive-item]-start
 	// Archive a item from your vault.
-	err := client.Items.Archive(context.Background(), vaultID, itemID)
+	err := client.Items().Archive(context.Background(), vaultID, itemID)
 
 	if err != nil {
 		panic(err)
@@ -284,28 +284,28 @@ func archiveItem(client *onepassword.Client, vaultID string, itemID string) {
 
 func generateItemSharing(client *onepassword.Client, vaultID string, itemID string) string {
 	// [developer-docs.sdk.go.item-share-get-item]-start
-	item, err := client.Items.Get(context.Background(), vaultID, itemID)
+	item, err := client.Items().Get(context.Background(), vaultID, itemID)
 	if err != nil {
 		panic(err)
 	}
 	// [developer-docs.sdk.go.item-share-get-item]-end
 
 	// [developer-docs.sdk.go.item-share-get-account-policy]-start
-	accountPolicy, err := client.Items.Shares.GetAccountPolicy(context.Background(), item.VaultID, item.ID)
+	accountPolicy, err := client.Items().Shares().GetAccountPolicy(context.Background(), item.VaultID, item.ID)
 	if err != nil {
 		panic(err)
 	}
 	// [developer-docs.sdk.go.item-share-get-account-policy]-end
 
 	// [developer-docs.sdk.go.item-share-validate-recipients]-start
-	recipients, err := client.Items.Shares.ValidateRecipients(context.Background(), accountPolicy, []string{"helloworld@agilebits.com"})
+	recipients, err := client.Items().Shares().ValidateRecipients(context.Background(), accountPolicy, []string{"helloworld@agilebits.com"})
 	if err != nil {
 		panic(err)
 	}
 	// [developer-docs.sdk.go.item-share-validate-recipients]-end
 
 	// [developer-docs.sdk.go.item-share-create-share]-start
-	shareLink, err := client.Items.Shares.Create(context.Background(), item, accountPolicy, onepassword.ItemShareParams{
+	shareLink, err := client.Items().Shares().Create(context.Background(), item, accountPolicy, onepassword.ItemShareParams{
 		Recipients:  recipients,
 		ExpireAfter: &accountPolicy.DefaultExpiry,
 		OneTimeOnly: false,

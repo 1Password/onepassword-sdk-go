@@ -4,6 +4,7 @@ import (
 	"context"
 	_ "embed"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"sync"
 
@@ -20,7 +21,7 @@ const (
 )
 
 var core *SharedCore
-
+const MAX_INVOCATION_SIZE = 50 * 1000 * 1000
 // GetSharedCore initializes the shared core once and returns the already existing one on subsequent calls.
 func GetSharedCore() (*SharedCore, error) {
 	runtimeCtx := context.Background()
@@ -72,6 +73,9 @@ func (c *SharedCore) Invoke(ctx context.Context, invokeConfig InvokeConfig) (*st
 	input, err := json.Marshal(invokeConfig)
 	if err != nil {
 		return nil, err
+	}
+	if len(input) > MAX_INVOCATION_SIZE{
+		return nil, errors.New("cannot send an invocation more than 50MB")
 	}
 	res, err := c.callWithCtx(ctx, invokeFuncName, input)
 	if err != nil {

@@ -29,7 +29,7 @@ func TestSecretRetrievalFromTestAccount(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	secret, err := client.Secrets.Resolve(context.Background(), "op://gowwbvgow7kxocrfmfvtwni6vi/6ydrn7ne6mwnqc2prsbqx4i4aq/password")
+	secret, err := client.Secrets().Resolve(context.Background(), "op://gowwbvgow7kxocrfmfvtwni6vi/6ydrn7ne6mwnqc2prsbqx4i4aq/password")
 	require.NoError(t, err)
 
 	assert.Equal(t, "test_password_42", secret)
@@ -163,7 +163,7 @@ func TestConcurrentCallsFromOneClient(t *testing.T) {
 	wg.Add(concurrentCalls)
 	for i := 0; i < concurrentCalls; i++ {
 		go func() {
-			secret, err := client.Secrets.Resolve(context.Background(), "op://gowwbvgow7kxocrfmfvtwni6vi/6ydrn7ne6mwnqc2prsbqx4i4aq/password")
+			secret, err := client.Secrets().Resolve(context.Background(), "op://gowwbvgow7kxocrfmfvtwni6vi/6ydrn7ne6mwnqc2prsbqx4i4aq/password")
 			require.NoError(t, err)
 
 			assert.Equal(t, "test_password_42", secret)
@@ -189,7 +189,7 @@ func TestConcurrentCallsFromMultipleClientsOnTheSameToken(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			secret, err := client.Secrets.Resolve(context.Background(), "op://gowwbvgow7kxocrfmfvtwni6vi/6ydrn7ne6mwnqc2prsbqx4i4aq/password")
+			secret, err := client.Secrets().Resolve(context.Background(), "op://gowwbvgow7kxocrfmfvtwni6vi/6ydrn7ne6mwnqc2prsbqx4i4aq/password")
 			require.NoError(t, err)
 
 			assert.Equal(t, "test_password_42", secret)
