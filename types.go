@@ -3,6 +3,94 @@ package onepassword
 
 import "encoding/json"
 
+// Generated type representing the anonymous struct variant `FieldFile` of the `FilePosition` Rust enum
+type FilePositionFieldFileInner struct {
+	SectionID string `json:"sectionId"`
+	FieldID   string `json:"fieldId"`
+}
+type FilePositionTypes string
+
+const (
+	// The document file saved in a Document item (can only be used with items of Document category)
+	FilePositionTypeVariantDocument FilePositionTypes = "Document"
+	// A file stored as an item field
+	FilePositionTypeVariantFieldFile FilePositionTypes = "FieldFile"
+)
+
+type FilePosition struct {
+	Type    FilePositionTypes `json:"type"`
+	content interface{}
+}
+
+func (f *FilePosition) UnmarshalJSON(data []byte) error {
+	var enum struct {
+		Tag     FilePositionTypes `json:"type"`
+		Content json.RawMessage   `json:"content"`
+	}
+	if err := json.Unmarshal(data, &enum); err != nil {
+		return err
+	}
+
+	f.Type = enum.Tag
+	switch f.Type {
+	case FilePositionTypeVariantDocument:
+		return nil
+	case FilePositionTypeVariantFieldFile:
+		var res FilePositionFieldFileInner
+		f.content = &res
+
+	}
+	if err := json.Unmarshal(enum.Content, &f.content); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (f FilePosition) MarshalJSON() ([]byte, error) {
+	var enum struct {
+		Tag     FilePositionTypes `json:"type"`
+		Content interface{}       `json:"content,omitempty"`
+	}
+	enum.Tag = f.Type
+	enum.Content = f.content
+	return json.Marshal(enum)
+}
+
+func (f FilePosition) FieldFile() *FilePositionFieldFileInner {
+	res, _ := f.content.(*FilePositionFieldFileInner)
+	return res
+}
+
+func NewFilePositionTypeVariantDocument() FilePosition {
+	return FilePosition{
+		Type: FilePositionTypeVariantDocument,
+	}
+}
+func NewFilePositionTypeVariantFieldFile(content *FilePositionFieldFileInner) FilePosition {
+	return FilePosition{
+		Type:    FilePositionTypeVariantFieldFile,
+		content: content,
+	}
+}
+
+type FileAttachParams struct {
+	// the name of the file
+	Name string `json:"name"`
+	// the content of the file
+	Content []byte `json:"content"`
+	// where the file is stored in the item
+	Position FilePosition `json:"position"`
+}
+type FileAttributes struct {
+	// The name of the file
+	Name string `json:"name"`
+	// The ID of the file retrieved from the server
+	ID string `json:"id"`
+	// The size of the file in bytes
+	Size uint32 `json:"size"`
+}
+
 // For future use, if we want to return more information about the generated password.
 // Currently, it only returns the password itself.
 type GeneratePasswordResponse struct {
@@ -50,6 +138,8 @@ const (
 	ItemFieldTypeTOTP             ItemFieldType = "Totp"
 	ItemFieldTypeEmail            ItemFieldType = "Email"
 	ItemFieldTypeReference        ItemFieldType = "Reference"
+	ItemFieldTypeSSHKey           ItemFieldType = "SshKey"
+	ItemFieldTypeMenu             ItemFieldType = "Menu"
 	ItemFieldTypeUnsupported      ItemFieldType = "Unsupported"
 )
 
@@ -59,6 +149,8 @@ type ItemFieldDetailsTypes string
 const (
 	// The computed OTP code and other details
 	ItemFieldDetailsTypeVariantOTP ItemFieldDetailsTypes = "Otp"
+	// Computed SSH Key attributes
+	ItemFieldDetailsTypeVariantSSHKey ItemFieldDetailsTypes = "SshKey"
 )
 
 type ItemFieldDetails struct {
@@ -79,6 +171,9 @@ func (i *ItemFieldDetails) UnmarshalJSON(data []byte) error {
 	switch i.Type {
 	case ItemFieldDetailsTypeVariantOTP:
 		var res OTPFieldDetails
+		i.content = &res
+	case ItemFieldDetailsTypeVariantSSHKey:
+		var res *SSHKeyAttributes
 		i.content = &res
 
 	}
@@ -103,11 +198,21 @@ func (i ItemFieldDetails) OTP() *OTPFieldDetails {
 	res, _ := i.content.(*OTPFieldDetails)
 	return res
 }
+func (i ItemFieldDetails) SSHKey() *SSHKeyAttributes {
+	res, _ := i.content.(**SSHKeyAttributes)
+	return *res
+}
 
 func NewItemFieldDetailsTypeVariantOTP(content *OTPFieldDetails) ItemFieldDetails {
 	return ItemFieldDetails{
 		Type:    ItemFieldDetailsTypeVariantOTP,
 		content: content,
+	}
+}
+func NewItemFieldDetailsTypeVariantSSHKey(content *SSHKeyAttributes) ItemFieldDetails {
+	return ItemFieldDetails{
+		Type:    ItemFieldDetailsTypeVariantSSHKey,
+		content: &content,
 	}
 }
 
@@ -159,6 +264,12 @@ type Website struct {
 	// For more information, visit https://support.1password.com/autofill-behavior/
 	AutofillBehavior AutofillBehavior `json:"autofillBehavior"`
 }
+type ItemFile struct {
+	// the attributes of the file
+	Attributes FileAttributes `json:"attributes"`
+	// where the file is stored in the item
+	Position FilePosition `json:"position"`
+}
 
 // Represents a 1Password item.
 type Item struct {
@@ -182,6 +293,8 @@ type Item struct {
 	Websites []Website `json:"websites"`
 	// The item's version
 	Version uint32 `json:"version"`
+	// The item's files
+	Files []ItemFile `json:"files"`
 }
 type ItemCreateParams struct {
 	// The item's category
@@ -200,6 +313,8 @@ type ItemCreateParams struct {
 	Tags []string `json:"tags,omitempty"`
 	// The websites used for autofilling for items of the Login and Password categories.
 	Websites []Website `json:"websites,omitempty"`
+	// The item's files
+	Files []FileAttachParams `json:"files,omitempty"`
 }
 
 // Represents a decrypted 1Password item.
@@ -367,6 +482,14 @@ type OTPFieldDetails struct {
 	Code *string `json:"code,omitempty"`
 	// The error message, if the OTP code could not be computed
 	ErrorMessage *string `json:"errorMessage,omitempty"`
+}
+type SSHKeyAttributes struct {
+	// The public part of the SSH Key
+	PublicKey string `json:"publicKey"`
+	// The fingerprint of the SSH Key
+	Fingerprint string `json:"fingerprint"`
+	// The key type ("Ed25519" or "RSA, {length}-bit")
+	KeyType string `json:"keyType"`
 }
 
 // Represents a decrypted 1Password vault.

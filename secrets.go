@@ -11,12 +11,17 @@ import (
 
 // The Secrets API includes all operations the SDK client can perform on secrets.
 // Use secret reference URIs to securely load secrets from 1Password: op://<vault-name>/<item-name>[/<section-name>]/<field-name>
-type SecretsSource struct {
-	innerClient internal.InnerClient
+type SecretsAPI interface {
+	// Resolve returns the secret the provided secret reference points to.
+	Resolve(ctx context.Context, secretReference string) (string, error)
 }
 
-func NewSecretsSource(inner internal.InnerClient) *SecretsSource {
-	return &SecretsSource{innerClient: inner}
+type SecretsSource struct {
+	internal.InnerClient
+}
+
+func NewSecretsSource(inner internal.InnerClient) SecretsAPI {
+	return &SecretsSource{InnerClient: inner}
 }
 
 type secretsUtil struct{}
@@ -25,7 +30,7 @@ var Secrets = secretsUtil{}
 
 // Resolve returns the secret the provided secret reference points to.
 func (s SecretsSource) Resolve(ctx context.Context, secretReference string) (string, error) {
-	resultString, err := clientInvoke(ctx, s.innerClient, "SecretsResolve", map[string]interface{}{
+	resultString, err := clientInvoke(ctx, s.InnerClient, "SecretsResolve", map[string]interface{}{
 		"secret_reference": secretReference,
 	})
 	if err != nil {
