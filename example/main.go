@@ -12,8 +12,7 @@ import (
 )
 
 // [developer-docs.sdk.go.sdk-import]-start
-import "github.com/1password/onepassword-sdk-go"
-
+import 	"github.com/1password/onepassword-sdk-go"
 // [developer-docs.sdk.go.sdk-import]-end
 
 func main() {
@@ -338,9 +337,6 @@ func createSSHKeyItem(client *onepassword.Client) {
 		Type:  "PRIVATE KEY",
 		Bytes: privBytes,
 	}))
-	if err != nil {
-		panic(err)
-	}
 
 	vaultID := os.Getenv("OP_VAULT_ID")
 
@@ -391,8 +387,8 @@ func createAndReplaceDocumentItem(client *onepassword.Client) {
 	if err != nil {
 		panic(err)
 	}
-	// Create a new document item
-	documentItemParams := onepassword.ItemCreateParams{
+	// Create the document item
+	documentItem, err := client.Items().Create(context.Background(), onepassword.ItemCreateParams{
 		Title:    "Document Item Created With Go SDK",
 		Category: onepassword.ItemCategoryDocument,
 		VaultID:  vaultID,
@@ -400,17 +396,13 @@ func createAndReplaceDocumentItem(client *onepassword.Client) {
 			Name:    "file.txt",
 			Content: fileContent,
 		},
-	}
-
-	// Create the document item
-	documentItem, err := client.Items().Create(context.Background(), documentItemParams)
+	})
 	if err != nil {
 		panic(err)
 	}
 	// [developer-docs.sdk.go.create-document-item]-end
 
 	// [developer-docs.sdk.go.replace-document-item]-start
-
 	// Replace the document item
 	file2Content, err := os.ReadFile("./example/file2.txt")
 	if err != nil {
@@ -476,7 +468,7 @@ func createAndAttachAndDeleteFileFieldItem(client *onepassword.Client) {
 		panic(err)
 	}
 
-	// Attach a file to an item
+	// Attach a file field to an item
 	newItem, err := client.Items().Files().Attach(context.Background(), item, onepassword.FileCreateParams{
 		Name:      "file2.txt",
 		Content:   file2Content,
@@ -489,7 +481,7 @@ func createAndAttachAndDeleteFileFieldItem(client *onepassword.Client) {
 	// [developer-docs.sdk.go.attach-file-field-item]-end
 
 	// [developer-docs.sdk.go.delete-file-field-item]-start
-	// Delete a file from an item
+	// Delete a file field from an item
 	updatedItemWithDeletedFile, err := client.Items().Files().Delete(context.Background(), newItem, newItem.Files[0].SectionID, newItem.Files[0].FieldID)
 	if err != nil {
 		panic(err)
