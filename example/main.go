@@ -387,14 +387,18 @@ func createAndReplaceDocumentItem(client *onepassword.Client) {
 	vaultID := os.Getenv("OP_VAULT_ID")
 
 	// [developer-docs.sdk.go.create-document-item]-start
+	fileContent, err := os.ReadFile("./example/file.txt")
+	if err != nil {
+		panic(err)
+	}
 	// Create a new document item
 	documentItemParams := onepassword.ItemCreateParams{
 		Title:    "Document Item Created With Go SDK",
 		Category: onepassword.ItemCategoryDocument,
 		VaultID:  vaultID,
 		Document: &onepassword.DocumentCreateParams{
-			Name:    "test.txt",
-			Content: []byte("Hello, World!"),
+			Name:    "file.txt",
+			Content: fileContent,
 		},
 	}
 
@@ -408,9 +412,13 @@ func createAndReplaceDocumentItem(client *onepassword.Client) {
 	// [developer-docs.sdk.go.replace-document-item]-start
 
 	// Replace the document item
+	file2Content, err := os.ReadFile("./example/file2.txt")
+	if err != nil {
+		panic(err)
+	}
 	replacedDocItem, err := client.Items().Files().ReplaceDocument(context.Background(), documentItem, onepassword.DocumentCreateParams{
-		Name:    "updatedDocument.txt",
-		Content: []byte("Hello, World! This is an updated document."),
+		Name:    "file2.txt",
+		Content: file2Content,
 	})
 	if err != nil {
 		panic(err)
@@ -431,50 +439,24 @@ func createAndAttachAndDeleteFileFieldItem(client *onepassword.Client) {
 	vaultID := os.Getenv("OP_VAULT_ID")
 
 	// [developer-docs.sdk.go.create-item-with-file-field]-start
+	fileContent, err := os.ReadFile("./example/file.txt")
+	if err != nil {
+		panic(err)
+	}
 	sectionID := "extraDetails"
 	itemParams := onepassword.ItemCreateParams{
 		Title:    "Login with File Field created with SDK",
 		Category: onepassword.ItemCategoryLogin,
 		VaultID:  vaultID,
-		Fields: []onepassword.ItemField{
-			{
-				ID:        "username",
-				Title:     "username",
-				Value:     "Wendy_Appleseed",
-				FieldType: onepassword.ItemFieldTypeText,
-			},
-			{
-				ID:        "password",
-				Title:     "password",
-				Value:     "my_weak_password123",
-				FieldType: onepassword.ItemFieldTypeConcealed,
-			},
-			{
-				ID:        "onetimepassword",
-				Title:     "one-time password",
-				Value:     "otpauth://totp/my-example-otp?secret=jncrjgbdjnrncbjsr&issuer=1Password",
-				SectionID: &sectionID,
-				FieldType: onepassword.ItemFieldTypeTOTP,
-			},
-		},
 		Sections: []onepassword.ItemSection{
 			{
-				ID:    sectionID,
-				Title: "Extra Details",
-			},
-		},
-		Tags: []string{"test tag1", "test tag 2"},
-		Websites: []onepassword.Website{
-			{
-				URL:              "1password.com",
-				AutofillBehavior: onepassword.AutofillBehaviorAnywhereOnWebsite,
-				Label:            "my custom website",
+				ID: sectionID,
 			},
 		},
 		Files: []onepassword.FileCreateParams{
 			{
-				Name:      "test.txt",
-				Content:   []byte("Hello, World!"),
+				Name:      "file.txt",
+				Content:   fileContent,
 				SectionID: sectionID,
 				FieldID:   "file_field",
 			},
@@ -489,10 +471,15 @@ func createAndAttachAndDeleteFileFieldItem(client *onepassword.Client) {
 	// [developer-docs.sdk.go.create-item-with-file-field]-end
 
 	// [developer-docs.sdk.go.attach-file-field-item]-start
+	file2Content, err := os.ReadFile("./example/file2.txt")
+	if err != nil {
+		panic(err)
+	}
+
 	// Attach a file to an item
 	newItem, err := client.Items().Files().Attach(context.Background(), item, onepassword.FileCreateParams{
-		Name:      "attached.txt",
-		Content:   []byte("Hello, World! This is an attached file."),
+		Name:      "file2.txt",
+		Content:   file2Content,
 		SectionID: sectionID,
 		FieldID:   "new_file_field",
 	})
@@ -503,10 +490,10 @@ func createAndAttachAndDeleteFileFieldItem(client *onepassword.Client) {
 
 	// [developer-docs.sdk.go.delete-file-field-item]-start
 	// Delete a file from an item
-	updatedItemWithDeletedFile, err := client.Items().Files().Delete(context.Background(), newItem, sectionID, "file_field")
+	updatedItemWithDeletedFile, err := client.Items().Files().Delete(context.Background(), newItem, newItem.Files[0].SectionID, newItem.Files[0].FieldID)
 	if err != nil {
 		panic(err)
 	}
 	// [developer-docs.sdk.go.delete-file-field-item]-end
-	fmt.Println(updatedItemWithDeletedFile.Files)
+	fmt.Println(len(updatedItemWithDeletedFile.Files))
 }
