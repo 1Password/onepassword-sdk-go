@@ -2,15 +2,18 @@ package main
 
 import (
 	"context"
+	"crypto/rand"
+	"crypto/rsa"
+	"crypto/x509"
+	"encoding/pem"
 	"errors"
 	"fmt"
 	"os"
 
-	"github.com/1password/onepassword-sdk-go"
 )
 
 // [developer-docs.sdk.go.sdk-import]-start
-
+import 	"github.com/1password/onepassword-sdk-go"
 // [developer-docs.sdk.go.sdk-import]-end
 
 func main() {
@@ -30,6 +33,9 @@ func main() {
 	// [developer-docs.sdk.go.client-initialization]-end
 
 	item := createAndGetItem(client)
+	createSSHKeyItem(client)
+	createAndReplaceDocumentItem(client)
+	createAndAttachAndDeleteFileFieldItem(client)
 	getAndUpdateItem(client, item.VaultID, item.ID)
 	listVaultsAndItems(client, item.VaultID)
 	generatePasswords()
@@ -314,4 +320,213 @@ func generateItemSharing(client *onepassword.Client, vaultID string, itemID stri
 	// [developer-docs.sdk.go.item-share-create-share]-end
 
 	return shareLink
+}
+
+func createSSHKeyItem(client *onepassword.Client) {
+	// Generate the RSA key pair
+	privateKey, err := generateSSHKey()
+	if err != nil {
+		panic(err)
+	}
+
+	// Encode the private key to PKCS#8 format (DER encoded)
+	pkcs8Bytes, err := encodePrivateKeyToPKCS8(privateKey)
+	if err != nil {
+		panic(err)
+	}
+
+	// Encode the PKCS#8 bytes to PEM format
+	pemBytes, err := encodeToPEM(pkcs8Bytes, "PRIVATE KEY")
+	if err != nil {
+		panic(err)
+	}
+	
+	vaultID := os.Getenv("OP_VAULT_ID")
+
+	// [developer-docs.sdk.go.create-item]-start
+	sectionID := "extraDetails"
+	itemParams := onepassword.ItemCreateParams{
+		Title:    "SSH Key Item Created With Go SDK",
+		Category: onepassword.ItemCategorySSHKey,
+		VaultID:  vaultID,
+		Fields: []onepassword.ItemField{
+			{
+				ID:        "private_key",
+				Title:     "private key",
+				Value:     string(pemBytes),
+				FieldType: onepassword.ItemFieldTypeSSHKey,
+				SectionID: &sectionID,
+			},
+		},
+		Sections: []onepassword.ItemSection{
+			{
+				ID:    sectionID,
+				Title: "Extra Details",
+			},
+		},
+		Tags: []string{"test tag1", "test tag 2"},
+	}
+
+	// Creates a new item based on the structure definition above
+	createdItem, err := client.Items().Create(context.Background(), itemParams)
+	if err != nil {
+		panic(err)
+	}
+	// [developer-docs.sdk.go.create-item]-end
+
+	fmt.Println("Private Key is: " + createdItem.Fields[0].Value)
+	fmt.Println("Public Key is: " + createdItem.Fields[0].Details.SSHKey().PublicKey)
+	fmt.Println("Fingerprint is: " + createdItem.Fields[0].Details.SSHKey().Fingerprint)
+	fmt.Println("Key Type is: " + createdItem.Fields[0].Details.SSHKey().KeyType)
+}
+
+func generateSSHKey() (*rsa.PrivateKey, error) {
+	// Generate a 2048-bit RSA private key
+	privateKey, err := rsa.GenerateKey(rand.Reader, 4096)
+	if err != nil {
+		return nil, err
+	}
+	return privateKey, nil
+}
+
+func encodePrivateKeyToPKCS8(privateKey *rsa.PrivateKey) ([]byte, error) {
+	// Marshal the private key into PKCS#8 format (DER encoding)
+	privBytes, err := x509.MarshalPKCS8PrivateKey(privateKey)
+	if err != nil {
+		return nil, err
+	}
+	return privBytes, nil
+}
+
+func encodeToPEM(data []byte, blockType string) ([]byte, error) {
+	// Create a PEM block with the specified type
+	block := &pem.Block{
+		Type:  blockType,
+		Bytes: data,
+	}
+
+	// Encode the data into PEM format
+	pemBytes := pem.EncodeToMemory(block)
+	return pemBytes, nil
+}
+
+func createAndReplaceDocumentItem(client *onepassword.Client) {
+	vaultID := os.Getenv("OP_VAULT_ID")
+
+	// [developer-docs.sdk.go.create-document-item]-start
+	// Create a new document item
+	documentItemParams := onepassword.ItemCreateParams{
+		Title:    "Document Item Created With Go SDK",
+		Category: onepassword.ItemCategoryDocument,
+		VaultID:  vaultID,
+		Document: &onepassword.DocumentCreateParams{
+			Name: "test.txt",
+			Content: []byte("Hello, World!"),
+		},
+	}
+
+	// Create the document item
+	documentItem, err := client.Items().Create(context.Background(), documentItemParams)
+	if err != nil {
+		panic(err)
+	}
+	// [developer-docs.sdk.go.create-document-item]-end
+
+	// [developer-docs.sdk.go.replace-document-item]-start
+
+	// Replace the document item
+	replacedDocItem, err := client.Items().Files().ReplaceDocument(context.Background(), documentItem, onepassword.DocumentCreateParams{
+		Name: "updatedDocument.txt",
+		Content: []byte("Hello, World! This is an updated document."),
+	})
+	if err != nil {
+		panic(err)
+	}
+	// [developer-docs.sdk.go.replace-document-item]-end
+	
+	fmt.Println(replacedDocItem.Document.Name)
+}
+
+func createAndAttachAndDeleteFileFieldItem(client *onepassword.Client) {
+	vaultID := os.Getenv("OP_VAULT_ID")
+	
+	// [developer-docs.sdk.go.create-item-with-file-field]-start
+	sectionID := "extraDetails"
+	itemParams := onepassword.ItemCreateParams{
+		Title:    "Login with File Field created with SDK",
+		Category: onepassword.ItemCategoryLogin,
+		VaultID:  vaultID,
+		Fields: []onepassword.ItemField{
+			{
+				ID:        "username",
+				Title:     "username",
+				Value:     "Wendy_Appleseed",
+				FieldType: onepassword.ItemFieldTypeText,
+			},
+			{
+				ID:        "password",
+				Title:     "password",
+				Value:     "my_weak_password123",
+				FieldType: onepassword.ItemFieldTypeConcealed,
+			},
+			{
+				ID:        "onetimepassword",
+				Title:     "one-time password",
+				Value:     "otpauth://totp/my-example-otp?secret=jncrjgbdjnrncbjsr&issuer=1Password",
+				SectionID: &sectionID,
+				FieldType: onepassword.ItemFieldTypeTOTP,
+			},
+		},
+		Sections: []onepassword.ItemSection{
+			{
+				ID:    sectionID,
+				Title: "Extra Details",
+			},
+		},
+		Tags: []string{"test tag1", "test tag 2"},
+		Websites: []onepassword.Website{
+			{
+				URL:              "1password.com",
+				AutofillBehavior: onepassword.AutofillBehaviorAnywhereOnWebsite,
+				Label:            "my custom website",
+			},
+		},
+		Files: []onepassword.FileCreateParams{
+			{
+				Name:    "test.txt",
+				Content: []byte("Hello, World!"),
+				SectionID: sectionID,
+				FieldID: "file_field",
+			},
+		},
+	}
+
+	// Create the document item
+	item, err := client.Items().Create(context.Background(), itemParams)
+	if err != nil {
+		panic(err)
+	}
+	// [developer-docs.sdk.go.create-item-with-file-field]-end
+
+	// [developer-docs.sdk.go.attach-file-field-item]-start
+	// Attach a file to an item
+	newItem, err := client.Items().Files().Attach(context.Background(), item, onepassword.FileCreateParams{
+		Name:    "attached.txt",
+		Content: []byte("Hello, World! This is an attached file."),
+		SectionID: sectionID,
+		FieldID: "new_file_field",
+	})
+	if err != nil {
+		panic(err)
+	}
+	// [developer-docs.sdk.go.attach-file-field-item]-end
+
+	// [developer-docs.sdk.go.delete-file-field-item]-start
+	// Delete a file from an item
+	updatedItemWithDeletedFile, err := client.Items().Files().Delete(context.Background(), newItem, sectionID, "file_field")
+	if err != nil {
+		panic(err)
+	}
+	// [developer-docs.sdk.go.delete-file-field-item]-end
+	fmt.Println(updatedItemWithDeletedFile.Files)
 }
