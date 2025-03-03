@@ -64,6 +64,10 @@ func (i ItemsSource) Create(ctx context.Context, params ItemCreateParams) (Item,
 	if err != nil {
 		return Item{}, err
 	}
+
+	if hi := result.Files[0].Position.FieldFile(); hi != nil {
+		client.Items().Files()
+	}
 	return result, nil
 }
 

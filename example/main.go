@@ -9,11 +9,11 @@ import (
 	"errors"
 	"fmt"
 	"os"
-
 )
 
 // [developer-docs.sdk.go.sdk-import]-start
-import 	"github.com/1password/onepassword-sdk-go"
+import "github.com/1password/onepassword-sdk-go"
+
 // [developer-docs.sdk.go.sdk-import]-end
 
 func main() {
@@ -270,10 +270,11 @@ func generatePasswords() {
 	// [developer-docs.sdk.go.generate-memorable-password]-end
 }
 
-//lint:ignore U1000 NOTE: this is in a separate function to avoid creating a new item
 // NOTE: just for the sake of archiving it. This is because the SDK
 // NOTE: only works with active items, so archiving and then deleting
 // NOTE: is not yet possible.
+//
+//lint:ignore U1000 NOTE: this is in a separate function to avoid creating a new item
 func archiveItem(client *onepassword.Client, vaultID string, itemID string) {
 	// [developer-docs.sdk.go.archive-item]-start
 	// Archive a item from your vault.
@@ -324,26 +325,26 @@ func generateItemSharing(client *onepassword.Client, vaultID string, itemID stri
 
 func createSSHKeyItem(client *onepassword.Client) {
 	// Generate the RSA key pair
-	privateKey, err := generateSSHKey()
+	privateKey, err := rsa.GenerateKey(rand.Reader, 4096)
+	if err != nil {
+		panic(err)
+	}
+	privBytes, err := x509.MarshalPKCS8PrivateKey(privateKey)
+	if err != nil {
+		panic(err)
+	}
+	// Encode the data into PEM format
+	sshKeyPEMBytes := string(pem.EncodeToMemory(&pem.Block{
+		Type:  "PRIVATE KEY",
+		Bytes: privBytes,
+	}))
 	if err != nil {
 		panic(err)
 	}
 
-	// Encode the private key to PKCS#8 format (DER encoded)
-	pkcs8Bytes, err := encodePrivateKeyToPKCS8(privateKey)
-	if err != nil {
-		panic(err)
-	}
-
-	// Encode the PKCS#8 bytes to PEM format
-	pemBytes, err := encodeToPEM(pkcs8Bytes, "PRIVATE KEY")
-	if err != nil {
-		panic(err)
-	}
-	
 	vaultID := os.Getenv("OP_VAULT_ID")
 
-    // [developer-docs.sdk.go.create-sshkey-item]-start
+	// [developer-docs.sdk.go.create-sshkey-item]-start
 	sectionID := "extraDetails"
 	itemParams := onepassword.ItemCreateParams{
 		Title:    "SSH Key Item Created With Go SDK",
@@ -353,7 +354,7 @@ func createSSHKeyItem(client *onepassword.Client) {
 			{
 				ID:        "private_key",
 				Title:     "private key",
-				Value:     string(pemBytes),
+				Value:     sshKeyPEMBytes,
 				FieldType: onepassword.ItemFieldTypeSSHKey,
 				SectionID: &sectionID,
 			},
@@ -364,7 +365,6 @@ func createSSHKeyItem(client *onepassword.Client) {
 				Title: "Extra Details",
 			},
 		},
-		Tags: []string{"test tag1", "test tag 2"},
 	}
 
 	// Creates a new item based on the structure definition above
@@ -372,43 +372,15 @@ func createSSHKeyItem(client *onepassword.Client) {
 	if err != nil {
 		panic(err)
 	}
+
+	// Fetch all SSH key attributes
+	fmt.Println(createdItem.Fields[0].Value)
+	if sshAttributes := createdItem.Fields[0].Details.SSHKey(); sshAttributes != nil {
+		fmt.Println(createdItem.Fields[0].Details.SSHKey().PublicKey)
+		fmt.Println(createdItem.Fields[0].Details.SSHKey().Fingerprint)
+		fmt.Println(createdItem.Fields[0].Details.SSHKey().KeyType)
+	}
 	// [developer-docs.sdk.go.create-sshkey-item]-end
-
-
-	fmt.Println("Private Key is: " + createdItem.Fields[0].Value)
-	fmt.Println("Public Key is: " + createdItem.Fields[0].Details.SSHKey().PublicKey)
-	fmt.Println("Fingerprint is: " + createdItem.Fields[0].Details.SSHKey().Fingerprint)
-	fmt.Println("Key Type is: " + createdItem.Fields[0].Details.SSHKey().KeyType)
-}
-
-func generateSSHKey() (*rsa.PrivateKey, error) {
-	// Generate a 2048-bit RSA private key
-	privateKey, err := rsa.GenerateKey(rand.Reader, 4096)
-	if err != nil {
-		return nil, err
-	}
-	return privateKey, nil
-}
-
-func encodePrivateKeyToPKCS8(privateKey *rsa.PrivateKey) ([]byte, error) {
-	// Marshal the private key into PKCS#8 format (DER encoding)
-	privBytes, err := x509.MarshalPKCS8PrivateKey(privateKey)
-	if err != nil {
-		return nil, err
-	}
-	return privBytes, nil
-}
-
-func encodeToPEM(data []byte, blockType string) ([]byte, error) {
-	// Create a PEM block with the specified type
-	block := &pem.Block{
-		Type:  blockType,
-		Bytes: data,
-	}
-
-	// Encode the data into PEM format
-	pemBytes := pem.EncodeToMemory(block)
-	return pemBytes, nil
 }
 
 func createAndReplaceDocumentItem(client *onepassword.Client) {
@@ -421,7 +393,7 @@ func createAndReplaceDocumentItem(client *onepassword.Client) {
 		Category: onepassword.ItemCategoryDocument,
 		VaultID:  vaultID,
 		Document: &onepassword.DocumentCreateParams{
-			Name: "test.txt",
+			Name:    "test.txt",
 			Content: []byte("Hello, World!"),
 		},
 	}
@@ -437,14 +409,14 @@ func createAndReplaceDocumentItem(client *onepassword.Client) {
 
 	// Replace the document item
 	replacedDocItem, err := client.Items().Files().ReplaceDocument(context.Background(), documentItem, onepassword.DocumentCreateParams{
-		Name: "updatedDocument.txt",
+		Name:    "updatedDocument.txt",
 		Content: []byte("Hello, World! This is an updated document."),
 	})
 	if err != nil {
 		panic(err)
 	}
 	// [developer-docs.sdk.go.replace-document-item]-end
-	
+
 	// [developer-docs.sdk.go.read-document-item]-start
 	// Read the document item
 	content, err := client.Items().Files().Read(context.Background(), replacedDocItem.VaultID, replacedDocItem.ID, *replacedDocItem.Document)
@@ -457,7 +429,7 @@ func createAndReplaceDocumentItem(client *onepassword.Client) {
 
 func createAndAttachAndDeleteFileFieldItem(client *onepassword.Client) {
 	vaultID := os.Getenv("OP_VAULT_ID")
-	
+
 	// [developer-docs.sdk.go.create-item-with-file-field]-start
 	sectionID := "extraDetails"
 	itemParams := onepassword.ItemCreateParams{
@@ -501,10 +473,10 @@ func createAndAttachAndDeleteFileFieldItem(client *onepassword.Client) {
 		},
 		Files: []onepassword.FileCreateParams{
 			{
-				Name:    "test.txt",
-				Content: []byte("Hello, World!"),
+				Name:      "test.txt",
+				Content:   []byte("Hello, World!"),
 				SectionID: sectionID,
-				FieldID: "file_field",
+				FieldID:   "file_field",
 			},
 		},
 	}
@@ -519,10 +491,10 @@ func createAndAttachAndDeleteFileFieldItem(client *onepassword.Client) {
 	// [developer-docs.sdk.go.attach-file-field-item]-start
 	// Attach a file to an item
 	newItem, err := client.Items().Files().Attach(context.Background(), item, onepassword.FileCreateParams{
-		Name:    "attached.txt",
-		Content: []byte("Hello, World! This is an attached file."),
+		Name:      "attached.txt",
+		Content:   []byte("Hello, World! This is an attached file."),
 		SectionID: sectionID,
-		FieldID: "new_file_field",
+		FieldID:   "new_file_field",
 	})
 	if err != nil {
 		panic(err)
