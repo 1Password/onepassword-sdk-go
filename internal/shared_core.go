@@ -13,6 +13,11 @@ import (
 //go:embed wasm/core.wasm
 var coreWASM []byte
 
+// In empirical tests, we determined that maximum message size that can cross the FFI boundary 
+// is ~64MB. Past this limit, the Extism FFI will throw an error and the program will crash.
+// We set the limit to 50MB to be safe, to be reconsidered upon further testing.
+const MessageLimit = 50 * 1024 * 1024;
+
 const (
 	invokeFuncName        = "invoke"
 	initClientFuncName    = "init_client"
@@ -72,6 +77,9 @@ func (c *SharedCore) Invoke(ctx context.Context, invokeConfig InvokeConfig) (*st
 	input, err := json.Marshal(invokeConfig)
 	if err != nil {
 		return nil, err
+	}
+	if len(input) > MessageLimit {
+		return nil, fmt.Errorf("message size exceeds limit of %d bytes", MessageLimit)
 	}
 	res, err := c.callWithCtx(ctx, invokeFuncName, input)
 	if err != nil {
