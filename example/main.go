@@ -10,11 +10,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/1password/onepassword-sdk-go"
 )
 
 // [developer-docs.sdk.go.sdk-import]-start
-
+import 	"github.com/1password/onepassword-sdk-go"
 // [developer-docs.sdk.go.sdk-import]-end
 
 func main() {
@@ -344,7 +343,7 @@ func createSSHKeyItem(client *onepassword.Client) {
 	
 	vaultID := os.Getenv("OP_VAULT_ID")
 
-	// [developer-docs.sdk.go.create-item]-start
+    // [developer-docs.sdk.go.create-sshkey-item]-start
 	sectionID := "extraDetails"
 	itemParams := onepassword.ItemCreateParams{
 		Title:    "SSH Key Item Created With Go SDK",
@@ -373,7 +372,8 @@ func createSSHKeyItem(client *onepassword.Client) {
 	if err != nil {
 		panic(err)
 	}
-	// [developer-docs.sdk.go.create-item]-end
+	// [developer-docs.sdk.go.create-sshkey-item]-end
+
 
 	fmt.Println("Private Key is: " + createdItem.Fields[0].Value)
 	fmt.Println("Public Key is: " + createdItem.Fields[0].Details.SSHKey().PublicKey)
@@ -509,7 +509,7 @@ func createAndAttachAndDeleteFileFieldItem(client *onepassword.Client) {
 		},
 	}
 
-	// Create the document item
+	// Create the file field item
 	item, err := client.Items().Create(context.Background(), itemParams)
 	if err != nil {
 		panic(err)
