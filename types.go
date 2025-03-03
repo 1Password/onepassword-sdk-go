@@ -4,9 +4,9 @@ package onepassword
 import "encoding/json"
 
 type DocumentCreateParams struct {
-	// the name of the file
+	// The name of the file
 	Name string `json:"name"`
-	// the content of the file
+	// The content of the file
 	Content []byte `json:"content"`
 }
 type FileAttributes struct {
@@ -18,13 +18,13 @@ type FileAttributes struct {
 	Size uint32 `json:"size"`
 }
 type FileCreateParams struct {
-	// the name of the file
+	// The name of the file
 	Name string `json:"name"`
-	// the content of the file
+	// The content of the file
 	Content []byte `json:"content"`
-	// the section id where the file should be stored
+	// The section id where the file should be stored
 	SectionID string `json:"sectionId"`
-	// the field id where the file should be stored
+	// The field id where the file should be stored
 	FieldID string `json:"fieldId"`
 }
 
@@ -257,7 +257,7 @@ type ItemCreateParams struct {
 	Websites []Website `json:"websites,omitempty"`
 	// The item's files stored as fields
 	Files []FileCreateParams `json:"files,omitempty"`
-	// The document file for the Document item category
+	// The document file for the Document item type. Empty when the item isn't of Document type.
 	Document *DocumentCreateParams `json:"document,omitempty"`
 }
 
