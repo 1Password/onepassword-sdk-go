@@ -10,10 +10,11 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/1password/onepassword-sdk-go"
 )
 
 // [developer-docs.sdk.go.sdk-import]-start
-import 	"github.com/1password/onepassword-sdk-go"
+
 // [developer-docs.sdk.go.sdk-import]-end
 
 func main() {
@@ -444,7 +445,14 @@ func createAndReplaceDocumentItem(client *onepassword.Client) {
 	}
 	// [developer-docs.sdk.go.replace-document-item]-end
 	
-	fmt.Println(replacedDocItem.Document.Name)
+	// [developer-docs.sdk.go.read-document-item]-start
+	// Read the document item
+	content, err := client.Items().Files().Read(context.Background(), replacedDocItem.VaultID, replacedDocItem.ID, *replacedDocItem.Document)
+	if err != nil {
+		panic(err)
+	}
+	// [developer-docs.sdk.go.read-document-item]-end
+	fmt.Println(string(content))
 }
 
 func createAndAttachAndDeleteFileFieldItem(client *onepassword.Client) {
