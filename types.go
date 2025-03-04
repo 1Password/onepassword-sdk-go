@@ -3,6 +3,31 @@ package onepassword
 
 import "encoding/json"
 
+type DocumentCreateParams struct {
+	// The name of the file
+	Name string `json:"name"`
+	// The content of the file
+	Content []byte `json:"content"`
+}
+type FileAttributes struct {
+	// The name of the file
+	Name string `json:"name"`
+	// The ID of the file retrieved from the server
+	ID string `json:"id"`
+	// The size of the file in bytes
+	Size uint32 `json:"size"`
+}
+type FileCreateParams struct {
+	// The name of the file
+	Name string `json:"name"`
+	// The content of the file
+	Content []byte `json:"content"`
+	// The section id where the file should be stored
+	SectionID string `json:"sectionId"`
+	// The field id where the file should be stored
+	FieldID string `json:"fieldId"`
+}
+
 // For future use, if we want to return more information about the generated password.
 // Currently, it only returns the password itself.
 type GeneratePasswordResponse struct {
@@ -50,6 +75,9 @@ const (
 	ItemFieldTypeTOTP             ItemFieldType = "Totp"
 	ItemFieldTypeEmail            ItemFieldType = "Email"
 	ItemFieldTypeReference        ItemFieldType = "Reference"
+	ItemFieldTypeSSHKey           ItemFieldType = "SshKey"
+	ItemFieldTypeMenu             ItemFieldType = "Menu"
+	ItemFieldTypeMonthYear        ItemFieldType = "MonthYear"
 	ItemFieldTypeUnsupported      ItemFieldType = "Unsupported"
 )
 
@@ -59,6 +87,8 @@ type ItemFieldDetailsTypes string
 const (
 	// The computed OTP code and other details
 	ItemFieldDetailsTypeVariantOTP ItemFieldDetailsTypes = "Otp"
+	// Computed SSH Key attributes
+	ItemFieldDetailsTypeVariantSSHKey ItemFieldDetailsTypes = "SshKey"
 )
 
 type ItemFieldDetails struct {
@@ -79,6 +109,9 @@ func (i *ItemFieldDetails) UnmarshalJSON(data []byte) error {
 	switch i.Type {
 	case ItemFieldDetailsTypeVariantOTP:
 		var res OTPFieldDetails
+		i.content = &res
+	case ItemFieldDetailsTypeVariantSSHKey:
+		var res *SSHKeyAttributes
 		i.content = &res
 
 	}
@@ -103,11 +136,21 @@ func (i ItemFieldDetails) OTP() *OTPFieldDetails {
 	res, _ := i.content.(*OTPFieldDetails)
 	return res
 }
+func (i ItemFieldDetails) SSHKey() *SSHKeyAttributes {
+	res, _ := i.content.(**SSHKeyAttributes)
+	return *res
+}
 
 func NewItemFieldDetailsTypeVariantOTP(content *OTPFieldDetails) ItemFieldDetails {
 	return ItemFieldDetails{
 		Type:    ItemFieldDetailsTypeVariantOTP,
 		content: content,
+	}
+}
+func NewItemFieldDetailsTypeVariantSSHKey(content *SSHKeyAttributes) ItemFieldDetails {
+	return ItemFieldDetails{
+		Type:    ItemFieldDetailsTypeVariantSSHKey,
+		content: &content,
 	}
 }
 
@@ -159,6 +202,14 @@ type Website struct {
 	// For more information, visit https://support.1password.com/autofill-behavior/
 	AutofillBehavior AutofillBehavior `json:"autofillBehavior"`
 }
+type ItemFile struct {
+	// the attributes of the file
+	Attributes FileAttributes `json:"attributes"`
+	// the section id where the file should be stored
+	SectionID string `json:"sectionId"`
+	// the field id where the file should be stored
+	FieldID string `json:"fieldId"`
+}
 
 // Represents a 1Password item.
 type Item struct {
@@ -182,6 +233,10 @@ type Item struct {
 	Websites []Website `json:"websites"`
 	// The item's version
 	Version uint32 `json:"version"`
+	// The item's file fields
+	Files []ItemFile `json:"files"`
+	// The document file for the Document item category
+	Document *FileAttributes `json:"document,omitempty"`
 }
 type ItemCreateParams struct {
 	// The item's category
@@ -200,6 +255,10 @@ type ItemCreateParams struct {
 	Tags []string `json:"tags,omitempty"`
 	// The websites used for autofilling for items of the Login and Password categories.
 	Websites []Website `json:"websites,omitempty"`
+	// The item's files stored as fields
+	Files []FileCreateParams `json:"files,omitempty"`
+	// The document file for the Document item type. Empty when the item isn't of Document type.
+	Document *DocumentCreateParams `json:"document,omitempty"`
 }
 
 // Represents a decrypted 1Password item.
@@ -367,6 +426,14 @@ type OTPFieldDetails struct {
 	Code *string `json:"code,omitempty"`
 	// The error message, if the OTP code could not be computed
 	ErrorMessage *string `json:"errorMessage,omitempty"`
+}
+type SSHKeyAttributes struct {
+	// The public part of the SSH Key
+	PublicKey string `json:"publicKey"`
+	// The fingerprint of the SSH Key
+	Fingerprint string `json:"fingerprint"`
+	// The key type ("Ed25519" or "RSA, {length}-bit")
+	KeyType string `json:"keyType"`
 }
 
 // Represents a decrypted 1Password vault.

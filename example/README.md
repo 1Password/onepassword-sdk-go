@@ -17,7 +17,7 @@ This folder contains a code snippet demonstrating how to use the 1Password Pytho
     ```bash
     export OP_SERVICE_ACCOUNT_TOKEN="<your token>"
     ```
-3. Export the vault UUID you wish to interact with as an environment variable:
+3. Set a vault ID that your service account has Read, Write and Share access to as the `OP_VAULT_ID` environment variable:
     ```bash
     export OP_VAULT_ID="<your vault uuid>"
     ```
