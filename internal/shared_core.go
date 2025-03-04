@@ -79,7 +79,7 @@ func (c *SharedCore) Invoke(ctx context.Context, invokeConfig InvokeConfig) (*st
 		return nil, err
 	}
 	if len(input) > messageLimit {
-		return nil, fmt.Errorf("message size exceeds limit of %d bytes", messageLimit)
+		return nil, fmt.Errorf("message size exceeds the limit of %d bytes, please contact 1Password at support@1password.com or https://developer.1password.com/joinslack if you need help.", messageLimit)
 	}
 	res, err := c.callWithCtx(ctx, invokeFuncName, input)
 	if err != nil {

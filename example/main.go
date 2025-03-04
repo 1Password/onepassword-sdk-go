@@ -9,10 +9,12 @@ import (
 	"errors"
 	"fmt"
 	"os"
+
+	"github.com/1password/onepassword-sdk-go"
 )
 
 // [developer-docs.sdk.go.sdk-import]-start
-import 	"github.com/1password/onepassword-sdk-go"
+
 // [developer-docs.sdk.go.sdk-import]-end
 
 func main() {
@@ -377,6 +379,10 @@ func createSSHKeyItem(client *onepassword.Client) {
 		fmt.Println(createdItem.Fields[0].Details.SSHKey().KeyType)
 	}
 	// [developer-docs.sdk.go.create-sshkey-item]-end
+	err = client.Items().Delete(context.Background(), createdItem.VaultID, createdItem.ID)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func createAndReplaceDocumentItem(client *onepassword.Client) {
@@ -425,18 +431,24 @@ func createAndReplaceDocumentItem(client *onepassword.Client) {
 	}
 	// [developer-docs.sdk.go.read-document-item]-end
 	fmt.Println(string(content))
+
+	err = client.Items().Delete(context.Background(), replacedDocItem.VaultID, replacedDocItem.ID)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func createAndAttachAndDeleteFileFieldItem(client *onepassword.Client) {
 	vaultID := os.Getenv("OP_VAULT_ID")
+	sectionID := "extraDetails"
 
 	// [developer-docs.sdk.go.create-item-with-file-field]-start
 	fileContent, err := os.ReadFile("./example/file.txt")
 	if err != nil {
 		panic(err)
 	}
-	sectionID := "extraDetails"
-	itemParams := onepassword.ItemCreateParams{
+	// Create the File Field item
+	item, err := client.Items().Create(context.Background(), onepassword.ItemCreateParams{
 		Title:    "Login with File Field created with SDK",
 		Category: onepassword.ItemCategoryLogin,
 		VaultID:  vaultID,
@@ -453,10 +465,7 @@ func createAndAttachAndDeleteFileFieldItem(client *onepassword.Client) {
 				FieldID:   "file_field",
 			},
 		},
-	}
-
-	// Create the file field item
-	item, err := client.Items().Create(context.Background(), itemParams)
+	})
 	if err != nil {
 		panic(err)
 	}
@@ -488,4 +497,9 @@ func createAndAttachAndDeleteFileFieldItem(client *onepassword.Client) {
 	}
 	// [developer-docs.sdk.go.delete-file-field-item]-end
 	fmt.Println(len(updatedItemWithDeletedFile.Files))
+
+	err = client.Items().Delete(context.Background(), updatedItemWithDeletedFile.VaultID, updatedItemWithDeletedFile.ID)
+	if err != nil {
+		panic(err)
+	}
 }
