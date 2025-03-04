@@ -10,11 +10,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/1password/onepassword-sdk-go"
 )
 
 // [developer-docs.sdk.go.sdk-import]-start
-
+import "github.com/1password/onepassword-sdk-go"
 // [developer-docs.sdk.go.sdk-import]-end
 
 func main() {
