@@ -1,5 +1,5 @@
 # Examples
-This folder contains a code snippet demonstrating how to use the 1Password Python SDK for performing various operations on 1Password vaults and items. Specifically, the example showcases how to:
+This folder contains a code snippet demonstrating how to use the 1Password Go SDK for performing various operations on 1Password vaults and items. Specifically, the example showcases how to:
 
 - Authenticate with the 1Password API using a service account token.
 - List available vaults and items within those vaults.
@@ -9,6 +9,9 @@ This folder contains a code snippet demonstrating how to use the 1Password Pytho
 - Generate different types of passwords (PIN, memorable, and random).
 - Share an item with valid recipients and create a shareable link.
 - Archive or delete items from the vault.
+- Create and manage SSH key items.
+- Create and manage document items, including replacing and reading documents.
+- Create and manage file field items by attaching and deleting files.
 
 ## Prerequisites
 
@@ -17,14 +20,14 @@ This folder contains a code snippet demonstrating how to use the 1Password Pytho
     ```bash
     export OP_SERVICE_ACCOUNT_TOKEN="<your token>"
     ```
-3. Set a vault ID that your service account has Read, Write and Share access to as the `OP_VAULT_ID` environment variable:
+3. Set a vault ID that your service account has Read, Write, and Share access to as the `OP_VAULT_ID` environment variable:
     ```bash
     export OP_VAULT_ID="<your vault uuid>"
     ```
 
 ## How to Run
 
-To run the example file, navigate to project root directory and run: 
+To run the example file, navigate to the project root directory and run: 
 ```bash
 go run example/main.go
 ```
@@ -38,5 +41,8 @@ When running the example, the terminal will display:
 - Details of newly created and updated items.
 - Generated passwords (PIN, memorable, random).
 - A shareable link for shared items.
+- SSH key attributes like public key and fingerprint.
+- Document content after replacing the file.
+- A list of file field items and file deletions.
 
-These outputs show the results of vault and item operations, password generation, and sharing.
+These outputs show the results of vault and item operations, password generation, item sharing, and management of SSH and document items.
