@@ -14,20 +14,17 @@ func TestLoadWASM(t *testing.T) {
 	value, err := loadWASM(ctx)
 	require.NoError(t, err)
 
-	// check that there's only one module field
-	assert.Equal(t, 1, len(value.Modules))
-
 	// check ExportedFunctionsDefinitions names contain init_client, invoke and release_client
 	functions := [3]string{"init_client", "invoke", "release_client"}
 	count := 0
 
 	for _, function := range functions {
-		if _, exists := value.Main.ExportedFunctions()[function]; exists {
+		if value.FunctionExists(function){
 			count++
 		}
 	}
 
-	assert.Equal(t, 3, count)
+	assert.Equal(t, len(functions), count)
 
 	// check AllowedHosts field matches allowed1PHosts
 	pluginHosts := sort.StringSlice(value.AllowedHosts)
