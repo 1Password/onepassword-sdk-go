@@ -475,8 +475,8 @@ func createAndAttachAndDeleteFileFieldItem(client *onepassword.Client) {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(string(retrievedFileContent))
 	// [developer-docs.sdk.go.read-file-field]-start
+	fmt.Println(string(retrievedFileContent))
 
 	// [developer-docs.sdk.go.attach-file-field-item]-start
 	file2Content, err := os.ReadFile("./example/file2.txt")
