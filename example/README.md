@@ -10,13 +10,14 @@ This folder contains a code snippet demonstrating how to use the 1Password Go SD
 - Share an item with valid recipients and create a shareable link.
 - Archive or delete items from the vault.
 - Create and manage SSH key items.
-- Create and manage document items, including replacing and reading documents.
-- Create and manage file field items by attaching and deleting files.
+- Create and manage Document items, including replacing and reading documents.
+- Read files stored in file fields and Document items.
+- Create and manage items that contain file fields, by attaching and deleting files.
 
 ## Prerequisites
 
 1. Clone the repository and follow the steps to [get started](https://github.com/1Password/onepassword-sdk-go/blob/main/README.md#get-started).
-2. Ensure that you have a valid service account token by exporting it as an environment variable:
+2. Export a valid service account token as an environment variable:
     ```bash
     export OP_SERVICE_ACCOUNT_TOKEN="<your token>"
     ```
@@ -25,14 +26,14 @@ This folder contains a code snippet demonstrating how to use the 1Password Go SD
     export OP_VAULT_ID="<your vault uuid>"
     ```
 
-## How to Run
+## How to run
 
 To run the example file, navigate to the project root directory and run: 
 ```bash
 go run example/main.go
 ```
 
-## Terminal Output
+## Terminal output
 
 When running the example, the terminal will display:
 
