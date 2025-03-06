@@ -43,7 +43,7 @@ jobs:
         run: go test -v ./internal/...
 
       - name: Example Test
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.os == 'ubuntu-latest' && matrix.go-version == '1.23'
         run: go run example/main.go
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.EXAMPLE_TESTS_OP_SERVICE_ACCOUNT_TOKEN }}
