@@ -1,8 +1,8 @@
 module github.com/1password/onepassword-sdk-go
 
-go 1.22.0
+go 1.22
 
-toolchain go1.23.3
+toolchain go1.22.5
 
 require (
 	github.com/extism/go-sdk v1.6.1
