@@ -471,11 +471,12 @@ func createAndAttachAndDeleteFileFieldItem(client *onepassword.Client) {
 	// [developer-docs.sdk.go.create-item-with-file-field]-end
 
 	// [developer-docs.sdk.go.read-file-field]-start
+	// Read the file field from an item
 	retrievedFileContent, err := client.Items().Files().Read(context.Background(), item.VaultID, item.ID, item.Files[0].Attributes)
 	if err != nil {
 		panic(err)
 	}
-	// [developer-docs.sdk.go.read-file-field]-start
+	// [developer-docs.sdk.go.read-file-field]-end
 	fmt.Println(string(retrievedFileContent))
 
 	// [developer-docs.sdk.go.attach-file-field-item]-start
