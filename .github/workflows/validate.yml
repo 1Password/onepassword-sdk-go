@@ -45,9 +45,6 @@ jobs:
     name: Run Example Code
     needs: test  
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        go-version: [ '1.23' ]
     steps:
       - uses: actions/checkout@v4
 
