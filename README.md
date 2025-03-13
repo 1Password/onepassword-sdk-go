@@ -61,7 +61,7 @@ func main() {
     if err != nil {
 	// handle err
     }
-    secret, err := client.Secrets.Resolve(context.TODO(), "op://vault/item/field")
+    secret, err := client.Secrets().Resolve(context.TODO(), "op://vault/item/field")
     if err != nil {
         // handle err
     }
