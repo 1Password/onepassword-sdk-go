@@ -13,7 +13,6 @@ import (
 
 // [developer-docs.sdk.go.sdk-import]-start
 import "github.com/1password/onepassword-sdk-go"
-
 // [developer-docs.sdk.go.sdk-import]-end
 
 func main() {
@@ -40,6 +39,7 @@ func main() {
 	listVaultsAndItems(client, item.VaultID)
 	generatePasswords()
 	resolveSecretReference(client, item.VaultID, item.ID, "username")
+	resolveBulkSecretReferences(client, item.VaultID, item.ID, "username", "password")
 	resolveTOTPSecretReference(client, item.VaultID, item.ID, "TOTP_onetimepassword")
 	sharelink := generateItemSharing(client, item.VaultID, item.ID)
 	fmt.Println(sharelink)
@@ -133,6 +133,26 @@ func resolveSecretReference(client *onepassword.Client, vaultID, itemID, fieldID
 	}
 	fmt.Println(secret)
 	// [developer-docs.sdk.go.resolve-secret]-end
+}
+
+func resolveBulkSecretReferences(client *onepassword.Client, vaultID, itemID, fieldID, fieldID2 string) {
+	// [developer-docs.sdk.go.resolve-bulk-secret]-start
+	// Retrieves multiple secrets from 1Password.
+	// Takes multiple secret references as input and returns the secret to which it points.
+	secret, _ := client.Secrets().ResolveAll(
+		context.Background(), 
+		[]string{
+			fmt.Sprintf("op://%s/%s/%s", vaultID, itemID, fieldID), 
+			fmt.Sprintf("op://%s/%s/%s", vaultID, itemID, fieldID2),
+		},
+	)
+	for _, s := range secret.IndividualResponses {
+		if s.Error != nil {
+			panic(string(s.Error.Type))
+		}
+		fmt.Println(s.Content.Secret)
+	}
+	// [developer-docs.sdk.go.resolve-bulk-secret]-end
 }
 
 func resolveTOTPSecretReference(client *onepassword.Client, vaultID, itemID, fieldID string) {
@@ -324,6 +344,7 @@ func generateItemSharing(client *onepassword.Client, vaultID string, itemID stri
 }
 
 func createSSHKeyItem(client *onepassword.Client) {
+	// [developer-docs.sdk.go.create-sshkey-item]-start
 	// Generate the RSA key pair
 	privateKey, err := rsa.GenerateKey(rand.Reader, 4096)
 	if err != nil {
@@ -341,7 +362,6 @@ func createSSHKeyItem(client *onepassword.Client) {
 
 	vaultID := os.Getenv("OP_VAULT_ID")
 
-	// [developer-docs.sdk.go.create-sshkey-item]-start
 	sectionID := "extraDetails"
 	itemParams := onepassword.ItemCreateParams{
 		Title:    "SSH Key Item Created With Go SDK",
@@ -509,5 +529,67 @@ func createAndAttachAndDeleteFileFieldItem(client *onepassword.Client) {
 	err = client.Items().Delete(context.Background(), updatedItemWithDeletedFile.VaultID, updatedItemWithDeletedFile.ID)
 	if err != nil {
 		panic(err)
+	}
+}
+
+//lint:ignore U1000 NOTE: this is just to showcase how to instantiate custom ItemFields
+func generateSpecialItemFields() []onepassword.ItemField {
+	sectionID := "extraDetails"
+
+	// [developer-docs.sdk.go.address-field-type]-start
+	address := onepassword.NewItemFieldDetailsTypeVariantAddress(&onepassword.AddressFieldDetails{
+		Street:  "123 Main St",
+		City:    "Anytown",
+		State:   "CA",
+		Zip:     "12345",
+		Country: "USA",
+	})
+	addressField := onepassword.ItemField{
+		ID:        "address",
+		Title:     "Address",
+		SectionID: &sectionID,
+		FieldType: onepassword.ItemFieldTypeAddress,
+		Value:     "",
+		Details:   &address,
+	}
+	// [developer-docs.sdk.go.address-field-type]-end
+	return []onepassword.ItemField{
+		addressField,
+		// [developer-docs.sdk.go.date-field-type]-start
+		{
+			ID:        "date",
+			Title:     "Date",
+			SectionID: &sectionID,
+			FieldType: onepassword.ItemFieldTypeDate,
+			Value:     "1998-03-15",
+		},
+		// [developer-docs.sdk.go.date-field-type]-end
+		// [developer-docs.sdk.go.month-year-field-type]-start
+		{
+			ID:        "month_year",
+			Title:     "Month Year",
+			SectionID: &sectionID,
+			FieldType: onepassword.ItemFieldTypeMonthYear,
+			Value:     "03/1998",
+		},
+		// [developer-docs.sdk.go.month-year-field-type]-end
+		// [developer-docs.sdk.go.reference-field-type]-start
+		{
+			ID:        "reference",
+			Title:     "Reference",
+			FieldType: onepassword.ItemFieldTypeReference,
+			SectionID: &sectionID,
+			Value:     "f43hnkatjllm5fsfsmgaqdhv7a",
+		},
+		// [developer-docs.sdk.go.reference-field-type]-end
+		// [developer-docs.sdk.go.totp-field-type]-start
+		{
+			ID:        "onetimepassword",
+			Title:     "One-Time Password URL",
+			SectionID: &sectionID,
+			FieldType: onepassword.ItemFieldTypeTOTP,
+			Value:     "otpauth://totp/my-example-otp?secret=jncrjgbdjnrncbjsr&issuer=1Password",
+		},
+		// [developer-docs.sdk.go.totp-field-type]-end
 	}
 }

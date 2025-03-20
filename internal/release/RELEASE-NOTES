@@ -1,28 +1,20 @@
-# 1Password Go SDK v0.2.0
+# 1Password Go SDK v0.2.1
 
 ## NEW
 
-- **File Support:** You can now create Document items, attach files to items, delete files from items, and read file contents using the SDK.
+- **`CreatedAt` and `UpdatedAt` item metadata:** Items and item overviews now expose attributes with their creation and last edit times.
+- **Resolving secrets in bulk**: With the `client.Secrets().ResolveAll` function, the SDK is now able to resolve multiple secrets at once, improving the performance of the operation.
 
 ## IMPROVED
 
-- **Read files using secret references**: You can now resolve secret references that point to files attached to 1Password items.
-- **Read SSH keys in Open SSH format**: You can now use a secret reference to fetch a private key in OpenSSH format. For example: `op://vault/<SSH item>/private key?ssh-format=openssh`
-- **Support for more item field types**: You can now create, retrieve, and edit items containing SSH keys, Month-Year and Menu-type fields using the SDK.
-- **Read more field types using secret references**: You can now resolve secret references that point to information stored in Date, Month/Year, Address, and Reference field types.
-- **Improved error messages**: The error messages returned by the SDK were improved to be more clear and actionable.
+- **Support for new field types:** Items with `Address` and `Date` fields can now be created, retrieved, and edited using the 1Password SDK.
+- **Item sharing for attachments and documents**: Items with files attached now can also be shared using the `client.Items().Shares()` functions.
+- **Adding custom fields in sections automatically**: The SDK now automatically adds custom fields without a section to an empty section within the item, creating it if necessary.
+- **`Tags` in item overviews**: The return type of `Items().ListAll` now also contains the item tags.
+- **Broader item editing capabilities**: You are now able to use the `items.put` function on more items, including those with fields that are not directly editable through the SDK (such as legacy fields, passkeys etc.)
 
-### ⚠️ BREAKING CHANGE ⚠️
+## FIXED
 
-This release contains a breaking change for the Go SDK, where the attributes of `client` (`Vaults`, `Items`, `Secrets`), as well as the `Shares` attribute of `client.Items` should now be accessed through getter methods instead of directly.
-
-This does **not** affect ****any code already deployed, and will not take effect in your code-base before explicitly updating to the latest version of the 1Password Go SDK (0.2.0).
-
-To migrate your code which uses prior versions of the 1Password Go SDK to the latest, replace in your application code all occurrences of:
-
-- `client.Items.Shares.` with `client.Items().Shares().`
-- `client.Items.`  with `client.Items().`
-- `client.Vaults.` with `client.Vaults().`
-- `client.Secrets.` with `client.Secrets().`
-
-in the SDK function calls.
+- **Improvements to resolving secret references:**
+    - Archived items are no longer used for secret references.
+    - When multiple sections match a section query in resolving secret references, the SDK look through the fields in all sections, instead of erroring.

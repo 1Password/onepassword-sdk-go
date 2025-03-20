@@ -84,7 +84,7 @@ Operations:
 - [x] [Delete items](https://developer.1password.com/docs/sdks/manage-items#delete-an-item)
 - [x] [Archive items](https://developer.1password.com/docs/sdks/manage-items/#archive-an-item)
 - [x] [List items](https://developer.1password.com/docs/sdks/list-vaults-items/)
-- [x] [Share items](https://developer.1password.com/docs/sdks/share-items) (items with files cannot be shared)
+- [x] [Share items](https://developer.1password.com/docs/sdks/share-items)
 - [x] [Generate PIN, random and memorable passwords](https://developer.1password.com/docs/sdks/manage-items#generate-a-password)
 
 Field types:
@@ -102,8 +102,8 @@ Field types:
 - [x] Credit card numbers
 - [x] Emails
 - [x] References to other items
-- [ ] Address
-- [ ] Date
+- [x] Address
+- [x] Date
 - [x] MM/YY
 - [x] Files attachments and Document items
 - [x] Menu

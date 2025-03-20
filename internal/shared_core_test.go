@@ -19,7 +19,7 @@ func TestLoadWASM(t *testing.T) {
 	count := 0
 
 	for _, function := range functions {
-		if value.FunctionExists(function){
+		if value.FunctionExists(function) {
 			count++
 		}
 	}

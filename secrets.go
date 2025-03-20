@@ -14,6 +14,9 @@ import (
 type SecretsAPI interface {
 	// Resolve returns the secret the provided secret reference points to.
 	Resolve(ctx context.Context, secretReference string) (string, error)
+
+	// Resolve takes in a list of secret references and returns the secrets they point to or errors if any.
+	ResolveAll(ctx context.Context, secretReferences []string) (ResolveAllResponse, error)
 }
 
 type SecretsSource struct {
@@ -40,6 +43,22 @@ func (s SecretsSource) Resolve(ctx context.Context, secretReference string) (str
 	err = json.Unmarshal([]byte(*resultString), &result)
 	if err != nil {
 		return "", err
+	}
+	return result, nil
+}
+
+// Resolve takes in a list of secret references and returns the secrets they point to or errors if any.
+func (s SecretsSource) ResolveAll(ctx context.Context, secretReferences []string) (ResolveAllResponse, error) {
+	resultString, err := clientInvoke(ctx, s.InnerClient, "SecretsResolveAll", map[string]interface{}{
+		"secret_references": secretReferences,
+	})
+	if err != nil {
+		return ResolveAllResponse{}, err
+	}
+	var result ResolveAllResponse
+	err = json.Unmarshal([]byte(*resultString), &result)
+	if err != nil {
+		return ResolveAllResponse{}, err
 	}
 	return result, nil
 }
