@@ -527,7 +527,7 @@ func createAndAttachAndDeleteFileFieldItem(client *onepassword.Client) {
 		panic(err)
 	}
 }
-
+//lint:ignore U1000 NOTE: this is just to showcase how to instantiate custom ItemFields
 func generateSpecialItemFields() []onepassword.ItemField {
 	// Instantiating the address
 	address := onepassword.NewItemFieldDetailsTypeVariantAddress(&onepassword.AddressFieldDetails{
