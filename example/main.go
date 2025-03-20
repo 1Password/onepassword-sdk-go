@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"crypto/ed25519"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
@@ -140,7 +141,7 @@ func resolveBulkSecretReferences(client *onepassword.Client, vaultID, itemID, fi
 	// [developer-docs.sdk.go.resolve-bulk-secret]-start
 	// Retrieves a secret from 1Password.
 	// Takes a secret reference as input and returns the secret to which it points.
-	secret, _ := client.Secrets().ResolveAll(context.Background(), []string{fmt.Sprintf("op://%s/%s/%s", vaultID, itemID, fieldID),fmt.Sprintf("op://%s/%s/%s", vaultID, itemID,fieldID2)})
+	secret, _ := client.Secrets().ResolveAll(context.Background(), []string{fmt.Sprintf("op://%s/%s/%s", vaultID, itemID, fieldID), fmt.Sprintf("op://%s/%s/%s", vaultID, itemID, fieldID2)})
 	for _, s := range secret.IndividualResponses {
 		if s.Error != nil {
 			panic(string(s.Error.Type))
@@ -557,7 +558,7 @@ func generateSpecialItemFields() []onepassword.ItemField {
 		Bytes: privBytes,
 	}))
 
-	[]onepassword.ItemField{
+	return []onepassword.ItemField{
 		// Address
 		{
 			ID:        "address",
@@ -603,7 +604,7 @@ func generateSpecialItemFields() []onepassword.ItemField {
 		{
 			ID:        "onetimepassword",
 			Title:     "One-Time Password Secret",
-			Value:     "jncrjgbdjnrncbjsr"
+			Value:     "jncrjgbdjnrncbjsr",
 			SectionID: &sectionID,
 			FieldType: onepassword.ItemFieldTypeTOTP,
 		},
