@@ -10,11 +10,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/1password/onepassword-sdk-go"
 )
 
 // [developer-docs.sdk.go.sdk-import]-start
-
+import 	"github.com/1password/onepassword-sdk-go"
 // [developer-docs.sdk.go.sdk-import]-end
 
 func main() {
@@ -41,6 +40,7 @@ func main() {
 	listVaultsAndItems(client, item.VaultID)
 	generatePasswords()
 	resolveSecretReference(client, item.VaultID, item.ID, "username")
+	resolveBulkSecretReferences(client, item.VaultID, item.ID, "username", "password")
 	resolveTOTPSecretReference(client, item.VaultID, item.ID, "TOTP_onetimepassword")
 	sharelink := generateItemSharing(client, item.VaultID, item.ID)
 	fmt.Println(sharelink)
@@ -134,6 +134,20 @@ func resolveSecretReference(client *onepassword.Client, vaultID, itemID, fieldID
 	}
 	fmt.Println(secret)
 	// [developer-docs.sdk.go.resolve-secret]-end
+}
+
+func resolveBulkSecretReferences(client *onepassword.Client, vaultID, itemID, fieldID, fieldID2 string) {
+	// [developer-docs.sdk.go.resolve-bulk-secret]-start
+	// Retrieves a secret from 1Password.
+	// Takes a secret reference as input and returns the secret to which it points.
+	secret, _ := client.Secrets().ResolveAll(context.Background(), []string{fmt.Sprintf("op://%s/%s/%s", vaultID, itemID, fieldID),fmt.Sprintf("op://%s/%s/%s", vaultID, itemID,fieldID2)})
+	for _, s := range secret.IndividualResponses {
+		if s.Error != nil {
+			panic(string(s.Error.Type))
+		}
+		fmt.Println(s.Content.Secret)
+	}
+	// [developer-docs.sdk.go.resolve-bulk-secret]-end
 }
 
 func resolveTOTPSecretReference(client *onepassword.Client, vaultID, itemID, fieldID string) {
