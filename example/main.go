@@ -340,6 +340,7 @@ func generateItemSharing(client *onepassword.Client, vaultID string, itemID stri
 }
 
 func createSSHKeyItem(client *onepassword.Client) {
+	// [developer-docs.sdk.go.create-sshkey-item]-start
 	// Generate the RSA key pair
 	privateKey, err := rsa.GenerateKey(rand.Reader, 4096)
 	if err != nil {
@@ -357,7 +358,6 @@ func createSSHKeyItem(client *onepassword.Client) {
 
 	vaultID := os.Getenv("OP_VAULT_ID")
 
-	// [developer-docs.sdk.go.create-sshkey-item]-start
 	sectionID := "extraDetails"
 	itemParams := onepassword.ItemCreateParams{
 		Title:    "SSH Key Item Created With Go SDK",
@@ -529,7 +529,9 @@ func createAndAttachAndDeleteFileFieldItem(client *onepassword.Client) {
 }
 //lint:ignore U1000 NOTE: this is just to showcase how to instantiate custom ItemFields
 func generateSpecialItemFields() []onepassword.ItemField {
-	// Instantiating the address
+	sectionID := "extraDetails"
+
+	// [developer-docs.sdk.go.address-field-type]-start
 	address := onepassword.NewItemFieldDetailsTypeVariantAddress(&onepassword.AddressFieldDetails{
 		Street:  "123 Main St",
 		City:    "Anytown",
@@ -537,38 +539,18 @@ func generateSpecialItemFields() []onepassword.ItemField {
 		Zip:     "12345",
 		Country: "USA",
 	})
-
-	// Instantiating a SectionId
-	sectionID := "extraDetails"
-
-	// SSH key generation
-	// Generate the key pair
-	_, privateKey, err := ed25519.GenerateKey(nil)
-	if err != nil {
-		panic(err)
+	addressField := onepassword.ItemField{
+		ID:        "address",
+		Title:     "Address",
+		Value:     "",
+		FieldType: onepassword.ItemFieldTypeAddress,
+		SectionID: &sectionID,
+		Details:   &address,
 	}
-	// Format the private key into PKCS8 format
-	privBytes, err := x509.MarshalPKCS8PrivateKey(privateKey)
-	if err != nil {
-		panic(err)
-	}
-	// Encode the data into PEM encoded string. This will be assigned to the item field
-	sshKeyPEMBytes := string(pem.EncodeToMemory(&pem.Block{
-		Type:  "PRIVATE KEY",
-		Bytes: privBytes,
-	}))
-
+	// [developer-docs.sdk.go.address-field-type]-end
 	return []onepassword.ItemField{
-		// Address
-		{
-			ID:        "address",
-			Title:     "Address",
-			Value:     "",
-			FieldType: onepassword.ItemFieldTypeAddress,
-			SectionID: &sectionID,
-			Details:   &address,
-		},
-		// Date
+		addressField,
+		// [developer-docs.sdk.go.date-field-type]-start
 		{
 			ID:        "date",
 			Title:     "Date",
@@ -576,7 +558,8 @@ func generateSpecialItemFields() []onepassword.ItemField {
 			SectionID: &sectionID,
 			FieldType: onepassword.ItemFieldTypeDate,
 		},
-		// MonthYear
+		// [developer-docs.sdk.go.date-field-type]-end
+		// [developer-docs.sdk.go.month-year-field-type]-start
 		{
 			ID:        "month_year",
 			Title:     "Month Year",
@@ -584,7 +567,8 @@ func generateSpecialItemFields() []onepassword.ItemField {
 			SectionID: &sectionID,
 			FieldType: onepassword.ItemFieldTypeMonthYear,
 		},
-		// Reference
+		// [developer-docs.sdk.go.month-year-field-type]-end
+		// [developer-docs.sdk.go.reference-field-type]-start
 		{
 			ID:        "reference",
 			Title:     "Reference",
@@ -592,7 +576,8 @@ func generateSpecialItemFields() []onepassword.ItemField {
 			FieldType: onepassword.ItemFieldTypeReference,
 			SectionID: &sectionID,
 		},
-		// TOTP from URL
+		// [developer-docs.sdk.go.reference-field-type]-end
+		// [developer-docs.sdk.go.otp-field-type]-start
 		{
 			ID:        "onetimepassword",
 			Title:     "One-Time Password URL",
@@ -600,22 +585,6 @@ func generateSpecialItemFields() []onepassword.ItemField {
 			SectionID: &sectionID,
 			FieldType: onepassword.ItemFieldTypeTOTP,
 		},
-		// TOTP from Secret
-		{
-			ID:        "onetimepassword",
-			Title:     "One-Time Password Secret",
-			Value:     "jncrjgbdjnrncbjsr",
-			SectionID: &sectionID,
-			FieldType: onepassword.ItemFieldTypeTOTP,
-		},
-		// SSH key
-		// ID and Title must be "private_key" and "private key", respectively
-		{
-			ID:        "private_key",
-			Title:     "private key",
-			Value:     sshKeyPEMBytes,
-			FieldType: onepassword.ItemFieldTypeSSHKey,
-			SectionID: &sectionID,
-		},
+		// [developer-docs.sdk.go.otp-field-type]-end
 	}
 }
