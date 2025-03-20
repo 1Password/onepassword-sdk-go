@@ -9,11 +9,10 @@ import (
 	"errors"
 	"fmt"
 	"os"
-
 )
 
 // [developer-docs.sdk.go.sdk-import]-start
-import 	"github.com/1password/onepassword-sdk-go"
+import "github.com/1password/onepassword-sdk-go"
 // [developer-docs.sdk.go.sdk-import]-end
 
 func main() {
@@ -526,6 +525,7 @@ func createAndAttachAndDeleteFileFieldItem(client *onepassword.Client) {
 		panic(err)
 	}
 }
+
 //lint:ignore U1000 NOTE: this is just to showcase how to instantiate custom ItemFields
 func generateSpecialItemFields() []onepassword.ItemField {
 	sectionID := "extraDetails"
@@ -541,9 +541,9 @@ func generateSpecialItemFields() []onepassword.ItemField {
 	addressField := onepassword.ItemField{
 		ID:        "address",
 		Title:     "Address",
-		Value:     "",
-		FieldType: onepassword.ItemFieldTypeAddress,
 		SectionID: &sectionID,
+		FieldType: onepassword.ItemFieldTypeAddress,
+		Value:     "",
 		Details:   &address,
 	}
 	// [developer-docs.sdk.go.address-field-type]-end
@@ -553,36 +553,36 @@ func generateSpecialItemFields() []onepassword.ItemField {
 		{
 			ID:        "date",
 			Title:     "Date",
-			Value:     "1998-03-15",
 			SectionID: &sectionID,
 			FieldType: onepassword.ItemFieldTypeDate,
+			Value:     "1998-03-15",
 		},
 		// [developer-docs.sdk.go.date-field-type]-end
 		// [developer-docs.sdk.go.month-year-field-type]-start
 		{
 			ID:        "month_year",
 			Title:     "Month Year",
-			Value:     "03/1998",
 			SectionID: &sectionID,
 			FieldType: onepassword.ItemFieldTypeMonthYear,
+			Value:     "03/1998",
 		},
 		// [developer-docs.sdk.go.month-year-field-type]-end
 		// [developer-docs.sdk.go.reference-field-type]-start
 		{
 			ID:        "reference",
 			Title:     "Reference",
-			Value:     "f43hnkatjllm5fsfsmgaqdhv7a",
 			FieldType: onepassword.ItemFieldTypeReference,
 			SectionID: &sectionID,
+			Value:     "f43hnkatjllm5fsfsmgaqdhv7a",
 		},
 		// [developer-docs.sdk.go.reference-field-type]-end
 		// [developer-docs.sdk.go.totp-field-type]-start
 		{
 			ID:        "onetimepassword",
 			Title:     "One-Time Password URL",
-			Value:     "otpauth://totp/my-example-otp?secret=jncrjgbdjnrncbjsr&issuer=1Password",
 			SectionID: &sectionID,
 			FieldType: onepassword.ItemFieldTypeTOTP,
+			Value:     "otpauth://totp/my-example-otp?secret=jncrjgbdjnrncbjsr&issuer=1Password",
 		},
 		// [developer-docs.sdk.go.totp-field-type]-end
 	}
