@@ -64,7 +64,6 @@ func (i ItemsSource) Create(ctx context.Context, params ItemCreateParams) (Item,
 	if err != nil {
 		return Item{}, err
 	}
-
 	return result, nil
 }
 

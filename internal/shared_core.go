@@ -13,10 +13,10 @@ import (
 //go:embed wasm/core.wasm
 var coreWASM []byte
 
-// In empirical tests, we determined that maximum message size that can cross the FFI boundary 
+// In empirical tests, we determined that maximum message size that can cross the FFI boundary
 // is ~64MB. Past this limit, the Extism FFI will throw an error and the program will crash.
 // We set the limit to 50MB to be safe, to be reconsidered upon further testing.
-const messageLimit = 50 * 1024 * 1024;
+const messageLimit = 50 * 1024 * 1024
 
 const (
 	invokeFuncName        = "invoke"
