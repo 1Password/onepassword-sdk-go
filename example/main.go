@@ -138,8 +138,8 @@ func resolveSecretReference(client *onepassword.Client, vaultID, itemID, fieldID
 
 func resolveBulkSecretReferences(client *onepassword.Client, vaultID, itemID, fieldID, fieldID2 string) {
 	// [developer-docs.sdk.go.resolve-bulk-secret]-start
-	// Retrieves a secret from 1Password.
-	// Takes a secret reference as input and returns the secret to which it points.
+	// Retrieves multiple secrets from 1Password.
+	// Takes multiple secret references as input and returns the secret to which it points.
 	secret, _ := client.Secrets().ResolveAll(context.Background(), []string{fmt.Sprintf("op://%s/%s/%s", vaultID, itemID, fieldID), fmt.Sprintf("op://%s/%s/%s", vaultID, itemID, fieldID2)})
 	for _, s := range secret.IndividualResponses {
 		if s.Error != nil {
