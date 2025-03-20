@@ -526,3 +526,95 @@ func createAndAttachAndDeleteFileFieldItem(client *onepassword.Client) {
 		panic(err)
 	}
 }
+
+func generateSpecialItemFields() []onepassword.ItemField {
+	// Instantiating the address
+	address := onepassword.NewItemFieldDetailsTypeVariantAddress(&onepassword.AddressFieldDetails{
+		Street:  "123 Main St",
+		City:    "Anytown",
+		State:   "CA",
+		Zip:     "12345",
+		Country: "USA",
+	})
+
+	// Instantiating a SectionId
+	sectionID := "extraDetails"
+
+	// SSH key generation
+	// Generate the key pair
+	_, privateKey, err := ed25519.GenerateKey(nil)
+	if err != nil {
+		panic(err)
+	}
+	// Format the private key into PKCS8 format
+	privBytes, err := x509.MarshalPKCS8PrivateKey(privateKey)
+	if err != nil {
+		panic(err)
+	}
+	// Encode the data into PEM encoded string. This will be assigned to the item field
+	sshKeyPEMBytes := string(pem.EncodeToMemory(&pem.Block{
+		Type:  "PRIVATE KEY",
+		Bytes: privBytes,
+	}))
+
+	[]onepassword.ItemField{
+		// Address
+		{
+			ID:        "address",
+			Title:     "Address",
+			Value:     "",
+			FieldType: onepassword.ItemFieldTypeAddress,
+			SectionID: &sectionID,
+			Details:   &address,
+		},
+		// Date
+		{
+			ID:        "date",
+			Title:     "Date",
+			Value:     "1998-03-15",
+			SectionID: &sectionID,
+			FieldType: onepassword.ItemFieldTypeDate,
+		},
+		// MonthYear
+		{
+			ID:        "month_year",
+			Title:     "Month Year",
+			Value:     "03/1998",
+			SectionID: &sectionID,
+			FieldType: onepassword.ItemFieldTypeMonthYear,
+		},
+		// Reference
+		{
+			ID:        "reference",
+			Title:     "Reference",
+			Value:     "f43hnkatjllm5fsfsmgaqdhv7a",
+			FieldType: onepassword.ItemFieldTypeReference,
+			SectionID: &sectionID,
+		},
+		// TOTP from URL
+		{
+			ID:        "onetimepassword",
+			Title:     "One-Time Password URL",
+			Value:     "otpauth://totp/my-example-otp?secret=jncrjgbdjnrncbjsr&issuer=1Password",
+			SectionID: &sectionID,
+			FieldType: onepassword.ItemFieldTypeTOTP,
+		},
+		// TOTP from Secret
+		{
+			ID:        "onetimepassword",
+			Title:     "One-Time Password Secret",
+			Value:     "jncrjgbdjnrncbjsr"
+			SectionID: &sectionID,
+			FieldType: onepassword.ItemFieldTypeTOTP,
+		},
+		// SSH key
+		// ID and Title must be "private_key" and "private key", respectively
+		{
+			ID:        "private_key",
+			Title:     "private key",
+			Value:     sshKeyPEMBytes,
+			FieldType: onepassword.ItemFieldTypeSSHKey,
+			SectionID: &sectionID,
+		},
+	}
+}
