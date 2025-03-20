@@ -576,7 +576,7 @@ func generateSpecialItemFields() []onepassword.ItemField {
 			SectionID: &sectionID,
 		},
 		// [developer-docs.sdk.go.reference-field-type]-end
-		// [developer-docs.sdk.go.otp-field-type]-start
+		// [developer-docs.sdk.go.totp-field-type]-start
 		{
 			ID:        "onetimepassword",
 			Title:     "One-Time Password URL",
@@ -584,6 +584,6 @@ func generateSpecialItemFields() []onepassword.ItemField {
 			SectionID: &sectionID,
 			FieldType: onepassword.ItemFieldTypeTOTP,
 		},
-		// [developer-docs.sdk.go.otp-field-type]-end
+		// [developer-docs.sdk.go.totp-field-type]-end
 	}
 }
