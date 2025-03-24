@@ -2,8 +2,8 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/dylibso/observe-sdk/go v0.0.0-20240819160327-2d926c5d788a h1:UwSIFv5g5lIvbGgtf3tVwC7Ky9rmMFBp0RMs+6f6YqE=
 github.com/dylibso/observe-sdk/go v0.0.0-20240819160327-2d926c5d788a/go.mod h1:C8DzXehI4zAbrdlbtOByKX6pfivJTBiV9Jjqv56Yd9Q=
-github.com/extism/go-sdk v1.7.0 h1:yHbSa2JbcF60kjGsYiGEOcClfbknqCJchyh9TRibFWo=
-github.com/extism/go-sdk v1.7.0/go.mod h1:Dhuc1qcD0aqjdqJ3ZDyGdkZPEj/EHKVjbE4P+1XRMqc=
+github.com/extism/go-sdk v1.7.1 h1:lWJos6uY+tRFdlIHR+SJjwFDApY7OypS/2nMhiVQ9Sw=
+github.com/extism/go-sdk v1.7.1/go.mod h1:IT+Xdg5AZM9hVtpFUA+uZCJMge/hbvshl8bwzLtFyKA=
 github.com/gobwas/glob v0.2.3 h1:A4xDbljILXROh+kObIiy5kIaPYD8e96x1tgBhUI5J+Y=
 github.com/gobwas/glob v0.2.3/go.mod h1:d3Ez4x06l9bZtSvzIay5+Yzi0fmZzPgnTbPcKjJAkT8=
 github.com/google/go-cmp v0.5.5 h1:Khx7svrCpmxxtHBq5j2mp/xVjsi8hQMfNLvJFAlrGgU=
