@@ -19,7 +19,6 @@ jobs:
         # supported versions at the time of writing (Oct. 4th, 2024)
         # https://go.dev/dl/
         go-version: [ '1.22', '1.23' ]
-      max-parallel: 1
 
     runs-on: ubuntu-latest
     steps:
@@ -41,8 +40,15 @@ jobs:
 
       - name: Unit Test
         run: go test -v ./internal/...
+  
+  example_test:
+    name: Run Example Code
+    needs: test  
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-      - name: Example Test
+      - name: Run Example Test
         run: go run example/main.go
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.EXAMPLE_TESTS_OP_SERVICE_ACCOUNT_TOKEN }}
