@@ -6,15 +6,13 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
-	"errors"
 	"fmt"
 	"os"
 
-	"github.com/1password/onepassword-sdk-go"
 )
 
 // [developer-docs.sdk.go.sdk-import]-start
-
+import "github.com/1password/onepassword-sdk-go"
 // [developer-docs.sdk.go.sdk-import]-end
 
 func main() {
@@ -50,34 +48,21 @@ func main() {
 
 func listVaultsAndItems(client *onepassword.Client, vaultID string) {
 	// [developer-docs.sdk.go.list-vaults]-start
-	vaults, err := client.Vaults().ListAll(context.Background())
+	vaults, err := client.Vaults().List(context.Background())
 	if err != nil {
 		panic(err)
 	}
-	for {
-		vault, err := vaults.Next()
-		if errors.Is(err, onepassword.ErrorIteratorDone) {
-			break
-		} else if err != nil {
-			panic(err)
-		}
-
+	for _, vault := range vaults {
 		fmt.Printf("%s %s\n", vault.ID, vault.Title)
 	}
 	// [developer-docs.sdk.go.list-vaults]-end
 
 	// [developer-docs.sdk.go.list-items]-start
-	items, err := client.Items().ListAll(context.Background(), vaultID)
+	items, err := client.Items().List(context.Background(), vaultID)
 	if err != nil {
 		panic(err)
 	}
-	for {
-		item, err := items.Next()
-		if errors.Is(err, onepassword.ErrorIteratorDone) {
-			break
-		} else if err != nil {
-			panic(err)
-		}
+	for _, item := range items {
 		fmt.Printf("%s %s\n", item.ID, item.Title)
 	}
 	// [developer-docs.sdk.go.list-items]-end
