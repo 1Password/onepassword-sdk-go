@@ -43,6 +43,7 @@ func main() {
 	resolveTOTPSecretReference(client, item.VaultID, item.ID, "TOTP_onetimepassword")
 	sharelink := generateItemSharing(client, item.VaultID, item.ID)
 	fmt.Println(sharelink)
+	archiveItem(client, item.VaultID, item.ID)
 	deleteItem(client, item.VaultID, item.ID)
 }
 
@@ -277,11 +278,6 @@ func generatePasswords() {
 	// [developer-docs.sdk.go.generate-memorable-password]-end
 }
 
-// NOTE: just for the sake of archiving it. This is because the SDK
-// NOTE: only works with active items, so archiving and then deleting
-// NOTE: is not yet possible.
-//
-//lint:ignore U1000 NOTE: this is in a separate function to avoid creating a new item
 func archiveItem(client *onepassword.Client, vaultID string, itemID string) {
 	// [developer-docs.sdk.go.archive-item]-start
 	// Archive a item from your vault.
@@ -290,7 +286,6 @@ func archiveItem(client *onepassword.Client, vaultID string, itemID string) {
 	if err != nil {
 		panic(err)
 	}
-
 	// [developer-docs.sdk.go.archive-item]-end
 }
 
