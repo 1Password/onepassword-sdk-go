@@ -9,10 +9,12 @@ import (
 	"errors"
 	"fmt"
 	"os"
+
+	"github.com/1password/onepassword-sdk-go"
 )
 
 // [developer-docs.sdk.go.sdk-import]-start
-import "github.com/1password/onepassword-sdk-go"
+
 // [developer-docs.sdk.go.sdk-import]-end
 
 func main() {
@@ -140,9 +142,9 @@ func resolveBulkSecretReferences(client *onepassword.Client, vaultID, itemID, fi
 	// Retrieves multiple secrets from 1Password.
 	// Takes multiple secret references as input and returns the secret to which it points.
 	secret, _ := client.Secrets().ResolveAll(
-		context.Background(), 
+		context.Background(),
 		[]string{
-			fmt.Sprintf("op://%s/%s/%s", vaultID, itemID, fieldID), 
+			fmt.Sprintf("op://%s/%s/%s", vaultID, itemID, fieldID),
 			fmt.Sprintf("op://%s/%s/%s", vaultID, itemID, fieldID2),
 		},
 	)
