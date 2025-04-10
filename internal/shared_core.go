@@ -79,7 +79,7 @@ func (c *SharedCore) Invoke(ctx context.Context, invokeConfig InvokeConfig) (*st
 		return nil, err
 	}
 	if len(input) > messageLimit {
-		return nil, fmt.Errorf("message size exceeds the limit of %d bytes, please contact 1Password at support@1password.com or https://developer.1password.com/joinslack if you need help.", messageLimit)
+		return nil, fmt.Errorf("message size exceeds the limit of %d bytes, please contact 1Password at support@1password.com or https://developer.1password.com/joinslack if you need help", messageLimit)
 	}
 	res, err := c.callWithCtx(ctx, invokeFuncName, input)
 	if err != nil {
@@ -139,7 +139,7 @@ func loadWASM(ctx context.Context) (*extism.Plugin, error) {
 	extismConfig := extism.PluginConfig{}
 	plugin, err := extism.NewPlugin(ctx, manifest, extismConfig, ImportedFunctions())
 	if err != nil {
-		return nil, fmt.Errorf("Failed to initialize plugin: %v\n", err)
+		return nil, fmt.Errorf("failed to initialize plugin: %v", err)
 	}
 
 	return plugin, nil
