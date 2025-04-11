@@ -86,3 +86,5 @@ for _, vault := range vaults{
 	fmt.Printf("%s %s\n", vault.ID, vault.Title)
 }
 ```
+
+*  All functions that return an Iterator will now return the appropriate list type.
