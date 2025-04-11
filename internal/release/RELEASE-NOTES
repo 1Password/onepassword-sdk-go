@@ -1,20 +1,88 @@
-# 1Password Go SDK v0.2.1
+# 1Password Go SDK v0.3.0
 
 ## NEW
 
-- **`CreatedAt` and `UpdatedAt` item metadata:** Items and item overviews now expose attributes with their creation and last edit times.
-- **Resolving secrets in bulk**: With the `client.Secrets().ResolveAll` function, the SDK is now able to resolve multiple secrets at once, improving the performance of the operation.
+- **Support for item states**: You can now fetch an item's state using the SDK. `Item` and `ItemOverview` expose two states: `Active` and`Archived`.
+    - Active: An item located inside a vault. (Default)
+    - Archived: An item that has been moved to the Archive. 1Password doesn't include archived items in search results or suggest them when you fill in apps and browsers. You can keep archived items as long as you'd like.
+- **Filtering the return of item listing by state**: You can now filter the listed items by item state. The current exposed filter is `ByState`, which allows devs to filter `ItemOverviews` by their `State` .
 
 ## IMPROVED
 
-- **Support for new field types:** Items with `Address` and `Date` fields can now be created, retrieved, and edited using the 1Password SDK.
-- **Item sharing for attachments and documents**: Items with files attached now can also be shared using the `client.Items().Shares()` functions.
-- **Adding custom fields in sections automatically**: The SDK now automatically adds custom fields without a section to an empty section within the item, creating it if necessary.
-- **`Tags` in item overviews**: The return type of `Items().ListAll` now also contains the item tags.
-- **Broader item editing capabilities**: You are now able to use the `items.put` function on more items, including those with fields that are not directly editable through the SDK (such as legacy fields, passkeys etc.)
+- **Improved Deleting Capabilities:** You can now delete `Archived` items in the SDKs.
 
-## FIXED
+### ⚠️ BREAKING CHANGES ⚠️
 
-- **Improvements to resolving secret references:**
-    - Archived items are no longer used for secret references.
-    - When multiple sections match a section query in resolving secret references, the SDK look through the fields in all sections, instead of erroring.
+This release contains a breaking change for the <lang> SDK.
+
+`Items().ListAll()` has changed to `Items().List()` and below is how to migrate.
+
+Before:
+```go
+	overviews, err := client.Items().ListAll(context.Background(), vaultID)
+	if err != nil {
+			panic(err)
+		}
+	for {
+			overview, err := overviews.Next()
+			if errors.Is(err, onepassword.ErrorIteratorDone) {
+				break
+			} else if err != nil {
+				panic(err)
+			}
+			fmt.Printf("%s %s\n", overview.ID, overview.Title)
+		}
+```
+
+After:
+
+```go
+overviews, err := client.Items().List(
+	context.Background(),
+	vaultID,
+	onepassword.NewItemListFilterTypeVariantByState(
+		&onepassword.ItemListFilterByStateInner{
+			Active:   true,
+			Archived: true,
+		},
+	),
+)
+if err != nil {
+	panic(err)
+}
+
+// To iterate through this you can do the following:
+for _, overview := range overviews {
+	fmt.Printf("%s %s\n", overview.ID, overview.Title)
+}
+```
+`Vaults().ListAll()` has changed to `Vaults().List()` and the migration guide is below:
+
+Before:
+```go
+vaults, err := client.Vaults().ListAll(context.Background())
+	if err != nil {
+		panic(err)
+	}
+	for {
+		vault, err := vaults.Next()
+		if errors.Is(err, onepassword.ErrorIteratorDone) {
+			break
+		} else if err != nil {
+			panic(err)
+		}
+
+		fmt.Printf("%s %s\n", vault.ID, vault.Title)
+	}
+```
+
+After:
+```go
+vaults, err := client.Vaults().List(context.Background())
+	if err != nil {
+		panic(err)
+}
+for _, vault := range vaults{
+	fmt.Printf("%s %s\n", vault.ID, vault.Title)
+}
+```
