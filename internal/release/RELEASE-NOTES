@@ -3,8 +3,8 @@
 ## NEW
 
 - **Support for item states**: You can now fetch an item's state using the SDK. `Item` and `ItemOverview` expose two states: `Active` and`Archived`.
-    - Active: An item located inside a vault. (Default)
-    - Archived: An item that has been moved to the Archive. 1Password doesn't include archived items in search results or suggest them when you fill in apps and browsers. You can keep archived items as long as you'd like.
+    - `Active`: An item located inside a vault. (Default)
+    - `Archived`: An item that has been moved to the Archive. 1Password doesn't include archived items in search results or suggest them when you fill in apps and browsers. You can keep archived items as long as you'd like.
 - **Filtering the return of item listing by state**: You can now filter the listed items by item state. The current exposed filter is `ByState`, which allows devs to filter `ItemOverviews` by their `State` .
 
 ## IMPROVED
@@ -13,7 +13,7 @@
 
 ### ⚠️ BREAKING CHANGES ⚠️
 
-This release contains a breaking change for the <lang> SDK.
+This release contains a breaking change for the Go SDK.
 
 `Items().ListAll()` has changed to `Items().List()` and below is how to migrate.
 
