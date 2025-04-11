@@ -246,6 +246,16 @@ type ItemFile struct {
 	FieldID string `json:"fieldId"`
 }
 
+// Represents the state of an item in the SDK.
+type ItemState string
+
+const (
+	// The item is active
+	ItemStateActive ItemState = "active"
+	// The item is archived meaning it's hidden from regular view and stored in the archive.
+	ItemStateArchived ItemState = "archived"
+)
+
 // Represents a 1Password item.
 type Item struct {
 	// The item's ID
@@ -276,6 +286,8 @@ type Item struct {
 	CreatedAt time.Time `json:"createdAt"`
 	// The time the item was updated at
 	UpdatedAt time.Time `json:"updatedAt"`
+	// Indicates the state of the item
+	State ItemState `json:"state"`
 }
 type ItemCreateParams struct {
 	// The item's category
@@ -318,6 +330,8 @@ type ItemOverview struct {
 	CreatedAt time.Time `json:"createdAt"`
 	// The time the item was updated at
 	UpdatedAt time.Time `json:"updatedAt"`
+	// Indicates the state of the item
+	State ItemState `json:"state"`
 }
 
 // The valid duration options for sharing an item
@@ -717,6 +731,67 @@ type VaultOverview struct {
 	ID string `json:"id"`
 	// The vault's title
 	Title string `json:"title"`
+}
+
+// Generated type representing the anonymous struct variant `ByState` of the `ItemListFilter` Rust enum
+type ItemListFilterByStateInner struct {
+	Active   bool `json:"active"`
+	Archived bool `json:"archived"`
+}
+type ItemListFilterTypes string
+
+const (
+	ItemListFilterTypeVariantByState ItemListFilterTypes = "ByState"
+)
+
+type ItemListFilter struct {
+	Type    ItemListFilterTypes `json:"type"`
+	content interface{}
+}
+
+func (i *ItemListFilter) UnmarshalJSON(data []byte) error {
+	var enum struct {
+		Tag     ItemListFilterTypes `json:"type"`
+		Content json.RawMessage     `json:"content"`
+	}
+	if err := json.Unmarshal(data, &enum); err != nil {
+		return err
+	}
+
+	i.Type = enum.Tag
+	switch i.Type {
+	case ItemListFilterTypeVariantByState:
+		var res ItemListFilterByStateInner
+		i.content = &res
+
+	}
+	if err := json.Unmarshal(enum.Content, &i.content); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (i ItemListFilter) MarshalJSON() ([]byte, error) {
+	var enum struct {
+		Tag     ItemListFilterTypes `json:"type"`
+		Content interface{}         `json:"content,omitempty"`
+	}
+	enum.Tag = i.Type
+	enum.Content = i.content
+	return json.Marshal(enum)
+}
+
+func (i ItemListFilter) ByState() *ItemListFilterByStateInner {
+	res, _ := i.content.(*ItemListFilterByStateInner)
+	return res
+}
+
+func NewItemListFilterTypeVariantByState(content *ItemListFilterByStateInner) ItemListFilter {
+	return ItemListFilter{
+		Type:    ItemListFilterTypeVariantByState,
+		content: content,
+	}
 }
 
 // Generated type representing the anonymous struct variant `Memorable` of the `PasswordRecipe` Rust enum

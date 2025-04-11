@@ -26,8 +26,8 @@ type ItemsAPI interface {
 	// Archive an item.
 	Archive(ctx context.Context, vaultID string, itemID string) error
 
-	// List all items
-	ListAll(ctx context.Context, vaultID string) (*Iterator[ItemOverview], error)
+	// List items based on filters.
+	List(ctx context.Context, vaultID string, filters ...ItemListFilter) ([]ItemOverview, error)
 
 	// ----- Sub APIs - these methods are used to access subordinate function groups -----
 	Shares() ItemsSharesAPI
@@ -118,10 +118,14 @@ func (i ItemsSource) Archive(ctx context.Context, vaultID string, itemID string)
 	return err
 }
 
-// List all items
-func (i ItemsSource) ListAll(ctx context.Context, vaultID string) (*Iterator[ItemOverview], error) {
-	resultString, err := clientInvoke(ctx, i.InnerClient, "ItemsListAll", map[string]interface{}{
+// List items based on filters.
+func (i ItemsSource) List(ctx context.Context, vaultID string, filters ...ItemListFilter) ([]ItemOverview, error) {
+	if filters == nil {
+		filters = []ItemListFilter{}
+	}
+	resultString, err := clientInvoke(ctx, i.InnerClient, "ItemsList", map[string]interface{}{
 		"vault_id": vaultID,
+		"filters":  filters,
 	})
 	if err != nil {
 		return nil, err
@@ -131,5 +135,5 @@ func (i ItemsSource) ListAll(ctx context.Context, vaultID string) (*Iterator[Ite
 	if err != nil {
 		return nil, err
 	}
-	return NewIterator(result), nil
+	return result, nil
 }
