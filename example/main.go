@@ -68,7 +68,7 @@ func listVaultsAndItems(client *onepassword.Client, vaultID string) {
 	}
 	// [developer-docs.sdk.go.list-items]-end
 
-	// [developer-docs.sdk.go.list-archived-items]-start
+	// [developer-docs.sdk.go.use-item-filters]-start
 	archivedOverviews, err := client.Items().List(context.Background(), vaultID, onepassword.NewItemListFilterTypeVariantByState(&onepassword.ItemListFilterByStateInner{Active: false, Archived: true}))
 	if err != nil {
 		panic(err)
@@ -76,7 +76,7 @@ func listVaultsAndItems(client *onepassword.Client, vaultID string) {
 	for _, overview := range archivedOverviews {
 		fmt.Printf("%s %s\n", overview.ID, overview.Title)
 	}
-	// [developer-docs.sdk.go.list-archived-items]-end
+	// [developer-docs.sdk.go.use-item-filters]-end
 
 }
 

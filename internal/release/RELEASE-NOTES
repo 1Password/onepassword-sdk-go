@@ -2,39 +2,39 @@
 
 ## NEW
 
-- **Support for item states**: You can now fetch an item's state using the SDK. `Item` and `ItemOverview` expose two states: `Active` and`Archived`.
+- **Support for item states**: You can now fetch an item's state using the SDK.`ItemOverview` exposes one of two states: `Active` or `Archived`.
     - `Active`: An item located inside a vault. (Default)
     - `Archived`: An item that has been moved to the Archive. 1Password doesn't include archived items in search results or suggest them when you fill in apps and browsers. You can keep archived items as long as you'd like.
-- **Filtering the return of item listing by state**: You can now filter the listed items by item state. The current exposed filter is `ByState`, which allows devs to filter `ItemOverviews` by their `State` .
+- **Filtering the return of item listing by state**: You can now filter the listed items by item state.
 
-## IMPROVED
+## FIXED
 
-- **Improved Deleting Capabilities:** You can now delete `Archived` items in the SDKs.
+- **Deleting Archived Items:** The SDK now supports deleting items from the archive.
 
 ### ⚠️ BREAKING CHANGES ⚠️
 
 This release contains a breaking change for the Go SDK.
 
-`Items().ListAll()` has changed to `Items().List()` and below is how to migrate.
+`Items().ListAll()` has changed to `Items().List()` and the return type has also changed from `*Iterator` to `[]ItemOverview`. To migrate to the latest SDK version:
 
-Before:
+Wherever you were using:
 ```go
-	overviews, err := client.Items().ListAll(context.Background(), vaultID)
-	if err != nil {
-			panic(err)
-		}
-	for {
-			overview, err := overviews.Next()
-			if errors.Is(err, onepassword.ErrorIteratorDone) {
-				break
-			} else if err != nil {
-				panic(err)
-			}
-			fmt.Printf("%s %s\n", overview.ID, overview.Title)
-		}
+overviews, err := client.Items().ListAll(context.Background(), vaultID)
+if err != nil {
+	panic(err)
+}
+for {
+	overview, err := overviews.Next()
+	if errors.Is(err, onepassword.ErrorIteratorDone) {
+		break
+	} else if err != nil {
+		panic(err)
+	}
+	fmt.Printf("%s %s\n", overview.ID, overview.Title)
+}
 ```
 
-After:
+You must now use:
 
 ```go
 overviews, err := client.Items().List(
@@ -51,14 +51,13 @@ if err != nil {
 	panic(err)
 }
 
-// To iterate through this you can do the following:
 for _, overview := range overviews {
 	fmt.Printf("%s %s\n", overview.ID, overview.Title)
 }
 ```
-`Vaults().ListAll()` has changed to `Vaults().List()` and the migration guide is below:
+`Vaults().ListAll()` has changed to `Vaults().List()` and the return type has also changed from `*Iterator` to `[]VaultOverview`. To migrate to the latest SDK version:
 
-Before:
+Wherever you were using:
 ```go
 vaults, err := client.Vaults().ListAll(context.Background())
 	if err != nil {
@@ -76,7 +75,7 @@ vaults, err := client.Vaults().ListAll(context.Background())
 	}
 ```
 
-After:
+You must now use:
 ```go
 vaults, err := client.Vaults().List(context.Background())
 	if err != nil {
@@ -87,6 +86,4 @@ for _, vault := range vaults{
 }
 ```
 
-*  All functions that return an Iterator will now return the appropriate list type.
-
-This does not affect any code already deployed, and will not take effect in your codebase until you choose to update to v0.3.0+ of the 1Password Go SDK 
+This does not affect any code that's already deployed, and will not take effect in your codebase until updating to v0.3.0+ of the 1Password Go SDK.
