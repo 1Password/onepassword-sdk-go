@@ -16,7 +16,7 @@ This release contains breaking changes for two functions in the Go SDK.
 
 **Vault listing**
 
-* The function name has changed from ListAll to List. To use this in your code, replace:
+* The function name has changed from `ListAll` to `List`. To use this in your code, replace:
 ```go
 vaults, err := client.Vaults().ListAll(context.Background(), vaultID)
 // error handling
@@ -27,7 +27,7 @@ vaults, err := client.Vaults().List(context.Background(), vaultID)
 // error handling
 ```
 
-* The return type of the vault listing function has changed from *Iterator[VaultOverview] to []VaultOverview. To use this in your code, replace:
+* The return type of the vault listing function has changed from `*Iterator[VaultOverview]` to `[]VaultOverview`. To use this in your code, replace:
 
 ```go
 for {
@@ -48,7 +48,7 @@ for _, vault := range vaults {
 ```
 **Item listing**
 
-* The function name has changed from ListAll to List. To use this in your code, replace:
+* The function name has changed from `ListAll` to `List`. To use this in your code, replace:
 ```go
 overviews, err := client.Items().ListAll(context.Background())
 // error handling
@@ -68,7 +68,7 @@ overviews, err := client.Items().List(
 // error handling
 ```
 
-* The return type of the item listing function has changed from *Iterator[ItemOverview] to []ItemOverview. To use this in your code, replace:
+* The return type of the item listing function has changed from `*Iterator[ItemOverview]` to `[]ItemOverview`. To use this in your code, replace:
 ```go
 for {
 	overview, err := overviews.Next()
