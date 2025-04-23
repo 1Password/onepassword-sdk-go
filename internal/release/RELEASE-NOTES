@@ -1,20 +1,90 @@
-# 1Password Go SDK v0.2.1
+# 1Password Go SDK v0.3.0
 
 ## NEW
 
-- **`CreatedAt` and `UpdatedAt` item metadata:** Items and item overviews now expose attributes with their creation and last edit times.
-- **Resolving secrets in bulk**: With the `client.Secrets().ResolveAll` function, the SDK is now able to resolve multiple secrets at once, improving the performance of the operation.
-
-## IMPROVED
-
-- **Support for new field types:** Items with `Address` and `Date` fields can now be created, retrieved, and edited using the 1Password SDK.
-- **Item sharing for attachments and documents**: Items with files attached now can also be shared using the `client.Items().Shares()` functions.
-- **Adding custom fields in sections automatically**: The SDK now automatically adds custom fields without a section to an empty section within the item, creating it if necessary.
-- **`Tags` in item overviews**: The return type of `Items().ListAll` now also contains the item tags.
-- **Broader item editing capabilities**: You are now able to use the `items.put` function on more items, including those with fields that are not directly editable through the SDK (such as legacy fields, passkeys etc.)
+- **Support for item states**: You can now fetch an item's state using the SDK. `ItemOverview` exposes one of two states: `Active` or `Archived`.
+    - `Active`: An item located inside a vault. (Default)
+    - `Archived`: An item that has been moved to the Archive. 1Password doesn't include archived items in search results or suggest them when you fill in apps and browsers. You can keep archived items as long as you'd like.
+- **Filtering listed items by state**: You can now filter the results of the item list function by item state.
 
 ## FIXED
 
-- **Improvements to resolving secret references:**
-    - Archived items are no longer used for secret references.
-    - When multiple sections match a section query in resolving secret references, the SDK look through the fields in all sections, instead of erroring.
+- **Deleting Archived Items:** The SDK now supports deleting items from the archive.
+
+## ⚠️ BREAKING CHANGES ⚠️
+This release contains breaking changes for two functions in the Go SDK.
+
+**Vault listing**
+
+* The function name has changed from `ListAll` to `List`. To use this in your code, replace:
+```go
+vaults, err := client.Vaults().ListAll(context.Background(), vaultID)
+// error handling
+```
+with:
+```go
+vaults, err := client.Vaults().List(context.Background(), vaultID)
+// error handling
+```
+
+* The return type of the vault listing function has changed from `*Iterator[VaultOverview]` to `[]VaultOverview`. To use this in your code, replace:
+
+```go
+for {
+	vault, err := vaults.Next()
+	if errors.Is(err, onepassword.ErrorIteratorDone) {
+		break
+	} else if err != nil {
+		// error handling
+	}
+	// using the vault overview
+}
+```
+with:
+```go
+for _, vault := range vaults {
+	// using the vault overview
+}
+```
+**Item listing**
+
+* The function name has changed from `ListAll` to `List`. To use this in your code, replace:
+```go
+overviews, err := client.Items().ListAll(context.Background())
+// error handling
+```
+with:
+```go
+overviews, err := client.Items().List(
+	context.Background(),
+	vaultID,
+	onepassword.NewItemListFilterTypeVariantByState(
+		&onepassword.ItemListFilterByStateInner{
+			Active:   true,
+			Archived: true,
+		},
+	),
+)
+// error handling
+```
+
+* The return type of the item listing function has changed from `*Iterator[ItemOverview]` to `[]ItemOverview`. To use this in your code, replace:
+```go
+for {
+	overview, err := overviews.Next()
+	if errors.Is(err, onepassword.ErrorIteratorDone) {
+		break
+	} else if err != nil {
+		// error handling
+	}
+	// using the item overview
+}
+```
+with:
+```go
+for _, overview := range overviews {
+	// using the item overview
+}
+```
+
+This does not affect any code that's already deployed, and will not take effect in your codebase until you choose to update to version 0.3.0 or later of the 1Password Go SDK.

@@ -6,7 +6,6 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
-	"errors"
 	"fmt"
 	"os"
 )
@@ -43,42 +42,48 @@ func main() {
 	resolveTOTPSecretReference(client, item.VaultID, item.ID, "TOTP_onetimepassword")
 	sharelink := generateItemSharing(client, item.VaultID, item.ID)
 	fmt.Println(sharelink)
+	archiveItem(client, item.VaultID, item.ID)
 	deleteItem(client, item.VaultID, item.ID)
 }
 
 func listVaultsAndItems(client *onepassword.Client, vaultID string) {
 	// [developer-docs.sdk.go.list-vaults]-start
-	vaults, err := client.Vaults().ListAll(context.Background())
+	vaults, err := client.Vaults().List(context.Background())
 	if err != nil {
 		panic(err)
 	}
-	for {
-		vault, err := vaults.Next()
-		if errors.Is(err, onepassword.ErrorIteratorDone) {
-			break
-		} else if err != nil {
-			panic(err)
-		}
-
+	for _, vault := range vaults {
 		fmt.Printf("%s %s\n", vault.ID, vault.Title)
 	}
 	// [developer-docs.sdk.go.list-vaults]-end
 
 	// [developer-docs.sdk.go.list-items]-start
-	items, err := client.Items().ListAll(context.Background(), vaultID)
+	overviews, err := client.Items().List(context.Background(), vaultID)
 	if err != nil {
 		panic(err)
 	}
-	for {
-		item, err := items.Next()
-		if errors.Is(err, onepassword.ErrorIteratorDone) {
-			break
-		} else if err != nil {
-			panic(err)
-		}
-		fmt.Printf("%s %s\n", item.ID, item.Title)
+	for _, overview := range overviews {
+		fmt.Printf("%s %s\n", overview.ID, overview.Title)
 	}
 	// [developer-docs.sdk.go.list-items]-end
+
+	// [developer-docs.sdk.go.use-item-filters]-start
+	archivedOverviews, err := client.Items().List(context.Background(), vaultID,
+		onepassword.NewItemListFilterTypeVariantByState(
+			&onepassword.ItemListFilterByStateInner{
+				Active:   false,
+				Archived: true,
+			},
+		),
+	)
+	if err != nil {
+		panic(err)
+	}
+	for _, overview := range archivedOverviews {
+		fmt.Printf("%s %s\n", overview.ID, overview.Title)
+	}
+	// [developer-docs.sdk.go.use-item-filters]-end
+
 }
 
 func getAndUpdateItem(client *onepassword.Client, existingVaultID, existingItemID string) {
@@ -140,9 +145,9 @@ func resolveBulkSecretReferences(client *onepassword.Client, vaultID, itemID, fi
 	// Retrieves multiple secrets from 1Password.
 	// Takes multiple secret references as input and returns the secret to which it points.
 	secret, _ := client.Secrets().ResolveAll(
-		context.Background(), 
+		context.Background(),
 		[]string{
-			fmt.Sprintf("op://%s/%s/%s", vaultID, itemID, fieldID), 
+			fmt.Sprintf("op://%s/%s/%s", vaultID, itemID, fieldID),
 			fmt.Sprintf("op://%s/%s/%s", vaultID, itemID, fieldID2),
 		},
 	)
@@ -290,11 +295,6 @@ func generatePasswords() {
 	// [developer-docs.sdk.go.generate-memorable-password]-end
 }
 
-// NOTE: just for the sake of archiving it. This is because the SDK
-// NOTE: only works with active items, so archiving and then deleting
-// NOTE: is not yet possible.
-//
-//lint:ignore U1000 NOTE: this is in a separate function to avoid creating a new item
 func archiveItem(client *onepassword.Client, vaultID string, itemID string) {
 	// [developer-docs.sdk.go.archive-item]-start
 	// Archive a item from your vault.
@@ -303,7 +303,6 @@ func archiveItem(client *onepassword.Client, vaultID string, itemID string) {
 	if err != nil {
 		panic(err)
 	}
-
 	// [developer-docs.sdk.go.archive-item]-end
 }
 

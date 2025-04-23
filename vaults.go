@@ -12,7 +12,7 @@ import (
 // The Vaults API holds all the operations the SDK client can perform on 1Password vaults.
 type VaultsAPI interface {
 	// List all vaults
-	ListAll(ctx context.Context) (*Iterator[VaultOverview], error)
+	List(ctx context.Context) ([]VaultOverview, error)
 }
 
 type VaultsSource struct {
@@ -24,8 +24,8 @@ func NewVaultsSource(inner internal.InnerClient) VaultsAPI {
 }
 
 // List all vaults
-func (v VaultsSource) ListAll(ctx context.Context) (*Iterator[VaultOverview], error) {
-	resultString, err := clientInvoke(ctx, v.InnerClient, "VaultsListAll", map[string]interface{}{})
+func (v VaultsSource) List(ctx context.Context) ([]VaultOverview, error) {
+	resultString, err := clientInvoke(ctx, v.InnerClient, "VaultsList", map[string]interface{}{})
 	if err != nil {
 		return nil, err
 	}
@@ -34,5 +34,5 @@ func (v VaultsSource) ListAll(ctx context.Context) (*Iterator[VaultOverview], er
 	if err != nil {
 		return nil, err
 	}
-	return NewIterator(result), nil
+	return result, nil
 }
