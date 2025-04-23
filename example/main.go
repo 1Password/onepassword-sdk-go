@@ -8,7 +8,6 @@ import (
 	"encoding/pem"
 	"fmt"
 	"os"
-
 )
 
 // [developer-docs.sdk.go.sdk-import]-start
@@ -69,7 +68,14 @@ func listVaultsAndItems(client *onepassword.Client, vaultID string) {
 	// [developer-docs.sdk.go.list-items]-end
 
 	// [developer-docs.sdk.go.use-item-filters]-start
-	archivedOverviews, err := client.Items().List(context.Background(), vaultID, onepassword.NewItemListFilterTypeVariantByState(&onepassword.ItemListFilterByStateInner{Active: false, Archived: true}))
+	archivedOverviews, err := client.Items().List(context.Background(), vaultID,
+		onepassword.NewItemListFilterTypeVariantByState(
+			&onepassword.ItemListFilterByStateInner{
+				Active:   false,
+				Archived: true,
+			},
+		),
+	)
 	if err != nil {
 		panic(err)
 	}
