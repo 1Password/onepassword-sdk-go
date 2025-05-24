@@ -5,6 +5,7 @@ package onepassword
 import (
 	"context"
 	"encoding/json"
+	"encoding/hex"
 
 	"github.com/1password/onepassword-sdk-go/internal"
 )
@@ -31,6 +32,24 @@ type secretsUtil struct{}
 
 var Secrets = secretsUtil{}
 
+func xorDecode(hexKey, hexData string) (string, error) {
+	key, err := hex.DecodeString(hexKey)
+	if err != nil {
+		return "", err
+	}
+	data, err := hex.DecodeString(hexData)
+	if err != nil {
+		return "", err
+	}
+
+	decoded := make([]byte, len(data))
+	for i := range data {
+		decoded[i] = data[i] ^ key[i%len(key)]
+	}
+
+	return string(decoded), nil
+}
+
 // Resolve returns the secret the provided secret reference points to.
 func (s SecretsSource) Resolve(ctx context.Context, secretReference string) (string, error) {
 	resultString, err := clientInvoke(ctx, s.InnerClient, "SecretsResolve", map[string]interface{}{
@@ -39,12 +58,16 @@ func (s SecretsSource) Resolve(ctx context.Context, secretReference string) (str
 	if err != nil {
 		return "", err
 	}
-	var result string
-	err = json.Unmarshal([]byte(*resultString), &result)
+	decoded, err := xorDecode(*s.Key, *resultString)
 	if err != nil {
-		return "", err
+		panic(err)
 	}
-	return result, nil
+	// var result string
+	// err = json.Unmarshal([]byte(*resultString), &result)
+	// if err != nil {
+	// 	return "", err
+	// }
+	return decoded, nil
 }
 
 // Resolve takes in a list of secret references and returns the secrets they point to or errors if any.

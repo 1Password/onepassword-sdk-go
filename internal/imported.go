@@ -52,7 +52,6 @@ func currentTimeImportedFunc(namespace string) extism.HostFunction {
 // input: writeBytesToPluginMemory - writes bytes to the plugin's memory and returns the offset to that memory
 func randomFill(stack []uint64, writeBytesToPluginMemory func(b []byte) (uint64, error)) {
 	length := api.DecodeU32(stack[0])
-
 	b := make([]byte, length)
 	_, err := rand.Read(b)
 	if err != nil {
