@@ -3,6 +3,7 @@ package internal
 import (
 	"context"
 	_ "embed"
+	"net"
 	"runtime"
 )
 
@@ -22,16 +23,28 @@ type Core interface {
 
 // ClientConfig contains information required for creating a client.
 type ClientConfig struct {
-	SAToken               string `json:"serviceAccountToken"`
+	SAToken               string `json:"serviceAccountToken,omitempty"`
 	Language              string `json:"programmingLanguage"`
 	SDKVersion            string `json:"sdkVersion"`
 	IntegrationName       string `json:"integrationName"`
 	IntegrationVersion    string `json:"integrationVersion"`
 	RequestLibraryName    string `json:"requestLibraryName"`
 	RequestLibraryVersion string `json:"requestLibraryVersion"`
-	SystemOS              string `json:"os"`
-	SystemOSVersion       string `json:"osVersion"`
-	SystemArch            string `json:"architecture"`
+	SystemOS              string `json:"os,omitempty"`
+	SystemOSVersion       string `json:"osVersion,omitempty"`
+	SystemArch            string `json:"architecture,omitempty"`
+	AccountId		   string `json:"accountId,omitempty"`
+}
+
+func NewDefaultAuthPromptConfig() ClientConfig {
+	// TODO: add logic for determining this for all systems in a different PR.
+	return ClientConfig{
+		Language:              SDKLanguage,
+		SDKVersion:            SDKSemverVersion,
+		RequestLibraryName:    DefaultRequestLibrary,
+		RequestLibraryVersion: runtime.Version(),
+		AccountId:             "KQU3GEBRD5C4NPBCEGH3EQLNHY",
+	}
 }
 
 func NewDefaultConfig() ClientConfig {
@@ -66,6 +79,8 @@ type Parameters struct {
 
 // InnerClient represents the sdk-core client on which calls will be made.
 type InnerClient struct {
-	ID   uint64
-	Core Core
+	// ID   uint64
+	Connection *net.Conn
+	Core *Core
+	Key *string
 }
