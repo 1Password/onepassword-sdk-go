@@ -729,6 +729,10 @@ type VaultOverview struct {
 	ID string `json:"id"`
 	// The vault's title
 	Title string `json:"title"`
+	// The time the vault was created at
+	CreatedAt time.Time `json:"createdAt"`
+	// The time the vault was updated at
+	UpdatedAt time.Time `json:"updatedAt"`
 }
 
 // Generated type representing the anonymous struct variant `ByState` of the `ItemListFilter` Rust enum
