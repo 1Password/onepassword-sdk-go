@@ -1,5 +1,5 @@
-# 1Password Go SDK v0.3.0
+# 1Password Go SDK v0.3.1
 
 ## NEW
 
-- `VaultOverview` has `created_at` and `updated_at` fields
+- `VaultOverview` has `created_at` and `updated_at` fields now.
