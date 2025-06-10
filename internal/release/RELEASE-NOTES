@@ -2,4 +2,4 @@
 
 ## NEW
 
-- `VaultOverview` has `created_at` and `updated_at` fields now.
+- `VaultOverview` now includes `created_at` and `updated_at` fields that show when the vault was created and last updated.
