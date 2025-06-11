@@ -53,7 +53,7 @@ func listVaultsAndItems(client *onepassword.Client, vaultID string) {
 		panic(err)
 	}
 	for _, vault := range vaults {
-		fmt.Printf("%s %s\n", vault.ID, vault.Title)
+		fmt.Printf("%s %s %v %v\n", vault.ID, vault.Title, vault.CreatedAt, vault.UpdatedAt)
 	}
 	// [developer-docs.sdk.go.list-vaults]-end
 
