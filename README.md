@@ -107,6 +107,7 @@ Field types:
 - [x] MM/YY
 - [x] Files attachments and Document items
 - [x] Menu
+- [ ] Passkeys
 
 ### Vault management
 - [ ] Retrieve vaults
