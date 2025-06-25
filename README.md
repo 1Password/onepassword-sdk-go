@@ -105,8 +105,9 @@ Field types:
 - [x] Address
 - [x] Date
 - [x] MM/YY
-- [x] Files attachments and Document items
+- [x] File attachments and Document items
 - [x] Menu
+- [ ] Passkeys
 
 ### Vault management
 - [ ] Retrieve vaults
