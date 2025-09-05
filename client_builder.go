@@ -15,14 +15,6 @@ const (
 
 // NewClient returns a 1Password Go SDK client using the provided ClientOption list.
 func NewClient(ctx context.Context, opts ...ClientOption) (*Client, error) {
-	core, err := internal.GetSharedCore()
-	if err != nil {
-		return nil, err
-	}
-	return createClient(ctx, core, opts...)
-}
-
-func createClient(ctx context.Context, core internal.Core, opts ...ClientOption) (*Client, error) {
 	client := Client{
 		config: internal.NewDefaultConfig(),
 	}
@@ -34,6 +26,21 @@ func createClient(ctx context.Context, core internal.Core, opts ...ClientOption)
 		}
 	}
 
+	var core internal.Core
+	var err error
+	if client.usesDesktopApp {
+		core, err = internal.NewSharedLibCore()
+	} else {
+		core, err = internal.GetSharedCore()
+	}
+
+	if err != nil {
+		return nil, err
+	}
+	return createClient(ctx, core, client)
+}
+
+func createClient(ctx context.Context, core internal.Core, client Client) (*Client, error) {
 	clientID, err := core.InitClient(ctx, client.config)
 	if err != nil {
 		return nil, fmt.Errorf("error initializing client: %w", unmarshalError(err.Error()))
@@ -67,6 +74,14 @@ func WithIntegrationInfo(name string, version string) ClientOption {
 	return func(c *Client) error {
 		c.config.IntegrationName = name
 		c.config.IntegrationVersion = version
+		return nil
+	}
+}
+
+// WithDesktopAppIntegration specifiers whether the SDK should attempt to connect to the 1Password Desktop app.
+func WithDesktopAppIntegration() ClientOption {
+	return func(c *Client) error {
+		c.usesDesktopApp = true
 		return nil
 	}
 }
