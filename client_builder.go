@@ -26,12 +26,16 @@ func NewClient(ctx context.Context, opts ...ClientOption) (*Client, error) {
 		}
 	}
 
+	if client.usesDesktopApp && client.config.SAToken != "" {
+		return nil, fmt.Errorf("cannot use both SA token and desktop app authentication")
+	}
+
 	var core internal.Core
 	var err error
 	if client.usesDesktopApp {
-		core, err = internal.NewSharedLibCore()
+		core, err = internal.GetSharedLibCore()
 	} else {
-		core, err = internal.GetSharedCore()
+		core, err = internal.GetExtismCore()
 	}
 
 	if err != nil {
