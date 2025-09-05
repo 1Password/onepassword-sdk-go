@@ -18,7 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Slack Notification
-        uses: kv109/action-ready-for-review@0.2
+        uses: kv109/action-ready-for-review@76820bc668c3ce6c9be0c9322d07c2d8804dbd7a
         env:
           SLACK_CHANNEL: sdk-security-alerts
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
