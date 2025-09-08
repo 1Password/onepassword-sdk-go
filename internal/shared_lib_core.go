@@ -72,9 +72,9 @@ static int close_library(void* handle) {
 import "C"
 
 type SharedLibCore struct {
-	handle      unsafe.Pointer
-	sendMessage C.send_message_t
-	freeMessage C.free_message_t
+	handle       unsafe.Pointer
+	sendMessage  C.send_message_t
+	freeResponse C.free_message_t
 }
 
 var coreLib *SharedLibCore
@@ -159,9 +159,9 @@ func loadCore(path string) (*SharedLibCore, error) {
 	}
 
 	return &SharedLibCore{
-		handle:      handle,
-		sendMessage: (C.send_message_t)(fnSend),
-		freeMessage: (C.free_message_t)(fnFree),
+		handle:       handle,
+		sendMessage:  (C.send_message_t)(fnSend),
+		freeResponse: (C.free_message_t)(fnFree),
 	}, nil
 }
 
@@ -218,7 +218,7 @@ func (c *SharedLibCore) callSharedLibrary(input []byte) ([]byte, error) {
 
 	resp := C.GoBytes(unsafe.Pointer(outBuf), C.int(outLen))
 	// Call trampoline with the function pointer
-	C.call_free_message(c.freeMessage, outBuf, outLen, outCap)
+	C.call_free_message(c.freeResponse, outBuf, outLen, outCap)
 
 	return resp, nil
 }
