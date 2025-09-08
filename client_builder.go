@@ -41,10 +41,11 @@ func NewClient(ctx context.Context, opts ...ClientOption) (*Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	return createClient(ctx, core, client)
+	coreWrapper := internal.CoreWrapper{InnerCore: core}
+	return createClient(ctx, coreWrapper, client)
 }
 
-func createClient(ctx context.Context, core internal.Core, client Client) (*Client, error) {
+func createClient(ctx context.Context, core internal.CoreWrapper, client Client) (*Client, error) {
 	clientID, err := core.InitClient(ctx, client.config)
 	if err != nil {
 		return nil, fmt.Errorf("error initializing client: %w", unmarshalError(err.Error()))

@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path/filepath"
 	"runtime"
 	"unsafe"
 )
@@ -83,54 +82,39 @@ var coreLib *SharedLibCore
 // find1PasswordLibPath returns the path to the 1Password shared library
 // (libop_sdk_ipc_client.dylib/.so/.dll) depending on OS.
 func find1PasswordLibPath() (string, error) {
-	switch runtime.GOOS {
-	case "darwin": // macOS
-		// Typical locations for the 1Password bundle
-		executables := []string{
-			"/Applications/1Password/Contents/MacOS/1Password",
-		}
+	hostOS := runtime.GOOS
 
-		for _, exe := range executables {
-			if _, err := os.Stat(exe); err == nil {
-				// Replace the executable name with the dylib name
-				libPath := filepath.Join(filepath.Dir(exe), "libop_sdk_ipc_client.dylib")
-				if _, err := os.Stat(libPath); err == nil {
-					return libPath, nil
-				}
-			}
-		}
+	core, err := GetExtismCore()
+	if err != nil {
+		return "", err
+	}
 
-	case "linux":
-		// On Linux, it might live under /opt/1Password or similar
-		candidates := []string{
-			"/opt/1Password/libop_sdk_ipc_client.so",
-			"/usr/lib/1password/libop_sdk_ipc_client.so",
-		}
-		for _, lib := range candidates {
-			if _, err := os.Stat(lib); err == nil {
-				return lib, nil
-			}
-		}
+	locationsRaw, err := core.Invoke(context.Background(), InvokeConfig{Invocation: Invocation{
+		Parameters: Parameters{
+			MethodName:       "GetDesktopAppIPCClientLocations",
+			SerializedParams: map[string]interface{}{"host_os": hostOS},
+		},
+	}})
+	if err != nil {
+		return "", err
+	}
 
-	case "windows":
-		// On Windows, shared libs are DLLs in the install directory
-		executables := []string{
-			`C:\Program Files\1Password\1Password.exe`,
-		}
-		for _, exe := range executables {
-			if _, err := os.Stat(exe); err == nil {
-				libPath := filepath.Join(filepath.Dir(exe), "op_sdk_ipc_client.dll")
-				if _, err := os.Stat(libPath); err == nil {
-					return libPath, nil
-				}
-			}
+	var locations []string
+	err = json.Unmarshal([]byte(*locationsRaw), &locations)
+	if err != nil {
+		return "", err
+	}
+
+	for _, libPath := range locations {
+		if _, err := os.Stat(libPath); err == nil {
+			return libPath, nil
 		}
 	}
 
 	return "", fmt.Errorf("1Password desktop application not found")
 }
 
-func GetSharedLibCore() (*SharedLibCore, error) {
+func GetSharedLibCore() (*CoreWrapper, error) {
 	if coreLib == nil {
 		path, err := find1PasswordLibPath()
 		if err != nil {
@@ -142,7 +126,9 @@ func GetSharedLibCore() (*SharedLibCore, error) {
 		}
 	}
 
-	return coreLib, nil
+	coreWrapper := CoreWrapper{InnerCore: coreLib}
+
+	return &coreWrapper, nil
 }
 
 func loadCore(path string) (*SharedLibCore, error) {
@@ -187,46 +173,26 @@ func (c *SharedLibCore) Close() {
 }
 
 // InitClient creates a client instance in the current core module and returns its unique ID.
-func (c *SharedLibCore) InitClient(ctx context.Context, config ClientConfig) (*uint64, error) {
-	marshaledConfig, err := json.Marshal(config)
+func (c *SharedLibCore) InitClient(ctx context.Context, config []byte) ([]byte, error) {
+	res, err := c.callSharedLibrary(config)
 	if err != nil {
 		return nil, err
 	}
-
-	res, err := c.callSharedLibrary(marshaledConfig)
-	if err != nil {
-		return nil, err
-	}
-	var id uint64
-	err = json.Unmarshal(res, &id)
-	if err != nil {
-		return nil, err
-	}
-	return &id, nil
+	return res, nil
 }
 
-func (c *SharedLibCore) Invoke(ctx context.Context, invokeConfig InvokeConfig) (*string, error) {
-	input, err := json.Marshal(invokeConfig)
+func (c *SharedLibCore) Invoke(ctx context.Context, invokeConfig []byte) ([]byte, error) {
+	res, err := c.callSharedLibrary(invokeConfig)
 	if err != nil {
 		return nil, err
 	}
 
-	res, err := c.callSharedLibrary(input)
-	if err != nil {
-		return nil, err
-	}
-
-	response := string(res)
-	return &response, nil
+	return res, nil
 }
 
 // ReleaseClient releases memory in the core associated with the given client ID.
-func (c *SharedLibCore) ReleaseClient(clientID uint64) {
-	marshaledClientID, err := json.Marshal(clientID)
-	if err != nil {
-		log.Println("failed to marshal clientID")
-	}
-	_, err = c.callSharedLibrary(marshaledClientID)
+func (c *SharedLibCore) ReleaseClient(clientID []byte) {
+	_, err := c.callSharedLibrary(clientID)
 	if err != nil {
 		log.Println("failed to release client")
 	}

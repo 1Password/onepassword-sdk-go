@@ -3,6 +3,9 @@ package internal
 import (
 	"context"
 	_ "embed"
+	"encoding/json"
+	"fmt"
+	"log"
 	"runtime"
 )
 
@@ -15,9 +18,61 @@ const (
 var SDKSemverVersion string
 
 type Core interface {
-	InitClient(ctx context.Context, config ClientConfig) (*uint64, error)
-	Invoke(ctx context.Context, invokeConfig InvokeConfig) (*string, error)
-	ReleaseClient(clientID uint64)
+	InitClient(ctx context.Context, config []byte) ([]byte, error)
+	Invoke(ctx context.Context, invokeConfig []byte) ([]byte, error)
+	ReleaseClient(clientID []byte)
+}
+
+type CoreWrapper struct {
+	InnerCore Core
+}
+
+// InitClient creates a client instance in the current core module and returns its unique ID.
+func (c *CoreWrapper) InitClient(ctx context.Context, config ClientConfig) (*uint64, error) {
+	marshaledConfig, err := json.Marshal(config)
+	if err != nil {
+		return nil, err
+	}
+
+	// first return parameter is a sys.Exit code, which we don't need since the error is fully recoverable
+	res, err := c.InnerCore.InitClient(ctx, marshaledConfig)
+	if err != nil {
+		return nil, err
+	}
+	var id uint64
+	err = json.Unmarshal(res, &id)
+	if err != nil {
+		return nil, err
+	}
+	return &id, nil
+}
+
+// Invoke calls specified business logic from core
+func (c *CoreWrapper) Invoke(ctx context.Context, invokeConfig InvokeConfig) (*string, error) {
+	input, err := json.Marshal(invokeConfig)
+	if err != nil {
+		return nil, err
+	}
+	if len(input) > messageLimit {
+		return nil, fmt.Errorf("message size exceeds the limit of %d bytes, please contact 1Password at support@1password.com or https://developer.1password.com/joinslack if you need help", messageLimit)
+	}
+	res, err := c.InnerCore.Invoke(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+
+	response := string(res)
+
+	return &response, nil
+}
+
+// ReleaseClient releases memory in the core associated with the given client ID.
+func (c *CoreWrapper) ReleaseClient(clientID uint64) {
+	marshaledClientID, err := json.Marshal(clientID)
+	if err != nil {
+		log.Println("failed to marshal clientID")
+	}
+	c.InnerCore.ReleaseClient(marshaledClientID)
 }
 
 // ClientConfig contains information required for creating a client.
@@ -68,5 +123,5 @@ type Parameters struct {
 // InnerClient represents the sdk-core client on which calls will be made.
 type InnerClient struct {
 	ID   uint64
-	Core Core
+	Core CoreWrapper
 }

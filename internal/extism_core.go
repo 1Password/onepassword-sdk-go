@@ -3,7 +3,6 @@ package internal
 import (
 	"context"
 	_ "embed"
-	"encoding/json"
 	"fmt"
 	"sync"
 
@@ -27,7 +26,7 @@ const (
 var core *ExtismCore
 
 // GetExtismCore initializes the shared core once and returns the already existing one on subsequent calls.
-func GetExtismCore() (*ExtismCore, error) {
+func GetExtismCore() (*CoreWrapper, error) {
 	runtimeCtx := context.Background()
 	if core == nil {
 		p, err := loadWASM(runtimeCtx)
@@ -37,7 +36,11 @@ func GetExtismCore() (*ExtismCore, error) {
 		core = &ExtismCore{plugin: p}
 	}
 
-	return core, nil
+	coreWrapper := CoreWrapper{
+		InnerCore: core,
+	}
+
+	return &coreWrapper, nil
 }
 
 func ReleaseCore() {
@@ -53,51 +56,30 @@ type ExtismCore struct {
 }
 
 // InitClient creates a client instance in the current core module and returns its unique ID.
-func (c *ExtismCore) InitClient(ctx context.Context, config ClientConfig) (*uint64, error) {
-	marshaledConfig, err := json.Marshal(config)
-	if err != nil {
-		return nil, err
-	}
-
+func (c *ExtismCore) InitClient(ctx context.Context, config []byte) ([]byte, error) {
 	// first return parameter is a sys.Exit code, which we don't need since the error is fully recoverable
-	res, err := c.callWithCtx(ctx, initClientFuncName, marshaledConfig)
+	res, err := c.callWithCtx(ctx, initClientFuncName, config)
 	if err != nil {
 		return nil, err
 	}
-	var id uint64
-	err = json.Unmarshal(res, &id)
-	if err != nil {
-		return nil, err
-	}
-	return &id, nil
+	return res, nil
 }
 
 // Invoke calls specified business logic from core
-func (c *ExtismCore) Invoke(ctx context.Context, invokeConfig InvokeConfig) (*string, error) {
-	input, err := json.Marshal(invokeConfig)
+func (c *ExtismCore) Invoke(ctx context.Context, invokeConfig []byte) ([]byte, error) {
+	if len(invokeConfig) > messageLimit {
+		return nil, fmt.Errorf("message size exceeds the limit of %d bytes, please contact 1Password at support@1password.com or https://developer.1password.com/joinslack if you need help", messageLimit)
+	}
+	res, err := c.callWithCtx(ctx, invokeFuncName, invokeConfig)
 	if err != nil {
 		return nil, err
 	}
-	if len(input) > messageLimit {
-		return nil, fmt.Errorf("message size exceeds the limit of %d bytes, please contact 1Password at support@1password.com or https://developer.1password.com/joinslack if you need help.", messageLimit)
-	}
-	res, err := c.callWithCtx(ctx, invokeFuncName, input)
-	if err != nil {
-		return nil, err
-	}
-
-	response := string(res)
-
-	return &response, nil
+	return res, nil
 }
 
 // ReleaseClient releases memory in the core associated with the given client ID.
-func (c *ExtismCore) ReleaseClient(clientID uint64) {
-	marshaledClientID, err := json.Marshal(clientID)
-	if err != nil {
-		c.plugin.Log(extism.LogLevelWarn, fmt.Sprintf("memory couldn't be released: %s", err.Error()))
-	}
-	_, err = c.call(releaseClientFuncName, marshaledClientID)
+func (c *ExtismCore) ReleaseClient(clientID []byte) {
+	_, err := c.call(releaseClientFuncName, clientID)
 	if err != nil {
 		c.plugin.Log(extism.LogLevelWarn, "memory couldn't be released")
 	}
