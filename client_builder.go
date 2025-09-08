@@ -30,7 +30,7 @@ func NewClient(ctx context.Context, opts ...ClientOption) (*Client, error) {
 		return nil, fmt.Errorf("cannot use both SA token and desktop app authentication")
 	}
 
-	var core internal.Core
+	var core *internal.CoreWrapper
 	var err error
 	if client.usesDesktopApp {
 		core, err = internal.GetSharedLibCore()
@@ -41,8 +41,7 @@ func NewClient(ctx context.Context, opts ...ClientOption) (*Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	coreWrapper := internal.CoreWrapper{InnerCore: core}
-	return createClient(ctx, coreWrapper, client)
+	return createClient(ctx, *core, client)
 }
 
 func createClient(ctx context.Context, core internal.CoreWrapper, client Client) (*Client, error) {
