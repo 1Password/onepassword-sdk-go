@@ -86,7 +86,7 @@ func WithIntegrationInfo(name string, version string) ClientOption {
 func WithDesktopAppIntegration(accountName string) ClientOption {
 	return func(c *Client) error {
 		c.usesDesktopApp = true
-		c.desktopAppAccountName = &accountName
+		c.config.AccountName = &accountName
 		return nil
 	}
 }
