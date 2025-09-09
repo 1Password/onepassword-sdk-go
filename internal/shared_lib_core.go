@@ -84,14 +84,14 @@ var coreLib *SharedLibCore
 func find1PasswordLibPath() (string, error) {
 	hostOS := runtime.GOOS
 
-	core, err := GetExtismCore()
+	wasmCore, err := GetExtismCore()
 	if err != nil {
 		return "", err
 	}
 
-	locationsRaw, err := core.Invoke(context.Background(), InvokeConfig{Invocation: Invocation{
+	locationsRaw, err := wasmCore.Invoke(context.Background(), InvokeConfig{Invocation: Invocation{
 		Parameters: Parameters{
-			MethodName:       "GetDesktopAppIPCClientLocations",
+			MethodName:       "GetDesktopAppIpcClientLocations",
 			SerializedParams: map[string]interface{}{"host_os": hostOS},
 		},
 	}})
@@ -165,24 +165,17 @@ func loadCore(path string) (*SharedLibCore, error) {
 	}, nil
 }
 
-func (c *SharedLibCore) Close() {
-	if c.handle != nil {
-		C.close_library(c.handle)
-		c.handle = nil
-	}
-}
-
 // InitClient creates a client instance in the current core module and returns its unique ID.
-func (c *SharedLibCore) InitClient(ctx context.Context, config []byte) ([]byte, error) {
-	res, err := c.callSharedLibrary(config)
+func (slc *SharedLibCore) InitClient(ctx context.Context, config []byte) ([]byte, error) {
+	res, err := slc.callSharedLibrary(config)
 	if err != nil {
 		return nil, err
 	}
 	return res, nil
 }
 
-func (c *SharedLibCore) Invoke(ctx context.Context, invokeConfig []byte) ([]byte, error) {
-	res, err := c.callSharedLibrary(invokeConfig)
+func (slc *SharedLibCore) Invoke(ctx context.Context, invokeConfig []byte) ([]byte, error) {
+	res, err := slc.callSharedLibrary(invokeConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -191,20 +184,24 @@ func (c *SharedLibCore) Invoke(ctx context.Context, invokeConfig []byte) ([]byte
 }
 
 // ReleaseClient releases memory in the core associated with the given client ID.
-func (c *SharedLibCore) ReleaseClient(clientID []byte) {
-	_, err := c.callSharedLibrary(clientID)
+func (slc *SharedLibCore) ReleaseClient(clientID []byte) {
+	_, err := slc.callSharedLibrary(clientID)
 	if err != nil {
 		log.Println("failed to release client")
 	}
 }
 
-func (c *SharedLibCore) callSharedLibrary(input []byte) ([]byte, error) {
+func (slc *SharedLibCore) callSharedLibrary(input []byte) ([]byte, error) {
+	if len(input) == 0 {
+		return nil, errors.New("internal: empty input")
+	}
+
 	var outBuf *C.uint8_t
 	var outLen C.size_t
 	var outCap C.size_t
 
 	retCode := C.call_send_message(
-		c.sendMessage,
+		slc.sendMessage,
 		(*C.uint8_t)(unsafe.Pointer(&input[0])),
 		C.size_t(len(input)),
 		&outBuf,
@@ -213,12 +210,12 @@ func (c *SharedLibCore) callSharedLibrary(input []byte) ([]byte, error) {
 	)
 
 	if retCode != 0 {
-		return nil, fmt.Errorf("send_message failed: %d", int(retCode))
+		return nil, fmt.Errorf("failed to send message to OPH. Return code: %d", int(retCode))
 	}
 
 	resp := C.GoBytes(unsafe.Pointer(outBuf), C.int(outLen))
 	// Call trampoline with the function pointer
-	C.call_free_message(c.freeResponse, outBuf, outLen, outCap)
+	C.call_free_message(slc.freeResponse, outBuf, outLen, outCap)
 
 	return resp, nil
 }
