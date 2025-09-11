@@ -26,13 +26,13 @@ func NewClient(ctx context.Context, opts ...ClientOption) (*Client, error) {
 		}
 	}
 
-	if client.usesDesktopApp && client.config.SAToken != "" {
+	if client.config.AccountName != nil && client.config.SAToken != "" {
 		return nil, fmt.Errorf("cannot use both SA token and desktop app authentication")
 	}
 
 	var core *internal.CoreWrapper
 	var err error
-	if client.usesDesktopApp {
+	if client.config.AccountName != nil {
 		core, err = internal.GetSharedLibCore()
 	} else {
 		core, err = internal.GetExtismCore()
@@ -86,7 +86,6 @@ func WithIntegrationInfo(name string, version string) ClientOption {
 // WithDesktopAppIntegration specifiers whether the SDK should attempt to connect to the 1Password Desktop app.
 func WithDesktopAppIntegration(accountName string) ClientOption {
 	return func(c *Client) error {
-		c.usesDesktopApp = true
 		c.config.AccountName = &accountName
 		return nil
 	}
