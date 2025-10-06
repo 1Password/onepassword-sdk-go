@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"runtime"
 	"unsafe"
 )
 
@@ -72,6 +71,7 @@ static int close_library(void* handle) {
 import "C"
 
 type SharedLibCore struct {
+	accountName  string
 	handle       unsafe.Pointer
 	sendMessage  C.send_message_t
 	freeResponse C.free_message_t
@@ -82,29 +82,7 @@ var coreLib *SharedLibCore
 // find1PasswordLibPath returns the path to the 1Password shared library
 // (libop_sdk_ipc_client.dylib/.so/.dll) depending on OS.
 func find1PasswordLibPath() (string, error) {
-	hostOS := runtime.GOOS
-
-	wasmCore, err := GetExtismCore()
-	if err != nil {
-		return "", err
-	}
-
-	locationsRaw, err := wasmCore.Invoke(context.Background(), InvokeConfig{Invocation: Invocation{
-		Parameters: Parameters{
-			MethodName:       "GetDesktopAppIpcClientLocations",
-			SerializedParams: map[string]interface{}{"host_os": hostOS},
-		},
-	}})
-	if err != nil {
-		return "", err
-	}
-
-	var locations []string
-	err = json.Unmarshal([]byte(*locationsRaw), &locations)
-	if err != nil {
-		return "", err
-	}
-
+	locations := []string{"/Users/andititu/core/target/debug/libop_sdk_ipc_client.dylib"}
 	for _, libPath := range locations {
 		if _, err := os.Stat(libPath); err == nil {
 			return libPath, nil
@@ -114,7 +92,7 @@ func find1PasswordLibPath() (string, error) {
 	return "", fmt.Errorf("1Password desktop application not found")
 }
 
-func GetSharedLibCore() (*CoreWrapper, error) {
+func GetSharedLibCore(accountName string) (*CoreWrapper, error) {
 	if coreLib == nil {
 		path, err := find1PasswordLibPath()
 		if err != nil {
@@ -124,6 +102,7 @@ func GetSharedLibCore() (*CoreWrapper, error) {
 		if err != nil {
 			return nil, err
 		}
+		coreLib.accountName = accountName
 	}
 
 	coreWrapper := CoreWrapper{InnerCore: coreLib}
@@ -167,15 +146,39 @@ func loadCore(path string) (*SharedLibCore, error) {
 
 // InitClient creates a client instance in the current core module and returns its unique ID.
 func (slc *SharedLibCore) InitClient(ctx context.Context, config []byte) ([]byte, error) {
-	res, err := slc.callSharedLibrary(config)
+	const kind = "init_client"
+	request := Request{
+		Kind:        kind,
+		AccountName: slc.accountName,
+		Payload:     config,
+	}
+
+	requestMarshaled, err := json.Marshal(request)
 	if err != nil {
 		return nil, err
 	}
+	res, err := slc.callSharedLibrary(requestMarshaled)
+	if err != nil {
+		return nil, err
+	}
+
 	return res, nil
 }
 
 func (slc *SharedLibCore) Invoke(ctx context.Context, invokeConfig []byte) ([]byte, error) {
-	res, err := slc.callSharedLibrary(invokeConfig)
+	const kind = "invoke"
+	request := Request{
+		Kind:        kind,
+		AccountName: slc.accountName,
+		Payload:     invokeConfig,
+	}
+
+	requestMarshaled, err := json.Marshal(request)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := slc.callSharedLibrary(requestMarshaled)
 	if err != nil {
 		return nil, err
 	}
@@ -217,5 +220,30 @@ func (slc *SharedLibCore) callSharedLibrary(input []byte) ([]byte, error) {
 	// Call trampoline with the function pointer
 	C.call_free_message(slc.freeResponse, outBuf, outLen, outCap)
 
-	return resp, nil
+	var response Response
+	err := json.Unmarshal(resp, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	if response.Success {
+		return response.Payload, nil
+	} else {
+		return nil, response
+	}
+}
+
+type Request struct {
+	Kind        string `json:"kind"`
+	AccountName string `json:"account_name"`
+	Payload     []byte `json:"payload"`
+}
+
+type Response struct {
+	Success bool   `json:"success"`
+	Payload []byte `json:"payload"`
+}
+
+func (r Response) Error() string {
+	return string(r.Payload)
 }
