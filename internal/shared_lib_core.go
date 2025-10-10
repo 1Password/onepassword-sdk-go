@@ -65,6 +65,11 @@ static void* load_symbol(void* handle, const char* name) {
     return dlsym(handle, name);
 }
 
+// dlclose wrapper
+static int close_library(void* handle) {
+    return dlclose(handle);
+}
+
 */
 import "C"
 
