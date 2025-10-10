@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"runtime"
 	"unsafe"
 )
 
@@ -79,7 +80,30 @@ var coreLib *SharedLibCore
 // find1PasswordLibPath returns the path to the 1Password shared library
 // (libop_sdk_ipc_client.dylib/.so/.dll) depending on OS.
 func find1PasswordLibPath() (string, error) {
-	locations := []string{"/Users/andititu/core/target/debug/libop_sdk_ipc_client.dylib"}
+	var locations []string
+
+	switch runtime.GOOS {
+	case "darwin":
+		locations = []string{
+			"/Applications/1Password.app/Contents/Frameworks/libop_sdk_ipc_client.dylib",
+		}
+
+	case "linux":
+		locations = []string{
+			"/usr/bin/1password/libop_sdk_ipc_client.so",
+			"/opt/1password/libop_sdk_ipc_client.so",
+			"/snap/bin/1password/libop_sdk_ipc_client.so",
+		}
+
+	case "windows":
+		locations = []string{
+			`C:\Program Files\1Password\op_sdk_ipc_client.dll`,
+			`C:\Program Files (x86)\1Password\op_sdk_ipc_client.dll`,
+		}
+
+	default:
+		return "", fmt.Errorf("unsupported OS: %s", runtime.GOOS)
+	}
 	for _, libPath := range locations {
 		if _, err := os.Stat(libPath); err == nil {
 			return libPath, nil
