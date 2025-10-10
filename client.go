@@ -8,11 +8,10 @@ import (
 
 // Client represents an instance of the 1Password Go SDK client.
 type Client struct {
-	config      internal.ClientConfig
-	accountName *string
-	SecretsAPI  SecretsAPI
-	ItemsAPI    ItemsAPI
-	VaultsAPI   VaultsAPI
+	config     internal.ClientConfig
+	SecretsAPI SecretsAPI
+	ItemsAPI   ItemsAPI
+	VaultsAPI  VaultsAPI
 }
 
 func initAPIs(client *Client, inner internal.InnerClient) {

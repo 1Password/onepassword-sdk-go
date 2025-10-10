@@ -77,16 +77,17 @@ func (c *CoreWrapper) ReleaseClient(clientID uint64) {
 
 // ClientConfig contains information required for creating a client.
 type ClientConfig struct {
-	SAToken               string `json:"serviceAccountToken"`
-	Language              string `json:"programmingLanguage"`
-	SDKVersion            string `json:"sdkVersion"`
-	IntegrationName       string `json:"integrationName"`
-	IntegrationVersion    string `json:"integrationVersion"`
-	RequestLibraryName    string `json:"requestLibraryName"`
-	RequestLibraryVersion string `json:"requestLibraryVersion"`
-	SystemOS              string `json:"os"`
-	SystemOSVersion       string `json:"osVersion"`
-	SystemArch            string `json:"architecture"`
+	SAToken               string  `json:"serviceAccountToken"`
+	Language              string  `json:"programmingLanguage"`
+	SDKVersion            string  `json:"sdkVersion"`
+	IntegrationName       string  `json:"integrationName"`
+	IntegrationVersion    string  `json:"integrationVersion"`
+	RequestLibraryName    string  `json:"requestLibraryName"`
+	RequestLibraryVersion string  `json:"requestLibraryVersion"`
+	SystemOS              string  `json:"os"`
+	SystemOSVersion       string  `json:"osVersion"`
+	SystemArch            string  `json:"architecture"`
+	AccountName           *string `json:"account_name"`
 }
 
 func NewDefaultConfig() ClientConfig {
