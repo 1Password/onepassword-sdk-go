@@ -84,6 +84,7 @@ func WithIntegrationInfo(name string, version string) ClientOption {
 }
 
 // WithDesktopAppIntegration specifiers whether the SDK should attempt to connect to the 1Password Desktop app.
+// Takes as input the account name as specified in the desktop application, or the account UUID.
 func WithDesktopAppIntegration(accountName string) ClientOption {
 	return func(c *Client) error {
 		c.config.AccountName = &accountName

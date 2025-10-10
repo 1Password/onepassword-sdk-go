@@ -32,7 +32,7 @@ typedef void (*free_message_t)(
     size_t cap
 );
 
-// Trampoline wrappers so Go can call the function pointers
+// Trampoline for calling `send_message`, as Go cannot call function pointers directly.
 static inline int32_t call_send_message(
     send_message_t fn,
     const uint8_t* msg_ptr,
@@ -44,6 +44,7 @@ static inline int32_t call_send_message(
     return fn(msg_ptr, msg_len, out_buf, out_len, out_cap);
 }
 
+// Trampoline for calling `free_message`, as Go cannot call function pointers directly.
 static inline void call_free_message(
     free_message_t fn,
     uint8_t* buf,
@@ -63,10 +64,6 @@ static void* load_symbol(void* handle, const char* name) {
     return dlsym(handle, name);
 }
 
-// dlclose wrapper
-static int close_library(void* handle) {
-    return dlclose(handle);
-}
 */
 import "C"
 
@@ -213,7 +210,7 @@ func (slc *SharedLibCore) callSharedLibrary(input []byte) ([]byte, error) {
 	)
 
 	if retCode != 0 {
-		return nil, fmt.Errorf("failed to send message to Desktop App. Return code: %d", int(retCode))
+		return nil, fmt.Errorf("failed to send message to Desktop App. Please make sure the integrations is enabled or otherwise contact 1Password support. Return code: %d", int(retCode))
 	}
 
 	resp := C.GoBytes(unsafe.Pointer(outBuf), C.int(outLen))

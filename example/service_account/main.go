@@ -5,7 +5,6 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
-	"encoding/json"
 	"encoding/pem"
 	"fmt"
 	"os"
@@ -19,11 +18,11 @@ import "github.com/1password/onepassword-sdk-go"
 func main() {
 	// [developer-docs.sdk.go.client-initialization]-start
 	// Gets your service account token from the OP_SERVICE_ACCOUNT_TOKEN environment variable.
-	//token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
+	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
 
 	// Authenticates with your service account token and connects to 1Password.
 	client, err := onepassword.NewClient(context.Background(),
-		onepassword.WithDesktopAppIntegration("AndiTituTest"),
+		onepassword.WithServiceAccountToken(token),
 		// TODO: Set the following to your own integration name and version.
 		onepassword.WithIntegrationInfo("My 1Password Integration", "v1.0.0"),
 	)
@@ -224,11 +223,6 @@ func createAndGetItem(client *onepassword.Client) onepassword.Item {
 	if err != nil {
 		panic(err)
 	}
-	p, err := json.Marshal(createdItem)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(string(p))
 	// [developer-docs.sdk.go.create-item]-end
 
 	// [developer-docs.sdk.go.get-item]-start
@@ -395,8 +389,6 @@ func createSSHKeyItem(client *onepassword.Client) {
 	if err != nil {
 		panic(err)
 	}
-
-	fmt.Println(createdItem)
 
 	// Fetch all SSH key attributes
 	fmt.Println(createdItem.Fields[0].Value)
