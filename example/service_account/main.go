@@ -12,6 +12,7 @@ import (
 
 // [developer-docs.sdk.go.sdk-import]-start
 import "github.com/1password/onepassword-sdk-go"
+
 // [developer-docs.sdk.go.sdk-import]-end
 
 func main() {
@@ -407,7 +408,7 @@ func createAndReplaceDocumentItem(client *onepassword.Client) {
 	vaultID := os.Getenv("OP_VAULT_ID")
 
 	// [developer-docs.sdk.go.create-document-item]-start
-	fileContent, err := os.ReadFile("./example/file.txt")
+	fileContent, err := os.ReadFile("./example/service_account/file.txt")
 	if err != nil {
 		panic(err)
 	}
@@ -428,7 +429,7 @@ func createAndReplaceDocumentItem(client *onepassword.Client) {
 
 	// [developer-docs.sdk.go.replace-document-item]-start
 	// Replace the document item
-	file2Content, err := os.ReadFile("./example/file2.txt")
+	file2Content, err := os.ReadFile("./example/service_account/file2.txt")
 	if err != nil {
 		panic(err)
 	}
@@ -461,7 +462,7 @@ func createAndAttachAndDeleteFileFieldItem(client *onepassword.Client) {
 	sectionID := "extraDetails"
 
 	// [developer-docs.sdk.go.create-item-with-file-field]-start
-	fileContent, err := os.ReadFile("./example/file.txt")
+	fileContent, err := os.ReadFile("./example/service_account/file.txt")
 	if err != nil {
 		panic(err)
 	}
@@ -499,7 +500,7 @@ func createAndAttachAndDeleteFileFieldItem(client *onepassword.Client) {
 	fmt.Println(string(retrievedFileContent))
 
 	// [developer-docs.sdk.go.attach-file-field-item]-start
-	file2Content, err := os.ReadFile("./example/file2.txt")
+	file2Content, err := os.ReadFile("./example/service_account/file2.txt")
 	if err != nil {
 		panic(err)
 	}
