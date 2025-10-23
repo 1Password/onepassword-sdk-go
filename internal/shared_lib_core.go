@@ -107,12 +107,6 @@ func find1PasswordLibPath() (string, error) {
 			"/snap/bin/1password/libop_sdk_ipc_client.so",
 		}
 
-	case "windows":
-		locations = []string{
-			`C:\Program Files\1Password\op_sdk_ipc_client.dll`,
-			`C:\Program Files (x86)\1Password\op_sdk_ipc_client.dll`,
-		}
-
 	default:
 		return "", fmt.Errorf("unsupported OS: %s", runtime.GOOS)
 	}
