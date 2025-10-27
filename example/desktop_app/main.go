@@ -25,12 +25,17 @@ func main() {
 	}
 	// [developer-docs.sdk.go.client-initialization]-end
 
-	createAndGetItem(client)
+	vaultID := os.Getenv("OP_VAULT_ID")
+	if vaultID == "" {
+		panic("OP_VAULT_ID is required")
+	}
+
+	createAndGetItem(client, vaultID)
+	showcaseVaultOperations(client, vaultID)
+	showcaseBatchItemOperations(client, vaultID)
 }
 
-func createAndGetItem(client *onepassword.Client) onepassword.Item {
-	vaultID := os.Getenv("OP_VAULT_ID")
-
+func createAndGetItem(client *onepassword.Client, vaultID string) onepassword.Item {
 	// [developer-docs.sdk.go.create-item]-start
 	sectionID := "extraDetails"
 	itemParams := onepassword.ItemCreateParams{
@@ -109,4 +114,118 @@ func createAndGetItem(client *onepassword.Client) onepassword.Item {
 	// [developer-docs.sdk.go.get-totp-item-crud]-end
 
 	return login
+}
+
+func showcaseVaultOperations(client *onepassword.Client, vaultID string) {
+	// Vault list
+	vaults, err := client.Vaults().List(context.Background())
+	if err != nil {
+		panic(err)
+	}
+	for _, vault := range vaults {
+		fmt.Println("VAULT ID: ", vault.ID)
+	}
+
+	// Vault get overview
+	vaultOverview, err := client.Vaults().GetOverview(context.Background(), vaultID)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("Vault overview: %v\n", vaultOverview)
+
+	// Vault get details
+	vault, err := client.Vaults().Get(context.Background(), vaultOverview.ID, onepassword.VaultGetParams{})
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("Vault details: %v\n", vault)
+}
+
+func showcaseBatchItemOperations(client *onepassword.Client, vaultID string) {
+	sectionID := "extraDetails"
+	var itemsToCreate []onepassword.ItemCreateParams
+	for i := 1; i <= 3; i++ {
+		itemsToCreate = append(itemsToCreate, onepassword.ItemCreateParams{
+			Title:    fmt.Sprintf("Login %d created with the SDK", i),
+			Category: onepassword.ItemCategoryLogin,
+			VaultID:  vaultID,
+			Fields: []onepassword.ItemField{
+				{
+					ID:        "username",
+					Title:     "username",
+					Value:     "Wendy_Appleseed",
+					FieldType: onepassword.ItemFieldTypeText,
+				},
+				{
+					ID:        "password",
+					Title:     "password",
+					Value:     "my_weak_password123",
+					FieldType: onepassword.ItemFieldTypeConcealed,
+				},
+				{
+					ID:        "onetimepassword",
+					Title:     "one-time password",
+					Value:     "otpauth://totp/my-example-otp?secret=jncrjgbdjnrncbjsr&issuer=1Password",
+					SectionID: &sectionID,
+					FieldType: onepassword.ItemFieldTypeTOTP,
+				},
+			},
+			Sections: []onepassword.ItemSection{
+				{
+					ID:    sectionID,
+					Title: "Extra Details",
+				},
+			},
+			Tags: []string{"test tag1", "test tag 2"},
+			Websites: []onepassword.Website{
+				{
+					URL:              "1password.com",
+					AutofillBehavior: onepassword.AutofillBehaviorAnywhereOnWebsite,
+					Label:            "my custom website",
+				},
+			},
+		})
+	}
+
+	// Batch item create
+	batchCreateResponse, err := client.Items().CreateAll(context.Background(), vaultID, itemsToCreate)
+	if err != nil {
+		panic(err)
+	}
+
+	var itemIDs []string
+	for _, res := range batchCreateResponse.IndividualResponses {
+		if res.Content != nil {
+			fmt.Printf("Created Item %q (%s)\n", res.Content.Title, res.Content.ID)
+			itemIDs = append(itemIDs, res.Content.ID)
+		} else if res.Error != nil {
+			fmt.Printf("[Batch create] Something went wrong: %s\n", res.Error)
+		}
+	}
+
+	// Batch item get
+	batchGetResponse, err := client.Items().GetAll(context.Background(), vaultID, itemIDs)
+	if err != nil {
+		panic(err)
+	}
+	for _, res := range batchGetResponse.IndividualResponses {
+		if res.Content != nil {
+			fmt.Printf("Obtained Item %q (%s)\n", res.Content.Title, res.Content.ID)
+		} else if res.Error != nil {
+			fmt.Printf("[Batch get] Something went wrong: %s\n", res.Error)
+		}
+	}
+
+	// Batch item delete
+	batchDeleteResponse, err := client.Items().DeleteAll(context.Background(), vaultID, itemIDs)
+	if err != nil {
+		panic(err)
+	}
+	for id, res := range batchDeleteResponse.IndividualResponses {
+		if res.Error != nil {
+			fmt.Printf("[Batch delete] Something went wrong: %s\n", res.Error)
+		} else {
+			fmt.Printf("Deleted item %s\n", id)
+		}
+	}
 }
