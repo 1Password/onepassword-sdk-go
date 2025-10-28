@@ -117,7 +117,8 @@ func createAndGetItem(client *onepassword.Client, vaultID string) onepassword.It
 }
 
 func showcaseVaultOperations(client *onepassword.Client, vaultID string) {
-	// Vault list
+	// [developer-docs.sdk.go.list-vaults]-start
+	// List vaults
 	vaults, err := client.Vaults().List(context.Background())
 	if err != nil {
 		panic(err)
@@ -125,23 +126,29 @@ func showcaseVaultOperations(client *onepassword.Client, vaultID string) {
 	for _, vault := range vaults {
 		fmt.Println("VAULT ID: ", vault.ID)
 	}
+	// [developer-docs.sdk.go.list-vaults]-end
 
-	// Vault get overview
+	// [developer-docs.sdk.go.get-vault-overview]-start
+	// Get vault overview
 	vaultOverview, err := client.Vaults().GetOverview(context.Background(), vaultID)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Printf("Vault overview: %v\n", vaultOverview)
+	// [developer-docs.sdk.go.get-vault-overview]-end
 
-	// Vault get details
+	// [developer-docs.sdk.go.get-vault-details]-start
+	// Get vault details
 	vault, err := client.Vaults().Get(context.Background(), vaultOverview.ID, onepassword.VaultGetParams{})
 	if err != nil {
 		panic(err)
 	}
 	fmt.Printf("Vault details: %v\n", vault)
+	// [developer-docs.sdk.go.get-vault-details]-end
 }
 
 func showcaseBatchItemOperations(client *onepassword.Client, vaultID string) {
+	// [developer-docs.sdk.go.batch-create-items]-start
 	sectionID := "extraDetails"
 	var itemsToCreate []onepassword.ItemCreateParams
 	for i := 1; i <= 3; i++ {
@@ -187,7 +194,7 @@ func showcaseBatchItemOperations(client *onepassword.Client, vaultID string) {
 		})
 	}
 
-	// Batch item create
+	// Create all items in the same vault in a single batch
 	batchCreateResponse, err := client.Items().CreateAll(context.Background(), vaultID, itemsToCreate)
 	if err != nil {
 		panic(err)
@@ -202,8 +209,10 @@ func showcaseBatchItemOperations(client *onepassword.Client, vaultID string) {
 			fmt.Printf("[Batch create] Something went wrong: %s\n", res.Error)
 		}
 	}
+	// [developer-docs.sdk.go.batch-create-items]-end
 
-	// Batch item get
+	// [developer-docs.sdk.go.batch-get-items]-start
+	// Get multiple items form the same vault in a single batch
 	batchGetResponse, err := client.Items().GetAll(context.Background(), vaultID, itemIDs)
 	if err != nil {
 		panic(err)
@@ -215,8 +224,10 @@ func showcaseBatchItemOperations(client *onepassword.Client, vaultID string) {
 			fmt.Printf("[Batch get] Something went wrong: %s\n", res.Error)
 		}
 	}
+	// [developer-docs.sdk.go.batch-get-items]-end
 
-	// Batch item delete
+	// [developer-docs.sdk.go.batch-delete-items]-start
+	// Delete multiple items from the same vault in a single batch
 	batchDeleteResponse, err := client.Items().DeleteAll(context.Background(), vaultID, itemIDs)
 	if err != nil {
 		panic(err)
@@ -228,4 +239,5 @@ func showcaseBatchItemOperations(client *onepassword.Client, vaultID string) {
 			fmt.Printf("Deleted item %s\n", id)
 		}
 	}
+	// [developer-docs.sdk.go.batch-delete-items]-end
 }
