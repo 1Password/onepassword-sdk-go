@@ -33,6 +33,20 @@ func main() {
 	createAndGetItem(client, vaultID)
 	showcaseVaultOperations(client, vaultID)
 	showcaseBatchItemOperations(client, vaultID)
+
+	groupID := os.Getenv("OP_GROUP_ID")
+	if groupID == "" {
+		panic("OP_GROUP_ID is required")
+	}
+
+	// [developer-docs.sdk.go.get-group]-start
+	// Get a group
+	group, err := client.Groups().Get(context.Background(), groupID, onepassword.GroupGetParams{})
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("Group details: %v\n", group)
+	// [developer-docs.sdk.go.get-group]-end
 }
 
 func createAndGetItem(client *onepassword.Client, vaultID string) onepassword.Item {
