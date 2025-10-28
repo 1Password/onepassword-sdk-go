@@ -29,7 +29,7 @@ type ItemsAPI interface {
 	// Delete an item.
 	Delete(ctx context.Context, vaultID string, itemID string) error
 
-	// Create items in batch, within a single vault.
+	// Delete items in batch, within a single vault.
 	DeleteAll(ctx context.Context, vaultID string, itemIds []string) (ItemsDeleteAllResponse, error)
 
 	// Archive an item.
@@ -152,7 +152,7 @@ func (i ItemsSource) Delete(ctx context.Context, vaultID string, itemID string) 
 	return err
 }
 
-// Create items in batch, within a single vault.
+// Delete items in batch, within a single vault.
 func (i ItemsSource) DeleteAll(ctx context.Context, vaultID string, itemIds []string) (ItemsDeleteAllResponse, error) {
 	resultString, err := clientInvoke(ctx, i.InnerClient, "ItemsDeleteAll", map[string]interface{}{
 		"vault_id": vaultID,
