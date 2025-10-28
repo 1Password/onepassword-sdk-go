@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path"
 	"runtime"
 	"unsafe"
 )
@@ -87,23 +88,23 @@ var coreLib *SharedLibCore
 func find1PasswordLibPath() (string, error) {
 	var locations []string
 
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return "", err
+	}
+
 	switch runtime.GOOS {
 	case "darwin":
 		locations = []string{
 			"/Applications/1Password.app/Contents/Frameworks/libop_sdk_ipc_client.dylib",
+			path.Join(home, "Applications/1Password.app/Contents/Frameworks/libop_sdk_ipc_client.dylib"),
 		}
 
 	case "linux":
 		locations = []string{
 			"/usr/bin/1password/libop_sdk_ipc_client.so",
-			"/opt/1password/libop_sdk_ipc_client.so",
+			"/opt/1Password/libop_sdk_ipc_client.so",
 			"/snap/bin/1password/libop_sdk_ipc_client.so",
-		}
-
-	case "windows":
-		locations = []string{
-			`C:\Program Files\1Password\op_sdk_ipc_client.dll`,
-			`C:\Program Files (x86)\1Password\op_sdk_ipc_client.dll`,
 		}
 
 	default:
