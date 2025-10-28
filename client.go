@@ -12,12 +12,14 @@ type Client struct {
 	SecretsAPI SecretsAPI
 	ItemsAPI   ItemsAPI
 	VaultsAPI  VaultsAPI
+	GroupsAPI  GroupsAPI
 }
 
 func initAPIs(client *Client, inner internal.InnerClient) {
 	client.SecretsAPI = NewSecretsSource(inner)
 	client.ItemsAPI = NewItemsSource(inner)
 	client.VaultsAPI = NewVaultsSource(inner)
+	client.GroupsAPI = NewGroupsSource(inner)
 }
 
 func (c *Client) Secrets() SecretsAPI {
@@ -28,4 +30,7 @@ func (c *Client) Items() ItemsAPI {
 }
 func (c *Client) Vaults() VaultsAPI {
 	return c.VaultsAPI
+}
+func (c *Client) Groups() GroupsAPI {
+	return c.GroupsAPI
 }
