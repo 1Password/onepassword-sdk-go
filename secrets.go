@@ -65,7 +65,7 @@ func (s SecretsSource) ResolveAll(ctx context.Context, secretReferences []string
 
 // Validate the secret reference to ensure there are no syntax errors.
 func (s secretsUtil) ValidateSecretReference(ctx context.Context, secretReference string) error {
-	core, err := internal.GetSharedCore()
+	core, err := internal.GetExtismCore()
 	if err != nil {
 		return err
 	}
@@ -87,7 +87,7 @@ func (s secretsUtil) ValidateSecretReference(ctx context.Context, secretReferenc
 }
 
 func (s secretsUtil) GeneratePassword(ctx context.Context, recipe PasswordRecipe) (GeneratePasswordResponse, error) {
-	core, err := internal.GetSharedCore()
+	core, err := internal.GetExtismCore()
 	if err != nil {
 		return GeneratePasswordResponse{}, err
 	}

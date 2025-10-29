@@ -45,7 +45,7 @@ func TestRetrivalWithMultipleClients(t *testing.T) {
 
 	// keep creating clients to check what happens
 	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
-	core, _ := internal.GetSharedCore()
+	core, _ := internal.GetExtismCore()
 	config := internal.NewDefaultConfig()
 	config.SAToken = token
 	config.IntegrationName = "name"
@@ -70,7 +70,7 @@ func TestInvalidInvoke(t *testing.T) {
 	})
 	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
 
-	core, err := internal.GetSharedCore()
+	core, err := internal.GetExtismCore()
 	require.NoError(t, err)
 
 	config := internal.NewDefaultConfig()
@@ -131,7 +131,7 @@ func TestClientReleasedSuccessfully(t *testing.T) {
 	TestSecretRetrievalFromTestAccount(t)
 	runtime.GC()
 
-	core, err := internal.GetSharedCore()
+	core, err := internal.GetExtismCore()
 	require.NoError(t, err)
 	clientID := uint64(0)
 	invocation := internal.InvokeConfig{

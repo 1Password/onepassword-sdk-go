@@ -11,8 +11,12 @@ import (
 
 // The Vaults API holds all the operations the SDK client can perform on 1Password vaults.
 type VaultsAPI interface {
-	// List all vaults
-	List(ctx context.Context) ([]VaultOverview, error)
+	// List information about vaults that's configurable based on some input parameters.
+	List(ctx context.Context, params ...VaultListParams) ([]VaultOverview, error)
+
+	GetOverview(ctx context.Context, vaultUuid string) (VaultOverview, error)
+
+	Get(ctx context.Context, vaultUuid string, vaultParams VaultGetParams) (Vault, error)
 }
 
 type VaultsSource struct {
@@ -23,9 +27,11 @@ func NewVaultsSource(inner internal.InnerClient) VaultsAPI {
 	return &VaultsSource{InnerClient: inner}
 }
 
-// List all vaults
-func (v VaultsSource) List(ctx context.Context) ([]VaultOverview, error) {
-	resultString, err := clientInvoke(ctx, v.InnerClient, "VaultsList", map[string]interface{}{})
+// List information about vaults that's configurable based on some input parameters.
+func (v VaultsSource) List(ctx context.Context, params ...VaultListParams) ([]VaultOverview, error) {
+	resultString, err := clientInvoke(ctx, v.InnerClient, "VaultsList", map[string]interface{}{
+		"params": params,
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -33,6 +39,37 @@ func (v VaultsSource) List(ctx context.Context) ([]VaultOverview, error) {
 	err = json.Unmarshal([]byte(*resultString), &result)
 	if err != nil {
 		return nil, err
+	}
+	return result, nil
+}
+
+func (v VaultsSource) GetOverview(ctx context.Context, vaultUuid string) (VaultOverview, error) {
+	resultString, err := clientInvoke(ctx, v.InnerClient, "VaultsGetOverview", map[string]interface{}{
+		"vault_uuid": vaultUuid,
+	})
+	if err != nil {
+		return VaultOverview{}, err
+	}
+	var result VaultOverview
+	err = json.Unmarshal([]byte(*resultString), &result)
+	if err != nil {
+		return VaultOverview{}, err
+	}
+	return result, nil
+}
+
+func (v VaultsSource) Get(ctx context.Context, vaultUuid string, vaultParams VaultGetParams) (Vault, error) {
+	resultString, err := clientInvoke(ctx, v.InnerClient, "VaultsGet", map[string]interface{}{
+		"vault_uuid":   vaultUuid,
+		"vault_params": vaultParams,
+	})
+	if err != nil {
+		return Vault{}, err
+	}
+	var result Vault
+	err = json.Unmarshal([]byte(*resultString), &result)
+	if err != nil {
+		return Vault{}, err
 	}
 	return result, nil
 }

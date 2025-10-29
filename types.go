@@ -52,6 +52,80 @@ type GeneratePasswordResponse struct {
 	// The generated password.
 	Password string `json:"password"`
 }
+type GroupType string
+
+const (
+	// The owners group, which gives the following permissions:
+	// - Do everything the Admin group can do
+	// - See every vault other than the personal vaults
+	// - Change people's names
+	// - See billing
+	// - Change billing
+	// - Make other people owners
+	// - Delete a person
+	GroupTypeOwners GroupType = "owners"
+	// The administrators group, which gives the following permissions:
+	// - Perform recovery
+	// - Create new vaults
+	// - Invite new members
+	// - See vault metadata, including the vault name and who has access.
+	// - Make other people admins
+	GroupTypeAdministrators GroupType = "administrators"
+	// The recovery group. It contains recovery keysets, and is added to every vault to allow for recovery.
+	//
+	// No one is added to this.
+	GroupTypeRecovery GroupType = "recovery"
+	// The external account managers group or EAM is a mandatory group for managed accounts that has
+	// same permissions as the owners.
+	GroupTypeExternalAccountManagers GroupType = "externalAccountManagers"
+	// Members of a team that a user is on.
+	GroupTypeTeamMembers GroupType = "teamMembers"
+	// A custom, user defined group.
+	GroupTypeUserDefined GroupType = "userDefined"
+	// Support for new or renamed group types
+	GroupTypeUnsupported GroupType = "unsupported"
+)
+
+type GroupState string
+
+const (
+	// This group is active
+	GroupStateActive GroupState = "active"
+	// This group has been deleted
+	GroupStateDeleted GroupState = "deleted"
+	// This group is in an unknown state
+	GroupStateUnsupported GroupState = "unsupported"
+)
+
+type VaultAccessorType string
+
+const (
+	VaultAccessorTypeUser  VaultAccessorType = "user"
+	VaultAccessorTypeGroup VaultAccessorType = "group"
+)
+
+// Represents the vault access information.
+type VaultAccess struct {
+	// The vault's UUID.
+	VaultUuid string `json:"vaultUuid"`
+	// The vault's accessor type.
+	AccessorType VaultAccessorType `json:"accessorType"`
+	// The vault's accessor UUID.
+	AccessorUuid string `json:"accessorUuid"`
+	// The permissions granted to this vault
+	Permissions uint32 `json:"permissions"`
+}
+type Group struct {
+	ID          string        `json:"id"`
+	Title       string        `json:"title"`
+	Description string        `json:"description"`
+	GroupType   GroupType     `json:"groupType"`
+	State       GroupState    `json:"state"`
+	VaultAccess []VaultAccess `json:"vaultAccess,omitempty"`
+}
+type GroupGetParams struct {
+	VaultPermissions *bool `json:"vaultPermissions,omitempty"`
+}
 type ItemCategory string
 
 const (
@@ -496,6 +570,200 @@ type ItemShareParams struct {
 	// Whether the item can only be viewed once per recipient
 	OneTimeOnly bool `json:"oneTimeOnly"`
 }
+type Response[T any, E any] struct {
+	Content *T `json:"content,omitempty"`
+	Error   *E `json:"error,omitempty"`
+}
+type ItemUpdateFailureReasonTypes string
+
+const (
+	// Item update operation failed due to bad user input.
+	ItemUpdateFailureReasonTypeVariantItemValidationError ItemUpdateFailureReasonTypes = "itemValidationError"
+	// Item update operation is forbidden, permission issue. Make sure you have the correct permissions to update items in this vault.
+	ItemUpdateFailureReasonTypeVariantItemStatusPermissionError ItemUpdateFailureReasonTypes = "itemStatusPermissionError"
+	// Item update operation failed due to incorrect version.
+	ItemUpdateFailureReasonTypeVariantItemStatusIncorrectItemVersion ItemUpdateFailureReasonTypes = "itemStatusIncorrectItemVersion"
+	// Item update operation failed because a file reference didn't match a known file.
+	ItemUpdateFailureReasonTypeVariantItemStatusFileNotFound ItemUpdateFailureReasonTypes = "itemStatusFileNotFound"
+	// Item update request is too big to be sent to the server.
+	ItemUpdateFailureReasonTypeVariantItemStatusTooBig ItemUpdateFailureReasonTypes = "itemStatusTooBig"
+	// The item was not found
+	ItemUpdateFailureReasonTypeVariantItemNotFound ItemUpdateFailureReasonTypes = "itemNotFound"
+	// Item update operation experienced an internal error.
+	ItemUpdateFailureReasonTypeVariantInternal ItemUpdateFailureReasonTypes = "internal"
+)
+
+type ItemUpdateFailureReason struct {
+	Type    ItemUpdateFailureReasonTypes `json:"type"`
+	message interface{}
+}
+
+func (i *ItemUpdateFailureReason) UnmarshalJSON(data []byte) error {
+	var enum struct {
+		Tag     ItemUpdateFailureReasonTypes `json:"type"`
+		Content json.RawMessage              `json:"message"`
+	}
+	if err := json.Unmarshal(data, &enum); err != nil {
+		return err
+	}
+
+	i.Type = enum.Tag
+	switch i.Type {
+	case ItemUpdateFailureReasonTypeVariantItemValidationError:
+		var res ErrorMessage
+		i.message = &res
+	case ItemUpdateFailureReasonTypeVariantItemStatusPermissionError:
+		return nil
+	case ItemUpdateFailureReasonTypeVariantItemStatusIncorrectItemVersion:
+		return nil
+	case ItemUpdateFailureReasonTypeVariantItemStatusFileNotFound:
+		return nil
+	case ItemUpdateFailureReasonTypeVariantItemStatusTooBig:
+		return nil
+	case ItemUpdateFailureReasonTypeVariantItemNotFound:
+		return nil
+	case ItemUpdateFailureReasonTypeVariantInternal:
+		var res ErrorMessage
+		i.message = &res
+
+	}
+	if err := json.Unmarshal(enum.Content, &i.message); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (i ItemUpdateFailureReason) MarshalJSON() ([]byte, error) {
+	var enum struct {
+		Tag     ItemUpdateFailureReasonTypes `json:"type"`
+		Content interface{}                  `json:"message,omitempty"`
+	}
+	enum.Tag = i.Type
+	enum.Content = i.message
+	return json.Marshal(enum)
+}
+
+func (i ItemUpdateFailureReason) ItemValidationError() ErrorMessage {
+	res, _ := i.message.(*ErrorMessage)
+	return *res
+}
+func (i ItemUpdateFailureReason) Internal() ErrorMessage {
+	res, _ := i.message.(*ErrorMessage)
+	return *res
+}
+
+func NewItemUpdateFailureReasonTypeVariantItemValidationError(content ErrorMessage) ItemUpdateFailureReason {
+	return ItemUpdateFailureReason{
+		Type:    ItemUpdateFailureReasonTypeVariantItemValidationError,
+		message: &content,
+	}
+}
+func NewItemUpdateFailureReasonTypeVariantItemStatusPermissionError() ItemUpdateFailureReason {
+	return ItemUpdateFailureReason{
+		Type: ItemUpdateFailureReasonTypeVariantItemStatusPermissionError,
+	}
+}
+func NewItemUpdateFailureReasonTypeVariantItemStatusIncorrectItemVersion() ItemUpdateFailureReason {
+	return ItemUpdateFailureReason{
+		Type: ItemUpdateFailureReasonTypeVariantItemStatusIncorrectItemVersion,
+	}
+}
+func NewItemUpdateFailureReasonTypeVariantItemStatusFileNotFound() ItemUpdateFailureReason {
+	return ItemUpdateFailureReason{
+		Type: ItemUpdateFailureReasonTypeVariantItemStatusFileNotFound,
+	}
+}
+func NewItemUpdateFailureReasonTypeVariantItemStatusTooBig() ItemUpdateFailureReason {
+	return ItemUpdateFailureReason{
+		Type: ItemUpdateFailureReasonTypeVariantItemStatusTooBig,
+	}
+}
+func NewItemUpdateFailureReasonTypeVariantItemNotFound() ItemUpdateFailureReason {
+	return ItemUpdateFailureReason{
+		Type: ItemUpdateFailureReasonTypeVariantItemNotFound,
+	}
+}
+func NewItemUpdateFailureReasonTypeVariantInternal(content ErrorMessage) ItemUpdateFailureReason {
+	return ItemUpdateFailureReason{
+		Type:    ItemUpdateFailureReasonTypeVariantInternal,
+		message: &content,
+	}
+}
+
+type ItemsDeleteAllResponse struct {
+	IndividualResponses map[string]Response[struct{}, ItemUpdateFailureReason] `json:"individualResponses"`
+}
+type ItemsGetAllErrorTypes string
+
+const (
+	ItemsGetAllErrorTypeVariantItemNotFound ItemsGetAllErrorTypes = "itemNotFound"
+	ItemsGetAllErrorTypeVariantInternal     ItemsGetAllErrorTypes = "internal"
+)
+
+type ItemsGetAllError struct {
+	Type    ItemsGetAllErrorTypes `json:"type"`
+	message interface{}
+}
+
+func (i *ItemsGetAllError) UnmarshalJSON(data []byte) error {
+	var enum struct {
+		Tag     ItemsGetAllErrorTypes `json:"type"`
+		Content json.RawMessage       `json:"message"`
+	}
+	if err := json.Unmarshal(data, &enum); err != nil {
+		return err
+	}
+
+	i.Type = enum.Tag
+	switch i.Type {
+	case ItemsGetAllErrorTypeVariantItemNotFound:
+		return nil
+	case ItemsGetAllErrorTypeVariantInternal:
+		var res ErrorMessage
+		i.message = &res
+
+	}
+	if err := json.Unmarshal(enum.Content, &i.message); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (i ItemsGetAllError) MarshalJSON() ([]byte, error) {
+	var enum struct {
+		Tag     ItemsGetAllErrorTypes `json:"type"`
+		Content interface{}           `json:"message,omitempty"`
+	}
+	enum.Tag = i.Type
+	enum.Content = i.message
+	return json.Marshal(enum)
+}
+
+func (i ItemsGetAllError) Internal() ErrorMessage {
+	res, _ := i.message.(*ErrorMessage)
+	return *res
+}
+
+func NewItemsGetAllErrorTypeVariantItemNotFound() ItemsGetAllError {
+	return ItemsGetAllError{
+		Type: ItemsGetAllErrorTypeVariantItemNotFound,
+	}
+}
+func NewItemsGetAllErrorTypeVariantInternal(content ErrorMessage) ItemsGetAllError {
+	return ItemsGetAllError{
+		Type:    ItemsGetAllErrorTypeVariantInternal,
+		message: &content,
+	}
+}
+
+type ItemsGetAllResponse struct {
+	IndividualResponses []Response[Item, ItemsGetAllError] `json:"individualResponses"`
+}
+type ItemsUpdateAllResponse struct {
+	IndividualResponses []Response[Item, ItemUpdateFailureReason] `json:"individualResponses"`
+}
 
 // Additional attributes for OTP fields.
 type OTPFieldDetails struct {
@@ -503,10 +771,6 @@ type OTPFieldDetails struct {
 	Code *string `json:"code,omitempty"`
 	// The error message, if the OTP code could not be computed
 	ErrorMessage *string `json:"errorMessage,omitempty"`
-}
-type Response[T any, E any] struct {
-	Content *T `json:"content,omitempty"`
-	Error   *E `json:"error,omitempty"`
 }
 type ResolvedReference struct {
 	Secret  string `json:"secret"`
@@ -723,12 +987,62 @@ type SSHKeyAttributes struct {
 	KeyType string `json:"keyType"`
 }
 
-// Represents a decrypted 1Password vault.
-type VaultOverview struct {
-	// The vault's ID
+// Represents the vault type.
+type VaultType string
+
+const (
+	VaultTypePersonal    VaultType = "personal"
+	VaultTypeEveryone    VaultType = "everyone"
+	VaultTypeTransfer    VaultType = "transfer"
+	VaultTypeUserCreated VaultType = "userCreated"
+	VaultTypeUnsupported VaultType = "unsupported"
+)
+
+// Represents regular vault information together with the vault's access information.
+type Vault struct {
+	// The vault's ID.
 	ID string `json:"id"`
-	// The vault's title
+	// The vault's title.
 	Title string `json:"title"`
+	// The description of the vault.
+	Description string `json:"description"`
+	// The type of the vault.
+	VaultType VaultType `json:"vaultType"`
+	// The number of active items within the vault.
+	ActiveItemCount uint32 `json:"activeItemCount"`
+	// The content version number of the vault. It gets incremented whenever the state of the vault's contents changes (e.g. items from within the vault get created or updated).
+	ContentVersion uint32 `json:"contentVersion"`
+	// The attribute version number of the vault. It gets incremented whenever vault presentation information changes, such as its title or icon.
+	AttributeVersion uint32 `json:"attributeVersion"`
+	// The access information associated with the vault.
+	Access []VaultAccess `json:"access,omitempty"`
+}
+
+// Represents the possible query parameters used for retrieving extra information about a vault.
+type VaultGetParams struct {
+	// The vault's accessor params.
+	Accessors *bool `json:"accessors,omitempty"`
+}
+type VaultListParams struct {
+	DecryptDetails *bool `json:"decryptDetails,omitempty"`
+}
+
+// Holds information about a 1Password Vault.
+type VaultOverview struct {
+	// The vault's ID.
+	ID string `json:"id"`
+	// The vault's title.
+	Title string `json:"title"`
+	// The description of this vault.
+	Description string `json:"description"`
+	// The type of the vault.
+	VaultType VaultType `json:"vaultType"`
+	// The number of active items within the vault.
+	ActiveItemCount uint32 `json:"activeItemCount"`
+	// The content version number of the vault. It gets incremented whenever the state of the vault's contents changes (e.g. items from within the vault get created or updated).
+	ContentVersion uint32 `json:"contentVersion"`
+	// The attribute version number of the vault. It gets incremented whenever vault presentation information changes, such as its title or icon.
+	AttributeVersion uint32 `json:"attributeVersion"`
 	// The time the vault was created at
 	CreatedAt time.Time `json:"createdAt"`
 	// The time the vault was updated at

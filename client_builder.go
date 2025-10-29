@@ -15,14 +15,6 @@ const (
 
 // NewClient returns a 1Password Go SDK client using the provided ClientOption list.
 func NewClient(ctx context.Context, opts ...ClientOption) (*Client, error) {
-	core, err := internal.GetSharedCore()
-	if err != nil {
-		return nil, err
-	}
-	return createClient(ctx, core, opts...)
-}
-
-func createClient(ctx context.Context, core internal.Core, opts ...ClientOption) (*Client, error) {
 	client := Client{
 		config: internal.NewDefaultConfig(),
 	}
@@ -34,6 +26,26 @@ func createClient(ctx context.Context, core internal.Core, opts ...ClientOption)
 		}
 	}
 
+	if client.config.AccountName != nil && client.config.SAToken != "" {
+		return nil, fmt.Errorf("cannot use both SA token and desktop app authentication")
+	}
+
+	var core *internal.CoreWrapper
+	var err error
+	if client.config.AccountName != nil {
+		core, err = internal.GetSharedLibCore(*client.config.AccountName)
+	} else {
+		core, err = internal.GetExtismCore()
+	}
+
+	if err != nil {
+		return nil, err
+	}
+	return initClient(ctx, *core, client)
+}
+
+// Initializes the client with the backend and gets it ready for later invocations.
+func initClient(ctx context.Context, core internal.CoreWrapper, client Client) (*Client, error) {
 	clientID, err := core.InitClient(ctx, client.config)
 	if err != nil {
 		return nil, fmt.Errorf("error initializing client: %w", unmarshalError(err.Error()))
@@ -67,6 +79,15 @@ func WithIntegrationInfo(name string, version string) ClientOption {
 	return func(c *Client) error {
 		c.config.IntegrationName = name
 		c.config.IntegrationVersion = version
+		return nil
+	}
+}
+
+// WithDesktopAppIntegration specifiers whether the SDK should attempt to connect to the 1Password Desktop app.
+// Takes as input the account name as specified in the desktop application, or the account UUID.
+func WithDesktopAppIntegration(accountName string) ClientOption {
+	return func(c *Client) error {
+		c.config.AccountName = &accountName
 		return nil
 	}
 }
