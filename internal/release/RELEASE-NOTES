@@ -1,5 +1,8 @@
-# 1Password Go SDK v0.3.1
+# 1Password Go SDK v0.4.0-beta.1
 
 ## NEW
 
-- `VaultOverview` now includes `created_at` and `updated_at` fields that show when the vault was created and last updated.
+- The SDK can now authenticate with the Desktop App.
+- Vault `Get`, `GetOverview` as well as new options for vault `List` are now available.
+- Item batch operations are now available.
+- The Groups API has been introduced.
