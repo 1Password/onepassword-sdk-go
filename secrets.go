@@ -10,7 +10,7 @@ import (
 )
 
 // The Secrets API includes all operations the SDK client can perform on secrets.
-// Use secret reference URIs to securely load secrets from 1Password: op://<vault-name>/<item-name>[/<section-name>]/<field-name>
+// Use secret reference URIs to securely load secrets from 1Password: `op://<vault-name>/<item-name>[/<section-name>]/<field-name>`
 type SecretsAPI interface {
 	// Resolve returns the secret the provided secret reference points to.
 	Resolve(ctx context.Context, secretReference string) (string, error)
