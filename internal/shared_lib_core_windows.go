@@ -46,9 +46,10 @@ func find1PasswordLibPath() (string, error) {
 	}
 
 	locations := []string{
+		path.Join(home, `AppData\Local\1Password\op_sdk_ipc_client.dll`),
+		`C:\Program Files\1Password\app\8\op_sdk_ipc_client.dll`,
+		`C:\Program Files (x86)\1Password\app\8\op_sdk_ipc_client.dll`,
 		path.Join(home, `AppData\Local\1Password\app\8\op_sdk_ipc_client.dll`),
-		`C:\Program Files\1Password\op_sdk_ipc_client.dll`,
-		`C:\Program Files (x86)\1Password\op_sdk_ipc_client.dll`,
 	}
 	for _, p := range locations {
 		if _, err := os.Stat(p); err == nil {
