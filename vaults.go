@@ -17,6 +17,12 @@ type VaultsAPI interface {
 	GetOverview(ctx context.Context, vaultUuid string) (VaultOverview, error)
 
 	Get(ctx context.Context, vaultUuid string, vaultParams VaultGetParams) (Vault, error)
+
+	GrantGroupPermissions(ctx context.Context, vaultID string, groupPermissionsList []GroupAccess) error
+
+	UpdateGroupPermissions(ctx context.Context, groupPermissionsList []GroupVaultAccess) error
+
+	RevokeGroupPermissions(ctx context.Context, vaultID string, groupID string) error
 }
 
 type VaultsSource struct {
@@ -72,4 +78,27 @@ func (v VaultsSource) Get(ctx context.Context, vaultUuid string, vaultParams Vau
 		return Vault{}, err
 	}
 	return result, nil
+}
+
+func (v VaultsSource) GrantGroupPermissions(ctx context.Context, vaultID string, groupPermissionsList []GroupAccess) error {
+	_, err := clientInvoke(ctx, v.InnerClient, "VaultsGrantGroupPermissions", map[string]interface{}{
+		"vault_id":               vaultID,
+		"group_permissions_list": groupPermissionsList,
+	})
+	return err
+}
+
+func (v VaultsSource) UpdateGroupPermissions(ctx context.Context, groupPermissionsList []GroupVaultAccess) error {
+	_, err := clientInvoke(ctx, v.InnerClient, "VaultsUpdateGroupPermissions", map[string]interface{}{
+		"group_permissions_list": groupPermissionsList,
+	})
+	return err
+}
+
+func (v VaultsSource) RevokeGroupPermissions(ctx context.Context, vaultID string, groupID string) error {
+	_, err := clientInvoke(ctx, v.InnerClient, "VaultsRevokeGroupPermissions", map[string]interface{}{
+		"vault_id": vaultID,
+		"group_id": groupID,
+	})
+	return err
 }

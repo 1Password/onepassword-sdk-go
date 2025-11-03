@@ -123,8 +123,27 @@ type Group struct {
 	State       GroupState    `json:"state"`
 	VaultAccess []VaultAccess `json:"vaultAccess,omitempty"`
 }
+
+// Represents a group's access to a 1Password vault.
+// This is used for granting permissions
+type GroupAccess struct {
+	// The group's ID
+	GroupID string `json:"group_id"`
+	// The group's set of permissions for the vault
+	Permissions uint32 `json:"permissions"`
+}
 type GroupGetParams struct {
 	VaultPermissions *bool `json:"vaultPermissions,omitempty"`
+}
+
+// Represents a group's access to a 1Password vault.
+type GroupVaultAccess struct {
+	// The vault's ID
+	VaultID string `json:"vault_id"`
+	// The group's ID
+	GroupID string `json:"group_id"`
+	// The group's set of permissions for the vault
+	Permissions uint32 `json:"permissions"`
 }
 type ItemCategory string
 
@@ -289,7 +308,7 @@ type ItemSection struct {
 
 // Controls the auto-fill behavior of a website.
 //
-// For more information, visit https://support.1password.com/autofill-behavior/
+// For more information, visit <https://support.1password.com/autofill-behavior/>
 type AutofillBehavior string
 
 const (
@@ -308,7 +327,7 @@ type Website struct {
 	Label string `json:"label"`
 	// The auto-fill behavior of the website
 	//
-	// For more information, visit https://support.1password.com/autofill-behavior/
+	// For more information, visit <https://support.1password.com/autofill-behavior/>
 	AutofillBehavior AutofillBehavior `json:"autofillBehavior"`
 }
 type ItemFile struct {
@@ -1259,3 +1278,17 @@ const (
 	// Three (random) letter "words"
 	WordListTypeThreeLetters WordListType = "threeLetters"
 )
+const ArchiveItems uint32 = 256
+const CreateItems uint32 = 128
+const DeleteItems uint32 = 512
+const ExportItems uint32 = 4194304
+const ImportItems uint32 = 2097152
+const ManageVault uint32 = 2
+const NoAccess uint32 = 0
+const PrintItems uint32 = 8388608
+const ReadItems uint32 = 32
+const RecoverVault uint32 = 1
+const RevealItemPassword uint32 = 16
+const SendItems uint32 = 1048576
+const UpdateItems uint32 = 64
+const UpdateItemHistory uint32 = 1024
