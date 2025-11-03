@@ -1,8 +1,6 @@
 module github.com/1password/onepassword-sdk-go
 
-go 1.22.0
-
-toolchain go1.22.5
+go 1.24.0
 
 require (
 	github.com/extism/go-sdk v1.7.0
@@ -18,6 +16,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/tetratelabs/wabin v0.0.0-20230304001439-f6f874872834 // indirect
 	go.opentelemetry.io/proto/otlp v1.3.1 // indirect
+	golang.org/x/sys v0.37.0 // indirect
 	google.golang.org/protobuf v1.34.2 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
