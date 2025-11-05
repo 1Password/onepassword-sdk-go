@@ -2,6 +2,7 @@ package onepassword
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"runtime"
 
@@ -104,7 +105,35 @@ func clientInvoke(ctx context.Context, innerClient *internal.InnerClient, invoca
 		},
 	})
 	if err != nil {
-		return nil, unmarshalError(err.Error())
+		err = unmarshalError(err.Error())
+		var e *DesktopSessionExpired
+		if errors.As(err, &e) {
+			oldInnerClient := *innerClient
+			var clientID *uint64
+			clientID, err = innerClient.Core.InitClient(ctx, innerClient.Config)
+			if err != nil {
+				return nil, err
+			}
+			innerClient = &internal.InnerClient{
+				ID:     *clientID,
+				Core:   oldInnerClient.Core,
+				Config: oldInnerClient.Config,
+			}
+			invocationResponse, err = innerClient.Core.Invoke(ctx, internal.InvokeConfig{
+				Invocation: internal.Invocation{
+					ClientID: &innerClient.ID,
+					Parameters: internal.Parameters{
+						MethodName:       invocation,
+						SerializedParams: params,
+					},
+				},
+			})
+			if err == nil {
+				return invocationResponse, nil
+			}
+		}
+
+		return nil, err
 	}
 	return invocationResponse, nil
 }
