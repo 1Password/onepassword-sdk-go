@@ -92,7 +92,7 @@ func WithDesktopAppIntegration(accountName string) ClientOption {
 	}
 }
 
-func clientInvoke(ctx context.Context, innerClient internal.InnerClient, invocation string, params map[string]interface{}) (*string, error) {
+func clientInvoke(ctx context.Context, innerClient *internal.InnerClient, invocation string, params map[string]interface{}) (*string, error) {
 	invocationResponse, err := innerClient.Core.Invoke(ctx, internal.InvokeConfig{
 		Invocation: internal.Invocation{
 			ClientID: &innerClient.ID,
