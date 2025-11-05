@@ -52,8 +52,9 @@ func initClient(ctx context.Context, core internal.CoreWrapper, client Client) (
 	}
 
 	inner := internal.InnerClient{
-		ID:   *clientID,
-		Core: core,
+		ID:     *clientID,
+		Core:   core,
+		Config: client.config,
 	}
 
 	initAPIs(&client, inner)
