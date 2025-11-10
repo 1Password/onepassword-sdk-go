@@ -2,6 +2,7 @@ package onepassword
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"runtime"
 
@@ -52,8 +53,9 @@ func initClient(ctx context.Context, core internal.CoreWrapper, client Client) (
 	}
 
 	inner := internal.InnerClient{
-		ID:   *clientID,
-		Core: core,
+		ID:     *clientID,
+		Core:   core,
+		Config: client.config,
 	}
 
 	initAPIs(&client, inner)
@@ -92,7 +94,7 @@ func WithDesktopAppIntegration(accountName string) ClientOption {
 	}
 }
 
-func clientInvoke(ctx context.Context, innerClient internal.InnerClient, invocation string, params map[string]interface{}) (*string, error) {
+func clientInvoke(ctx context.Context, innerClient *internal.InnerClient, invocation string, params map[string]interface{}) (*string, error) {
 	invocationResponse, err := innerClient.Core.Invoke(ctx, internal.InvokeConfig{
 		Invocation: internal.Invocation{
 			ClientID: &innerClient.ID,
@@ -103,7 +105,30 @@ func clientInvoke(ctx context.Context, innerClient internal.InnerClient, invocat
 		},
 	})
 	if err != nil {
-		return nil, unmarshalError(err.Error())
+		err = unmarshalError(err.Error())
+		var e *DesktopSessionExpired
+		if errors.As(err, &e) {
+			var clientID *uint64
+			clientID, err = innerClient.Core.InitClient(ctx, innerClient.Config)
+			if err != nil {
+				return nil, err
+			}
+			innerClient.ID = *clientID
+			invocationResponse, err = innerClient.Core.Invoke(ctx, internal.InvokeConfig{
+				Invocation: internal.Invocation{
+					ClientID: &innerClient.ID,
+					Parameters: internal.Parameters{
+						MethodName:       invocation,
+						SerializedParams: params,
+					},
+				},
+			})
+			if err == nil {
+				return invocationResponse, nil
+			}
+		}
+
+		return nil, err
 	}
 	return invocationResponse, nil
 }
