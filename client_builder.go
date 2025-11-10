@@ -108,17 +108,12 @@ func clientInvoke(ctx context.Context, innerClient *internal.InnerClient, invoca
 		err = unmarshalError(err.Error())
 		var e *DesktopSessionExpired
 		if errors.As(err, &e) {
-			oldInnerClient := *innerClient
 			var clientID *uint64
 			clientID, err = innerClient.Core.InitClient(ctx, innerClient.Config)
 			if err != nil {
 				return nil, err
 			}
-			innerClient = &internal.InnerClient{
-				ID:     *clientID,
-				Core:   oldInnerClient.Core,
-				Config: oldInnerClient.Config,
-			}
+			innerClient.ID = *clientID
 			invocationResponse, err = innerClient.Core.Invoke(ctx, internal.InvokeConfig{
 				Invocation: internal.Invocation{
 					ClientID: &innerClient.ID,
