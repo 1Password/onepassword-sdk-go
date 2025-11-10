@@ -16,16 +16,16 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
-        # supported versions at the time of writing (Oct. 4th, 2024)
+        # supported versions at the time of writing (Nov. 3rd, 2025)
         # https://go.dev/dl/
-        go-version: [ '1.22', '1.23' ]
+        go-version: [ '1.24', '1.25' ]
 
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version: ${{ matrix.go-version }}
 
@@ -46,7 +46,7 @@ jobs:
     needs: test  
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Run Example Test
         run: go run example/main.go
@@ -59,12 +59,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
-          go-version: '^1.21'
+          go-version: '^1.24'
 
       - name: Check out code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Lint with golanci-lint
         uses: golangci/golangci-lint-action@v6
