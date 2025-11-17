@@ -7,11 +7,11 @@ import (
 	"errors"
 )
 
-type DesktopSessionExpired struct {
+type DesktopSessionExpiredError struct {
 	message string
 }
 
-func (e *DesktopSessionExpired) Error() string {
+func (e *DesktopSessionExpiredError) Error() string {
 	return e.message
 }
 
@@ -33,7 +33,7 @@ func unmarshalError(err string) error {
 	}
 	switch v.Name {
 	case "DesktopSessionExpired":
-		return &DesktopSessionExpired{
+		return &DesktopSessionExpiredError{
 			message: v.Message,
 		}
 	case "RateLimitExceeded":

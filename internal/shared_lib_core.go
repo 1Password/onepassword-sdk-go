@@ -131,7 +131,20 @@ func (slc *SharedLibCore) Invoke(ctx context.Context, invokeConfig []byte) ([]by
 
 // ReleaseClient releases memory in the core associated with the given client ID.
 func (slc *SharedLibCore) ReleaseClient(clientID []byte) {
-	_, err := slc.callSharedLibrary(clientID)
+	const kind = "release_client"
+	request := Request{
+		Kind:        kind,
+		AccountName: slc.accountName,
+		Payload:     clientID,
+	}
+
+	requestMarshaled, err := json.Marshal(request)
+	if err != nil {
+		log.Println("failed to marshal release_client request")
+		return
+	}
+
+	_, err = slc.callSharedLibrary(requestMarshaled)
 	if err != nil {
 		log.Println("failed to release client")
 	}
