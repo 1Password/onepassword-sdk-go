@@ -35,8 +35,12 @@ func NewVaultsSource(inner internal.InnerClient) VaultsAPI {
 
 // List information about vaults that's configurable based on some input parameters.
 func (v VaultsSource) List(ctx context.Context, params ...VaultListParams) ([]VaultOverview, error) {
+	var param VaultListParams
+	if len(params) > 0 {
+		param = params[0]
+	}
 	resultString, err := clientInvoke(ctx, &v.InnerClient, "VaultsList", map[string]interface{}{
-		"params": params,
+		"params": param,
 	})
 	if err != nil {
 		return nil, err
