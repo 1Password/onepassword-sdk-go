@@ -122,6 +122,7 @@ type Parameters struct {
 
 // InnerClient represents the sdk-core client on which calls will be made.
 type InnerClient struct {
-	ID   uint64
-	Core CoreWrapper
+	ID     uint64
+	Config ClientConfig
+	Core   CoreWrapper
 }

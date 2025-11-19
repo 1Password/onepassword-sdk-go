@@ -23,7 +23,7 @@ func NewGroupsSource(inner internal.InnerClient) GroupsAPI {
 }
 
 func (g GroupsSource) Get(ctx context.Context, groupID string, groupParams GroupGetParams) (Group, error) {
-	resultString, err := clientInvoke(ctx, g.InnerClient, "GroupsGet", map[string]interface{}{
+	resultString, err := clientInvoke(ctx, &g.InnerClient, "GroupsGet", map[string]interface{}{
 		"group_id":     groupID,
 		"group_params": groupParams,
 	})

@@ -10,7 +10,7 @@ import (
 )
 
 // The Secrets API includes all operations the SDK client can perform on secrets.
-// Use secret reference URIs to securely load secrets from 1Password: op://<vault-name>/<item-name>[/<section-name>]/<field-name>
+// Use secret reference URIs to securely load secrets from 1Password: `op://<vault-name>/<item-name>[/<section-name>]/<field-name>`
 type SecretsAPI interface {
 	// Resolve returns the secret the provided secret reference points to.
 	Resolve(ctx context.Context, secretReference string) (string, error)
@@ -33,7 +33,7 @@ var Secrets = secretsUtil{}
 
 // Resolve returns the secret the provided secret reference points to.
 func (s SecretsSource) Resolve(ctx context.Context, secretReference string) (string, error) {
-	resultString, err := clientInvoke(ctx, s.InnerClient, "SecretsResolve", map[string]interface{}{
+	resultString, err := clientInvoke(ctx, &s.InnerClient, "SecretsResolve", map[string]interface{}{
 		"secret_reference": secretReference,
 	})
 	if err != nil {
@@ -49,7 +49,7 @@ func (s SecretsSource) Resolve(ctx context.Context, secretReference string) (str
 
 // Resolve takes in a list of secret references and returns the secrets they point to or errors if any.
 func (s SecretsSource) ResolveAll(ctx context.Context, secretReferences []string) (ResolveAllResponse, error) {
-	resultString, err := clientInvoke(ctx, s.InnerClient, "SecretsResolveAll", map[string]interface{}{
+	resultString, err := clientInvoke(ctx, &s.InnerClient, "SecretsResolveAll", map[string]interface{}{
 		"secret_references": secretReferences,
 	})
 	if err != nil {
