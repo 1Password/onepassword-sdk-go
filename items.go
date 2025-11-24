@@ -44,12 +44,12 @@ type ItemsAPI interface {
 }
 
 type ItemsSource struct {
-	internal.InnerClient
+	*internal.InnerClient
 	SharesAPI ItemsSharesAPI
 	FilesAPI  ItemsFilesAPI
 }
 
-func NewItemsSource(inner internal.InnerClient) ItemsAPI {
+func NewItemsSource(inner *internal.InnerClient) ItemsAPI {
 	return &ItemsSource{InnerClient: inner, SharesAPI: NewItemsSharesSource(inner), FilesAPI: NewItemsFilesSource(inner)}
 }
 
@@ -62,7 +62,7 @@ func (i ItemsSource) Files() ItemsFilesAPI {
 
 // Create a new item.
 func (i ItemsSource) Create(ctx context.Context, params ItemCreateParams) (Item, error) {
-	resultString, err := clientInvoke(ctx, &i.InnerClient, "ItemsCreate", map[string]interface{}{
+	resultString, err := clientInvoke(ctx, i.InnerClient, "ItemsCreate", map[string]interface{}{
 		"params": params,
 	})
 	if err != nil {
@@ -78,7 +78,7 @@ func (i ItemsSource) Create(ctx context.Context, params ItemCreateParams) (Item,
 
 // Create items in batch, within a single vault.
 func (i ItemsSource) CreateAll(ctx context.Context, vaultID string, params []ItemCreateParams) (ItemsUpdateAllResponse, error) {
-	resultString, err := clientInvoke(ctx, &i.InnerClient, "ItemsCreateAll", map[string]interface{}{
+	resultString, err := clientInvoke(ctx, i.InnerClient, "ItemsCreateAll", map[string]interface{}{
 		"vault_id": vaultID,
 		"params":   params,
 	})
@@ -95,7 +95,7 @@ func (i ItemsSource) CreateAll(ctx context.Context, vaultID string, params []Ite
 
 // Get an item by vault and item ID
 func (i ItemsSource) Get(ctx context.Context, vaultID string, itemID string) (Item, error) {
-	resultString, err := clientInvoke(ctx, &i.InnerClient, "ItemsGet", map[string]interface{}{
+	resultString, err := clientInvoke(ctx, i.InnerClient, "ItemsGet", map[string]interface{}{
 		"vault_id": vaultID,
 		"item_id":  itemID,
 	})
@@ -112,7 +112,7 @@ func (i ItemsSource) Get(ctx context.Context, vaultID string, itemID string) (It
 
 // Get items by vault and their item IDs.
 func (i ItemsSource) GetAll(ctx context.Context, vaultID string, itemIds []string) (ItemsGetAllResponse, error) {
-	resultString, err := clientInvoke(ctx, &i.InnerClient, "ItemsGetAll", map[string]interface{}{
+	resultString, err := clientInvoke(ctx, i.InnerClient, "ItemsGetAll", map[string]interface{}{
 		"vault_id": vaultID,
 		"item_ids": itemIds,
 	})
@@ -129,7 +129,7 @@ func (i ItemsSource) GetAll(ctx context.Context, vaultID string, itemIds []strin
 
 // Update an existing item.
 func (i ItemsSource) Put(ctx context.Context, item Item) (Item, error) {
-	resultString, err := clientInvoke(ctx, &i.InnerClient, "ItemsPut", map[string]interface{}{
+	resultString, err := clientInvoke(ctx, i.InnerClient, "ItemsPut", map[string]interface{}{
 		"item": item,
 	})
 	if err != nil {
@@ -145,7 +145,7 @@ func (i ItemsSource) Put(ctx context.Context, item Item) (Item, error) {
 
 // Delete an item.
 func (i ItemsSource) Delete(ctx context.Context, vaultID string, itemID string) error {
-	_, err := clientInvoke(ctx, &i.InnerClient, "ItemsDelete", map[string]interface{}{
+	_, err := clientInvoke(ctx, i.InnerClient, "ItemsDelete", map[string]interface{}{
 		"vault_id": vaultID,
 		"item_id":  itemID,
 	})
@@ -154,7 +154,7 @@ func (i ItemsSource) Delete(ctx context.Context, vaultID string, itemID string) 
 
 // Delete items in batch, within a single vault.
 func (i ItemsSource) DeleteAll(ctx context.Context, vaultID string, itemIds []string) (ItemsDeleteAllResponse, error) {
-	resultString, err := clientInvoke(ctx, &i.InnerClient, "ItemsDeleteAll", map[string]interface{}{
+	resultString, err := clientInvoke(ctx, i.InnerClient, "ItemsDeleteAll", map[string]interface{}{
 		"vault_id": vaultID,
 		"item_ids": itemIds,
 	})
@@ -171,7 +171,7 @@ func (i ItemsSource) DeleteAll(ctx context.Context, vaultID string, itemIds []st
 
 // Archive an item.
 func (i ItemsSource) Archive(ctx context.Context, vaultID string, itemID string) error {
-	_, err := clientInvoke(ctx, &i.InnerClient, "ItemsArchive", map[string]interface{}{
+	_, err := clientInvoke(ctx, i.InnerClient, "ItemsArchive", map[string]interface{}{
 		"vault_id": vaultID,
 		"item_id":  itemID,
 	})
@@ -183,7 +183,7 @@ func (i ItemsSource) List(ctx context.Context, vaultID string, filters ...ItemLi
 	if filters == nil {
 		filters = []ItemListFilter{}
 	}
-	resultString, err := clientInvoke(ctx, &i.InnerClient, "ItemsList", map[string]interface{}{
+	resultString, err := clientInvoke(ctx, i.InnerClient, "ItemsList", map[string]interface{}{
 		"vault_id": vaultID,
 		"filters":  filters,
 	})

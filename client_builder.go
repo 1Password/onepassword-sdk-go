@@ -58,7 +58,7 @@ func initClient(ctx context.Context, core internal.CoreWrapper, client Client) (
 		Config: client.config,
 	}
 
-	initAPIs(&client, inner)
+	initAPIs(&client, &inner)
 
 	runtime.SetFinalizer(&client, func(f *Client) {
 		core.ReleaseClient(*clientID)
