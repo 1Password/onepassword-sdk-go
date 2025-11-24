@@ -15,15 +15,15 @@ type GroupsAPI interface {
 }
 
 type GroupsSource struct {
-	internal.InnerClient
+	*internal.InnerClient
 }
 
-func NewGroupsSource(inner internal.InnerClient) GroupsAPI {
+func NewGroupsSource(inner *internal.InnerClient) GroupsAPI {
 	return &GroupsSource{InnerClient: inner}
 }
 
 func (g GroupsSource) Get(ctx context.Context, groupID string, groupParams GroupGetParams) (Group, error) {
-	resultString, err := clientInvoke(ctx, &g.InnerClient, "GroupsGet", map[string]interface{}{
+	resultString, err := clientInvoke(ctx, g.InnerClient, "GroupsGet", map[string]interface{}{
 		"group_id":     groupID,
 		"group_params": groupParams,
 	})

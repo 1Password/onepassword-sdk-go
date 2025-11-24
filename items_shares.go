@@ -21,16 +21,16 @@ type ItemsSharesAPI interface {
 }
 
 type ItemsSharesSource struct {
-	internal.InnerClient
+	*internal.InnerClient
 }
 
-func NewItemsSharesSource(inner internal.InnerClient) ItemsSharesAPI {
+func NewItemsSharesSource(inner *internal.InnerClient) ItemsSharesAPI {
 	return &ItemsSharesSource{InnerClient: inner}
 }
 
 // Get the item sharing policy of your account.
 func (i ItemsSharesSource) GetAccountPolicy(ctx context.Context, vaultID string, itemID string) (ItemShareAccountPolicy, error) {
-	resultString, err := clientInvoke(ctx, &i.InnerClient, "ItemsSharesGetAccountPolicy", map[string]interface{}{
+	resultString, err := clientInvoke(ctx, i.InnerClient, "ItemsSharesGetAccountPolicy", map[string]interface{}{
 		"vault_id": vaultID,
 		"item_id":  itemID,
 	})
@@ -47,7 +47,7 @@ func (i ItemsSharesSource) GetAccountPolicy(ctx context.Context, vaultID string,
 
 // Validate the recipients of an item sharing link.
 func (i ItemsSharesSource) ValidateRecipients(ctx context.Context, policy ItemShareAccountPolicy, recipients []string) ([]ValidRecipient, error) {
-	resultString, err := clientInvoke(ctx, &i.InnerClient, "ItemsSharesValidateRecipients", map[string]interface{}{
+	resultString, err := clientInvoke(ctx, i.InnerClient, "ItemsSharesValidateRecipients", map[string]interface{}{
 		"policy":     policy,
 		"recipients": recipients,
 	})
@@ -64,7 +64,7 @@ func (i ItemsSharesSource) ValidateRecipients(ctx context.Context, policy ItemSh
 
 // Create a new item sharing link.
 func (i ItemsSharesSource) Create(ctx context.Context, item Item, policy ItemShareAccountPolicy, params ItemShareParams) (string, error) {
-	resultString, err := clientInvoke(ctx, &i.InnerClient, "ItemsSharesCreate", map[string]interface{}{
+	resultString, err := clientInvoke(ctx, i.InnerClient, "ItemsSharesCreate", map[string]interface{}{
 		"item":   item,
 		"policy": policy,
 		"params": params,

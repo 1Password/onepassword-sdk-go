@@ -24,16 +24,16 @@ type ItemsFilesAPI interface {
 }
 
 type ItemsFilesSource struct {
-	internal.InnerClient
+	*internal.InnerClient
 }
 
-func NewItemsFilesSource(inner internal.InnerClient) ItemsFilesAPI {
+func NewItemsFilesSource(inner *internal.InnerClient) ItemsFilesAPI {
 	return &ItemsFilesSource{InnerClient: inner}
 }
 
 // Attach files to Items
 func (i ItemsFilesSource) Attach(ctx context.Context, item Item, fileParams FileCreateParams) (Item, error) {
-	resultString, err := clientInvoke(ctx, &i.InnerClient, "ItemsFilesAttach", map[string]interface{}{
+	resultString, err := clientInvoke(ctx, i.InnerClient, "ItemsFilesAttach", map[string]interface{}{
 		"item":        item,
 		"file_params": fileParams,
 	})
@@ -50,7 +50,7 @@ func (i ItemsFilesSource) Attach(ctx context.Context, item Item, fileParams File
 
 // Read file content from the Item
 func (i ItemsFilesSource) Read(ctx context.Context, vaultID string, itemID string, attr FileAttributes) ([]byte, error) {
-	resultString, err := clientInvoke(ctx, &i.InnerClient, "ItemsFilesRead", map[string]interface{}{
+	resultString, err := clientInvoke(ctx, i.InnerClient, "ItemsFilesRead", map[string]interface{}{
 		"vault_id": vaultID,
 		"item_id":  itemID,
 		"attr":     attr,
@@ -68,7 +68,7 @@ func (i ItemsFilesSource) Read(ctx context.Context, vaultID string, itemID strin
 
 // Delete a field file from Item using the section and field IDs
 func (i ItemsFilesSource) Delete(ctx context.Context, item Item, sectionID string, fieldID string) (Item, error) {
-	resultString, err := clientInvoke(ctx, &i.InnerClient, "ItemsFilesDelete", map[string]interface{}{
+	resultString, err := clientInvoke(ctx, i.InnerClient, "ItemsFilesDelete", map[string]interface{}{
 		"item":       item,
 		"section_id": sectionID,
 		"field_id":   fieldID,
@@ -86,7 +86,7 @@ func (i ItemsFilesSource) Delete(ctx context.Context, item Item, sectionID strin
 
 // Replace the document file within a document item
 func (i ItemsFilesSource) ReplaceDocument(ctx context.Context, item Item, docParams DocumentCreateParams) (Item, error) {
-	resultString, err := clientInvoke(ctx, &i.InnerClient, "ItemsFilesReplaceDocument", map[string]interface{}{
+	resultString, err := clientInvoke(ctx, i.InnerClient, "ItemsFilesReplaceDocument", map[string]interface{}{
 		"item":       item,
 		"doc_params": docParams,
 	})
