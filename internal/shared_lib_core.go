@@ -59,6 +59,9 @@ func find1PasswordLibPath() (string, error) {
 	default:
 		return "", fmt.Errorf("unsupported OS: %s", runtime.GOOS)
 	}
+	if libPath := os.Getenv("OP_SHARED_LIB_PATH"); libPath != "" {
+		locations = append([]string{libPath}, locations...)
+	}
 	for _, libPath := range locations {
 		if _, err := os.Stat(libPath); err == nil {
 			return libPath, nil
