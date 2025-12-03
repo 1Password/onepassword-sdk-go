@@ -133,7 +133,7 @@ func (slc *SharedLibCore) callSharedLibrary(input []byte) ([]byte, error) {
 	)
 
 	if retCode != 0 {
-		return nil, fmt.Errorf("failed to send message to Desktop App. Please make sure the integrations is enabled or otherwise contact 1Password support. Return code: %d", int(retCode))
+		return nil, fmt.Errorf("failed to send message to 1Password desktop app. Make sure Settings > Developer > Integrate with other apps is enabled, or contact 1Password support. Return code: %d", int(retCode))
 	}
 
 	resp := C.GoBytes(unsafe.Pointer(outBuf), C.int(outLen))
