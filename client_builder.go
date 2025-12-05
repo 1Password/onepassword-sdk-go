@@ -94,8 +94,8 @@ func WithDesktopAppIntegration(accountName string) ClientOption {
 	}
 }
 
-// WithCustomSharedLibraryPath specifies a custom path to load the shared library (dll/dylib/so) file from
-func WithCustomSharedLibraryPath(path string) ClientOption {
+// WithSharedLibraryPath specifies a custom path to load the shared library (dll/dylib/so) file from
+func WithSharedLibraryPath(path string) ClientOption {
 	return func(c *Client) error {
 		c.config.SharedLibraryPath = path
 		return nil
