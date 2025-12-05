@@ -34,7 +34,7 @@ func NewClient(ctx context.Context, opts ...ClientOption) (*Client, error) {
 	var core *internal.CoreWrapper
 	var err error
 	if client.config.AccountName != nil {
-		core, err = internal.GetSharedLibCore(*client.config.AccountName)
+		core, err = internal.GetSharedLibCore(*client.config.AccountName, client.config.SharedLibraryPath)
 	} else {
 		core, err = internal.GetExtismCore()
 	}
@@ -90,6 +90,14 @@ func WithIntegrationInfo(name string, version string) ClientOption {
 func WithDesktopAppIntegration(accountName string) ClientOption {
 	return func(c *Client) error {
 		c.config.AccountName = &accountName
+		return nil
+	}
+}
+
+// WithCustomSharedLibraryPath specifies a custom path to load the shared library (dll/dylib/so) file from
+func WithCustomSharedLibraryPath(path string) ClientOption {
+	return func(c *Client) error {
+		c.config.SharedLibraryPath = path
 		return nil
 	}
 }

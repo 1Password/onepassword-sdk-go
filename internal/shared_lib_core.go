@@ -26,7 +26,7 @@ func (r Response) Error() string { return string(r.Payload) }
 
 // find1PasswordLibPath returns the path to the 1Password shared library
 // (libop_sdk_ipc_client.dylib/.so/.dll) depending on OS.
-func find1PasswordLibPath() (string, error) {
+func find1PasswordLibPath(customLocation string) (string, error) {
 	var locations []string
 
 	home, err := os.UserHomeDir()
@@ -59,8 +59,8 @@ func find1PasswordLibPath() (string, error) {
 	default:
 		return "", fmt.Errorf("unsupported OS: %s", runtime.GOOS)
 	}
-	if libPath := os.Getenv("OP_SHARED_LIB_PATH"); libPath != "" {
-		locations = append([]string{libPath}, locations...)
+	if customLocation != "" {
+		locations = append([]string{customLocation}, locations...)
 	}
 	for _, libPath := range locations {
 		if _, err := os.Stat(libPath); err == nil {
@@ -71,9 +71,9 @@ func find1PasswordLibPath() (string, error) {
 	return "", fmt.Errorf("1Password desktop application not found")
 }
 
-func GetSharedLibCore(accountName string) (*CoreWrapper, error) {
+func GetSharedLibCore(accountName string, libraryPath string) (*CoreWrapper, error) {
 	if coreLib == nil {
-		libPath, err := find1PasswordLibPath()
+		libPath, err := find1PasswordLibPath(libraryPath)
 		if err != nil {
 			return nil, err
 		}

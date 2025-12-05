@@ -80,6 +80,7 @@ type ClientConfig struct {
 	SAToken               string  `json:"serviceAccountToken"`
 	Language              string  `json:"programmingLanguage"`
 	SDKVersion            string  `json:"sdkVersion"`
+	SharedLibraryPath     string  `json:"sharedLibraryPath"`
 	IntegrationName       string  `json:"integrationName"`
 	IntegrationVersion    string  `json:"integrationVersion"`
 	RequestLibraryName    string  `json:"requestLibraryName"`
