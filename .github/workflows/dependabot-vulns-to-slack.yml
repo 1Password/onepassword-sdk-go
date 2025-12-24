@@ -1,6 +1,7 @@
 name: 'Dependabot vulerabilities notification to Slack'
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: '0 10 * * 1' # Cron - every Monday at 10.00AM UTC
 
