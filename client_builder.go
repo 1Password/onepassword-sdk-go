@@ -85,14 +85,6 @@ func WithIntegrationInfo(name string, version string) ClientOption {
 	}
 }
 
-// WithDesktopAppIntegration specifies a client should use the desktop app to authenticate. Set to your 1Password account name as shown at the top left sidebar of the app, or your account UUID.
-func WithDesktopAppIntegration(accountName string) ClientOption {
-	return func(c *Client) error {
-		c.config.AccountName = &accountName
-		return nil
-	}
-}
-
 func clientInvoke(ctx context.Context, innerClient *internal.InnerClient, invocation string, params map[string]interface{}) (*string, error) {
 	invocationResponse, err := innerClient.Core.Invoke(ctx, internal.InvokeConfig{
 		Invocation: internal.Invocation{
