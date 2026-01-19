@@ -18,7 +18,7 @@
 
 To use the 1Password Go SDK in your project:
 
-1. [Create a service account](https://my.1password.com/developer-tools/infrastructure-secrets/serviceaccount/) and give it the appropriate permissions in the vaults where the items you want to use with the SDK are saved.
+1. [Create a service account](https://my.1password.com/developer-tools/infrastructure-secrets/serviceaccount/?source=sdk) and give it the appropriate permissions in the vaults where the items you want to use with the SDK are saved.
 2. Provision your service account token. We recommend provisioning your token from the environment. For example, to export your token to the `OP_SERVICE_ACCOUNT_TOKEN` environment variable:
 
    **macOS or Linux**
