@@ -1,11 +1,8 @@
-//go:build windows
-
 package internal
 
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"unsafe"
 
 	"golang.org/x/sys/windows"
@@ -66,8 +63,9 @@ func (slc *SharedLibCore) callSharedLibrary(input []byte) ([]byte, error) {
 		return nil, callErr
 	}
 	// library-level return code
-	if int32(r1) != 0 {
-		return nil, fmt.Errorf("failed to send message to Desktop App. Return code: %d", int32(r1))
+	err := errorFromReturnCode(int(r1))
+	if err != nil {
+		return nil, err
 	}
 
 	// Copy response out of the DLL buffer, then free via exported function
@@ -84,7 +82,7 @@ func (slc *SharedLibCore) callSharedLibrary(input []byte) ([]byte, error) {
 
 	// Match Unix: decode envelope and return payload or error
 	var response Response
-	if err := json.Unmarshal(out, &response); err != nil {
+	if err = json.Unmarshal(out, &response); err != nil {
 		return nil, err
 	}
 	if response.Success {

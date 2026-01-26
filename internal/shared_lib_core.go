@@ -149,3 +149,28 @@ func (slc *SharedLibCore) ReleaseClient(clientID []byte) {
 		log.Println("failed to release client")
 	}
 }
+
+func errorFromReturnCode(retCode int) error {
+	if retCode == 0 {
+		return nil
+	}
+	if runtime.GOOS == "darwin" {
+		switch retCode {
+		case -3:
+			return fmt.Errorf("desktop app connection channel is closed. Make sure Settings > Developer > Integrate with other apps is enabled, or contact 1Password support")
+		case -7:
+			return fmt.Errorf("connection was unexpectedly dropped by the desktop app. Make sure the desktop app is running and Settings > Developer > Integrate with other apps is enabled, or contact 1Password support")
+		default:
+			return fmt.Errorf("an internal error occurred. Please contact 1Password support and mention the return code: %d", retCode)
+		}
+	} else {
+		switch retCode {
+		case -2:
+			return fmt.Errorf("desktop app connection channel is closed. Make sure Settings > Developer > Integrate with other apps is enabled, or contact 1Password support")
+		case -5:
+			return fmt.Errorf("connection was unexpectedly dropped by the desktop app. Make sure the desktop app is running and Settings > Developer > Integrate with other apps is enabled, or contact 1Password support")
+		default:
+			return fmt.Errorf("an internal error occurred. Please contact 1Password support and mention the return code: %d", retCode)
+		}
+	}
+}

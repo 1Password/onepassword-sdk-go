@@ -5,7 +5,6 @@ package internal
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"unsafe"
 )
 
@@ -131,9 +130,9 @@ func (slc *SharedLibCore) callSharedLibrary(input []byte) ([]byte, error) {
 		&outLen,
 		&outCap,
 	)
-
-	if retCode != 0 {
-		return nil, fmt.Errorf("failed to send message to 1Password desktop app. Make sure Settings > Developer > Integrate with other apps is enabled, or contact 1Password support. Return code: %d", int(retCode))
+	err := errorFromReturnCode(retCode)
+	if err != nil {
+		return nil, err
 	}
 
 	resp := C.GoBytes(unsafe.Pointer(outBuf), C.int(outLen))
@@ -141,7 +140,7 @@ func (slc *SharedLibCore) callSharedLibrary(input []byte) ([]byte, error) {
 	C.call_free_message(slc.freeResponse, outBuf, outLen, outCap)
 
 	var response Response
-	err := json.Unmarshal(resp, &response)
+	err = json.Unmarshal(resp, &response)
 	if err != nil {
 		return nil, err
 	}
