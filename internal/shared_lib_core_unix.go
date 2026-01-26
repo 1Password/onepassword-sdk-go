@@ -130,7 +130,7 @@ func (slc *SharedLibCore) callSharedLibrary(input []byte) ([]byte, error) {
 		&outLen,
 		&outCap,
 	)
-	err := errorFromReturnCode(retCode)
+	err := errorFromReturnCode(int32(retCode))
 	if err != nil {
 		return nil, err
 	}
