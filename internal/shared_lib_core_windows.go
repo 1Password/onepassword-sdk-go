@@ -63,7 +63,7 @@ func (slc *SharedLibCore) callSharedLibrary(input []byte) ([]byte, error) {
 		return nil, callErr
 	}
 	// library-level return code
-	err := errorFromReturnCode(int(r1))
+	err := errorFromReturnCode(int32(r1))
 	if err != nil {
 		return nil, err
 	}

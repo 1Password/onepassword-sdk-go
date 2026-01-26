@@ -150,7 +150,7 @@ func (slc *SharedLibCore) ReleaseClient(clientID []byte) {
 	}
 }
 
-func errorFromReturnCode(retCode int) error {
+func errorFromReturnCode(retCode int32) error {
 	if retCode == 0 {
 		return nil
 	}
