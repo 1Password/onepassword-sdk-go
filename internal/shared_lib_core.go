@@ -3,6 +3,7 @@ package internal
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -164,9 +165,9 @@ func errorFromReturnCode(retCode int32) error {
 	if runtime.GOOS == "darwin" {
 		switch retCode {
 		case -3:
-			return fmt.Errorf(errChannelClosed)
+			return errors.New(errChannelClosed)
 		case -7:
-			return fmt.Errorf(errConnectionDropped)
+			return errors.New(errConnectionDropped)
 		default:
 			return fmt.Errorf(errInternalFmt, retCode)
 		}
@@ -174,9 +175,9 @@ func errorFromReturnCode(retCode int32) error {
 
 	switch retCode {
 	case -2:
-		return fmt.Errorf(errChannelClosed)
+		return errors.New(errChannelClosed)
 	case -5:
-		return fmt.Errorf(errConnectionDropped)
+		return errors.New(errConnectionDropped)
 	default:
 		return fmt.Errorf(errInternalFmt, retCode)
 	}
