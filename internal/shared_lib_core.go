@@ -3,6 +3,7 @@ package internal
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -147,5 +148,37 @@ func (slc *SharedLibCore) ReleaseClient(clientID []byte) {
 	_, err = slc.callSharedLibrary(requestMarshaled)
 	if err != nil {
 		log.Println("failed to release client")
+	}
+}
+
+const (
+	errChannelClosed     = "desktop app connection channel is closed. Make sure Settings > Developer > Integrate with other apps is enabled, or contact 1Password support"
+	errConnectionDropped = "connection was unexpectedly dropped by the desktop app. Make sure the desktop app is running and Settings > Developer > Integrate with other apps is enabled, or contact 1Password support"
+	errInternalFmt       = "an internal error occurred. Please contact 1Password support and mention the return code: %d"
+)
+
+func errorFromReturnCode(retCode int32) error {
+	if retCode == 0 {
+		return nil
+	}
+
+	if runtime.GOOS == "darwin" {
+		switch retCode {
+		case -3:
+			return errors.New(errChannelClosed)
+		case -7:
+			return errors.New(errConnectionDropped)
+		default:
+			return fmt.Errorf(errInternalFmt, retCode)
+		}
+	}
+
+	switch retCode {
+	case -2:
+		return errors.New(errChannelClosed)
+	case -5:
+		return errors.New(errConnectionDropped)
+	default:
+		return fmt.Errorf(errInternalFmt, retCode)
 	}
 }
