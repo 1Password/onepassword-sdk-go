@@ -1,3 +1,5 @@
+//go:build cgo || windows
+
 package internal
 
 import (
@@ -11,7 +13,6 @@ import (
 	"runtime"
 )
 
-// Request/Response mirror your Unix file (kept identical)
 type Request struct {
 	Kind        string `json:"kind"`
 	AccountName string `json:"account_name"`

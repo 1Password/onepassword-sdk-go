@@ -136,6 +136,16 @@ Field types:
 - [ ] User authentication
 - [ ] 1Password Connect. For now, use [1Password/connect-sdk-go](https://github.com/1Password/connect-sdk-go).
 
+### Cross compilation
+
+You will not be able to cross compile the Go SDK if you choose to use it with the 
+Desktop App integration authentication method (if you specify the `WithDesktopAppIntegration` option on the client),
+unless CGO is enabled. 
+
+CGO can be enabled either by default if your system permits that, or deliberately if your system doesn't permit that by:
+- setting the `CGO_ENABLED` env var to 1
+- downloading and selecting the right cross-compiler depending on your desired target and host system.
+
 ## 📖 Learn more
 
 - [Load secrets with 1Password SDKs](https://developer.1password.com/docs/sdks/load-secrets)
