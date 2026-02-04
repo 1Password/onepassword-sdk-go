@@ -16,7 +16,7 @@ jobs:
     if: startsWith(github.head_ref, 'dependabot/') # This step only runs when PR has dependabot/ HEAD
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Slack Notification
         uses: kv109/action-ready-for-review@76820bc668c3ce6c9be0c9322d07c2d8804dbd7a
         env:

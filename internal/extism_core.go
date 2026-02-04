@@ -121,7 +121,7 @@ func loadWASM(ctx context.Context) (*extism.Plugin, error) {
 	extismConfig := extism.PluginConfig{}
 	plugin, err := extism.NewPlugin(ctx, manifest, extismConfig, ImportedFunctions())
 	if err != nil {
-		return nil, fmt.Errorf("Failed to initialize plugin: %v\n", err)
+		return nil, fmt.Errorf("failed to initialize plugin: %v", err)
 	}
 
 	return plugin, nil
