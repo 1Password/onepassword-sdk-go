@@ -215,7 +215,7 @@ type ItemSection struct {
 
 // Controls the auto-fill behavior of a website.
 //
-// For more information, visit https://support.1password.com/autofill-behavior/
+// For more information, visit <https://support.1password.com/autofill-behavior/>
 type AutofillBehavior string
 
 const (
@@ -234,7 +234,7 @@ type Website struct {
 	Label string `json:"label"`
 	// The auto-fill behavior of the website
 	//
-	// For more information, visit https://support.1password.com/autofill-behavior/
+	// For more information, visit <https://support.1password.com/autofill-behavior/>
 	AutofillBehavior AutofillBehavior `json:"autofillBehavior"`
 }
 type ItemFile struct {
