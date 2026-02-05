@@ -14,7 +14,7 @@ type ItemsAPI interface {
 	// Create a new item.
 	Create(ctx context.Context, params ItemCreateParams) (Item, error)
 
-	// Get an item by vault and item ID
+	// Get an item by vault and item ID.
 	Get(ctx context.Context, vaultID string, itemID string) (Item, error)
 
 	// Update an existing item.
@@ -67,7 +67,7 @@ func (i ItemsSource) Create(ctx context.Context, params ItemCreateParams) (Item,
 	return result, nil
 }
 
-// Get an item by vault and item ID
+// Get an item by vault and item ID.
 func (i ItemsSource) Get(ctx context.Context, vaultID string, itemID string) (Item, error) {
 	resultString, err := clientInvoke(ctx, i.InnerClient, "ItemsGet", map[string]interface{}{
 		"vault_id": vaultID,

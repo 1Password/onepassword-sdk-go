@@ -10,16 +10,16 @@ import (
 )
 
 type ItemsFilesAPI interface {
-	// Attach files to Items
+	// Attach files to Items.
 	Attach(ctx context.Context, item Item, fileParams FileCreateParams) (Item, error)
 
-	// Read file content from the Item
+	// Read file content from the Item.
 	Read(ctx context.Context, vaultID string, itemID string, attr FileAttributes) ([]byte, error)
 
-	// Delete a field file from Item using the section and field IDs
+	// Delete a field file from Item using the section and field IDs.
 	Delete(ctx context.Context, item Item, sectionID string, fieldID string) (Item, error)
 
-	// Replace the document file within a document item
+	// Replace the document file within a document item.
 	ReplaceDocument(ctx context.Context, item Item, docParams DocumentCreateParams) (Item, error)
 }
 
@@ -31,7 +31,7 @@ func NewItemsFilesSource(inner internal.InnerClient) ItemsFilesAPI {
 	return &ItemsFilesSource{InnerClient: inner}
 }
 
-// Attach files to Items
+// Attach files to Items.
 func (i ItemsFilesSource) Attach(ctx context.Context, item Item, fileParams FileCreateParams) (Item, error) {
 	resultString, err := clientInvoke(ctx, i.InnerClient, "ItemsFilesAttach", map[string]interface{}{
 		"item":        item,
@@ -48,7 +48,7 @@ func (i ItemsFilesSource) Attach(ctx context.Context, item Item, fileParams File
 	return result, nil
 }
 
-// Read file content from the Item
+// Read file content from the Item.
 func (i ItemsFilesSource) Read(ctx context.Context, vaultID string, itemID string, attr FileAttributes) ([]byte, error) {
 	resultString, err := clientInvoke(ctx, i.InnerClient, "ItemsFilesRead", map[string]interface{}{
 		"vault_id": vaultID,
@@ -66,7 +66,7 @@ func (i ItemsFilesSource) Read(ctx context.Context, vaultID string, itemID strin
 	return result, nil
 }
 
-// Delete a field file from Item using the section and field IDs
+// Delete a field file from Item using the section and field IDs.
 func (i ItemsFilesSource) Delete(ctx context.Context, item Item, sectionID string, fieldID string) (Item, error) {
 	resultString, err := clientInvoke(ctx, i.InnerClient, "ItemsFilesDelete", map[string]interface{}{
 		"item":       item,
@@ -84,7 +84,7 @@ func (i ItemsFilesSource) Delete(ctx context.Context, item Item, sectionID strin
 	return result, nil
 }
 
-// Replace the document file within a document item
+// Replace the document file within a document item.
 func (i ItemsFilesSource) ReplaceDocument(ctx context.Context, item Item, docParams DocumentCreateParams) (Item, error) {
 	resultString, err := clientInvoke(ctx, i.InnerClient, "ItemsFilesReplaceDocument", map[string]interface{}{
 		"item":       item,
