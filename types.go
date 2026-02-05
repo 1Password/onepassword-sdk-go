@@ -27,6 +27,16 @@ type DocumentCreateParams struct {
 	// The content of the file
 	Content []byte `json:"content"`
 }
+
+// Represents an environment variable (name:value pair) and it's masked state
+type EnvironmentVariable struct {
+	// An environment variable's name
+	Name string `json:"name"`
+	// An environment variable's value
+	Value string `json:"value"`
+	// An environment variable's masked state
+	Masked bool `json:"masked"`
+}
 type FileAttributes struct {
 	// The name of the file
 	Name string `json:"name"`
@@ -51,6 +61,12 @@ type FileCreateParams struct {
 type GeneratePasswordResponse struct {
 	// The generated password.
 	Password string `json:"password"`
+}
+
+// Response containing the full set of environment variables from an Environment.
+type GetVariablesResponse struct {
+	// List of environment variables.
+	Variables []EnvironmentVariable `json:"variables"`
 }
 type GroupType string
 
@@ -128,7 +144,7 @@ type Group struct {
 // This is used for granting permissions
 type GroupAccess struct {
 	// The group's ID
-	GroupID string `json:"group_id"`
+	GroupID string `json:"groupId"`
 	// The group's set of permissions for the vault
 	Permissions uint32 `json:"permissions"`
 }
@@ -139,9 +155,9 @@ type GroupGetParams struct {
 // Represents a group's access to a 1Password vault.
 type GroupVaultAccess struct {
 	// The vault's ID
-	VaultID string `json:"vault_id"`
+	VaultID string `json:"vaultId"`
 	// The group's ID
-	GroupID string `json:"group_id"`
+	GroupID string `json:"groupId"`
 	// The group's set of permissions for the vault
 	Permissions uint32 `json:"permissions"`
 }
@@ -1031,10 +1047,15 @@ type Vault struct {
 	ActiveItemCount uint32 `json:"activeItemCount"`
 	// The content version number of the vault. It gets incremented whenever the state of the vault's contents changes (e.g. items from within the vault get created or updated).
 	ContentVersion uint32 `json:"contentVersion"`
-	// The attribute version number of the vault. It gets incremented whenever vault presentation information changes, such as its title or icon.
+	// The attribute version number of the vault. It gets incremented whenever vault presentation information changes, such as its name or icon.
 	AttributeVersion uint32 `json:"attributeVersion"`
 	// The access information associated with the vault.
 	Access []VaultAccess `json:"access,omitempty"`
+}
+type VaultCreateParams struct {
+	Title             string  `json:"title"`
+	Description       *string `json:"description,omitempty"`
+	AllowAdminsAccess *bool   `json:"allowAdminsAccess,omitempty"`
 }
 
 // Represents the possible query parameters used for retrieving extra information about a vault.
@@ -1060,12 +1081,16 @@ type VaultOverview struct {
 	ActiveItemCount uint32 `json:"activeItemCount"`
 	// The content version number of the vault. It gets incremented whenever the state of the vault's contents changes (e.g. items from within the vault get created or updated).
 	ContentVersion uint32 `json:"contentVersion"`
-	// The attribute version number of the vault. It gets incremented whenever vault presentation information changes, such as its title or icon.
+	// The attribute version number of the vault. It gets incremented whenever vault presentation information changes, such as its name or icon.
 	AttributeVersion uint32 `json:"attributeVersion"`
 	// The time the vault was created at
 	CreatedAt time.Time `json:"createdAt"`
 	// The time the vault was updated at
 	UpdatedAt time.Time `json:"updatedAt"`
+}
+type VaultUpdateParams struct {
+	Title       *string `json:"title,omitempty"`
+	Description *string `json:"description,omitempty"`
 }
 
 // Generated type representing the anonymous struct variant `ByState` of the `ItemListFilter` Rust enum
