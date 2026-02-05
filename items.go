@@ -14,14 +14,23 @@ type ItemsAPI interface {
 	// Create a new item.
 	Create(ctx context.Context, params ItemCreateParams) (Item, error)
 
-	// Get an item by vault and item ID
+	// Create items in batch, within a single vault.
+	CreateAll(ctx context.Context, vaultID string, params []ItemCreateParams) (ItemsUpdateAllResponse, error)
+
+	// Get an item by vault and item ID.
 	Get(ctx context.Context, vaultID string, itemID string) (Item, error)
+
+	// Get items by vault and their item IDs.
+	GetAll(ctx context.Context, vaultID string, itemIds []string) (ItemsGetAllResponse, error)
 
 	// Update an existing item.
 	Put(ctx context.Context, item Item) (Item, error)
 
 	// Delete an item.
 	Delete(ctx context.Context, vaultID string, itemID string) error
+
+	// Delete items in batch, within a single vault.
+	DeleteAll(ctx context.Context, vaultID string, itemIds []string) (ItemsDeleteAllResponse, error)
 
 	// Archive an item.
 	Archive(ctx context.Context, vaultID string, itemID string) error
@@ -35,12 +44,12 @@ type ItemsAPI interface {
 }
 
 type ItemsSource struct {
-	internal.InnerClient
+	*internal.InnerClient
 	SharesAPI ItemsSharesAPI
 	FilesAPI  ItemsFilesAPI
 }
 
-func NewItemsSource(inner internal.InnerClient) ItemsAPI {
+func NewItemsSource(inner *internal.InnerClient) ItemsAPI {
 	return &ItemsSource{InnerClient: inner, SharesAPI: NewItemsSharesSource(inner), FilesAPI: NewItemsFilesSource(inner)}
 }
 
@@ -67,7 +76,24 @@ func (i ItemsSource) Create(ctx context.Context, params ItemCreateParams) (Item,
 	return result, nil
 }
 
-// Get an item by vault and item ID
+// Create items in batch, within a single vault.
+func (i ItemsSource) CreateAll(ctx context.Context, vaultID string, params []ItemCreateParams) (ItemsUpdateAllResponse, error) {
+	resultString, err := clientInvoke(ctx, i.InnerClient, "ItemsCreateAll", map[string]interface{}{
+		"vault_id": vaultID,
+		"params":   params,
+	})
+	if err != nil {
+		return ItemsUpdateAllResponse{}, err
+	}
+	var result ItemsUpdateAllResponse
+	err = json.Unmarshal([]byte(*resultString), &result)
+	if err != nil {
+		return ItemsUpdateAllResponse{}, err
+	}
+	return result, nil
+}
+
+// Get an item by vault and item ID.
 func (i ItemsSource) Get(ctx context.Context, vaultID string, itemID string) (Item, error) {
 	resultString, err := clientInvoke(ctx, i.InnerClient, "ItemsGet", map[string]interface{}{
 		"vault_id": vaultID,
@@ -80,6 +106,23 @@ func (i ItemsSource) Get(ctx context.Context, vaultID string, itemID string) (It
 	err = json.Unmarshal([]byte(*resultString), &result)
 	if err != nil {
 		return Item{}, err
+	}
+	return result, nil
+}
+
+// Get items by vault and their item IDs.
+func (i ItemsSource) GetAll(ctx context.Context, vaultID string, itemIds []string) (ItemsGetAllResponse, error) {
+	resultString, err := clientInvoke(ctx, i.InnerClient, "ItemsGetAll", map[string]interface{}{
+		"vault_id": vaultID,
+		"item_ids": itemIds,
+	})
+	if err != nil {
+		return ItemsGetAllResponse{}, err
+	}
+	var result ItemsGetAllResponse
+	err = json.Unmarshal([]byte(*resultString), &result)
+	if err != nil {
+		return ItemsGetAllResponse{}, err
 	}
 	return result, nil
 }
@@ -107,6 +150,23 @@ func (i ItemsSource) Delete(ctx context.Context, vaultID string, itemID string) 
 		"item_id":  itemID,
 	})
 	return err
+}
+
+// Delete items in batch, within a single vault.
+func (i ItemsSource) DeleteAll(ctx context.Context, vaultID string, itemIds []string) (ItemsDeleteAllResponse, error) {
+	resultString, err := clientInvoke(ctx, i.InnerClient, "ItemsDeleteAll", map[string]interface{}{
+		"vault_id": vaultID,
+		"item_ids": itemIds,
+	})
+	if err != nil {
+		return ItemsDeleteAllResponse{}, err
+	}
+	var result ItemsDeleteAllResponse
+	err = json.Unmarshal([]byte(*resultString), &result)
+	if err != nil {
+		return ItemsDeleteAllResponse{}, err
+	}
+	return result, nil
 }
 
 // Archive an item.

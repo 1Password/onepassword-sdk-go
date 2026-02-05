@@ -10,7 +10,7 @@ import (
 )
 
 // The Secrets API includes all operations the SDK client can perform on secrets.
-// Use secret reference URIs to securely load secrets from 1Password: op://<vault-name>/<item-name>[/<section-name>]/<field-name>
+// Use secret reference URIs to securely load secrets from 1Password: `op://<vault-name>/<item-name>[/<section-name>]/<field-name>`
 type SecretsAPI interface {
 	// Resolve returns the secret the provided secret reference points to.
 	Resolve(ctx context.Context, secretReference string) (string, error)
@@ -20,10 +20,10 @@ type SecretsAPI interface {
 }
 
 type SecretsSource struct {
-	internal.InnerClient
+	*internal.InnerClient
 }
 
-func NewSecretsSource(inner internal.InnerClient) SecretsAPI {
+func NewSecretsSource(inner *internal.InnerClient) SecretsAPI {
 	return &SecretsSource{InnerClient: inner}
 }
 
@@ -65,7 +65,7 @@ func (s SecretsSource) ResolveAll(ctx context.Context, secretReferences []string
 
 // Validate the secret reference to ensure there are no syntax errors.
 func (s secretsUtil) ValidateSecretReference(ctx context.Context, secretReference string) error {
-	core, err := internal.GetSharedCore()
+	core, err := internal.GetExtismCore()
 	if err != nil {
 		return err
 	}
@@ -86,8 +86,9 @@ func (s secretsUtil) ValidateSecretReference(ctx context.Context, secretReferenc
 	return nil
 }
 
+// Generate a password using the provided recipe.
 func (s secretsUtil) GeneratePassword(ctx context.Context, recipe PasswordRecipe) (GeneratePasswordResponse, error) {
-	core, err := internal.GetSharedCore()
+	core, err := internal.GetExtismCore()
 	if err != nil {
 		return GeneratePasswordResponse{}, err
 	}
