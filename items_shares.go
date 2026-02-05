@@ -21,10 +21,10 @@ type ItemsSharesAPI interface {
 }
 
 type ItemsSharesSource struct {
-	internal.InnerClient
+	*internal.InnerClient
 }
 
-func NewItemsSharesSource(inner internal.InnerClient) ItemsSharesAPI {
+func NewItemsSharesSource(inner *internal.InnerClient) ItemsSharesAPI {
 	return &ItemsSharesSource{InnerClient: inner}
 }
 
