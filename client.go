@@ -14,7 +14,7 @@ type Client struct {
 	VaultsAPI  VaultsAPI
 }
 
-func initAPIs(client *Client, inner internal.InnerClient) {
+func initAPIs(client *Client, inner *internal.InnerClient) {
 	client.SecretsAPI = NewSecretsSource(inner)
 	client.ItemsAPI = NewItemsSource(inner)
 	client.VaultsAPI = NewVaultsSource(inner)
