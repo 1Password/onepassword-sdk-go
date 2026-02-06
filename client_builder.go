@@ -2,6 +2,7 @@ package onepassword
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"runtime"
 
@@ -15,14 +16,6 @@ const (
 
 // NewClient returns a 1Password Go SDK client using the provided ClientOption list.
 func NewClient(ctx context.Context, opts ...ClientOption) (*Client, error) {
-	core, err := internal.GetSharedCore()
-	if err != nil {
-		return nil, err
-	}
-	return createClient(ctx, core, opts...)
-}
-
-func createClient(ctx context.Context, core internal.Core, opts ...ClientOption) (*Client, error) {
 	client := Client{
 		config: internal.NewDefaultConfig(),
 	}
@@ -34,17 +27,38 @@ func createClient(ctx context.Context, core internal.Core, opts ...ClientOption)
 		}
 	}
 
+	if client.config.AccountName != nil && client.config.SAToken != "" {
+		return nil, fmt.Errorf("cannot use both SA token and desktop app authentication")
+	}
+
+	var core *internal.CoreWrapper
+	var err error
+	if client.config.AccountName != nil {
+		core, err = internal.GetSharedLibCore(*client.config.AccountName)
+	} else {
+		core, err = internal.GetExtismCore()
+	}
+
+	if err != nil {
+		return nil, err
+	}
+	return initClient(ctx, *core, client)
+}
+
+// Initializes the client with the backend and gets it ready for later invocations.
+func initClient(ctx context.Context, core internal.CoreWrapper, client Client) (*Client, error) {
 	clientID, err := core.InitClient(ctx, client.config)
 	if err != nil {
 		return nil, fmt.Errorf("error initializing client: %w", unmarshalError(err.Error()))
 	}
 
 	inner := internal.InnerClient{
-		ID:   *clientID,
-		Core: core,
+		ID:     *clientID,
+		Core:   core,
+		Config: client.config,
 	}
 
-	initAPIs(&client, inner)
+	initAPIs(&client, &inner)
 
 	runtime.SetFinalizer(&client, func(f *Client) {
 		core.ReleaseClient(*clientID)
@@ -71,7 +85,7 @@ func WithIntegrationInfo(name string, version string) ClientOption {
 	}
 }
 
-func clientInvoke(ctx context.Context, innerClient internal.InnerClient, invocation string, params map[string]interface{}) (*string, error) {
+func clientInvoke(ctx context.Context, innerClient *internal.InnerClient, invocation string, params map[string]interface{}) (*string, error) {
 	invocationResponse, err := innerClient.Core.Invoke(ctx, internal.InvokeConfig{
 		Invocation: internal.Invocation{
 			ClientID: &innerClient.ID,
@@ -82,7 +96,30 @@ func clientInvoke(ctx context.Context, innerClient internal.InnerClient, invocat
 		},
 	})
 	if err != nil {
-		return nil, unmarshalError(err.Error())
+		err = unmarshalError(err.Error())
+		var e *DesktopSessionExpiredError
+		if errors.As(err, &e) {
+			var clientID *uint64
+			clientID, err = innerClient.Core.InitClient(ctx, innerClient.Config)
+			if err != nil {
+				return nil, err
+			}
+			innerClient.ID = *clientID
+			invocationResponse, err = innerClient.Core.Invoke(ctx, internal.InvokeConfig{
+				Invocation: internal.Invocation{
+					ClientID: &innerClient.ID,
+					Parameters: internal.Parameters{
+						MethodName:       invocation,
+						SerializedParams: params,
+					},
+				},
+			})
+			if err == nil {
+				return invocationResponse, nil
+			}
+		}
+
+		return nil, err
 	}
 	return invocationResponse, nil
 }

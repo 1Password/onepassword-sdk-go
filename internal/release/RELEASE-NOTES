@@ -1,5 +1,11 @@
-# 1Password Go SDK v0.3.1
+# 1Password Go SDK v0.4.0-beta.2
 
 ## NEW
 
-- `VaultOverview` now includes `created_at` and `updated_at` fields that show when the vault was created and last updated.
+- **Vault group permission management operations:** You can now grant, update and revoke group access to vaults using `GrantGroupPermissions`, `UpdateGroupPermissions`, and `RevokeGroupPermissions` functions.
+- **Desktop App integration on Windows:** The SDK can now authenticate via an authorization prompt from the 1Password app on Windows as well. Now all major desktop OSs support this feature.
+
+## FIXED
+
+- **Vault listing with additional parameters:** `Vaults().List` no longer errors when additional parameters are provided.
+- **Handling locked 1Password app state:** When the 1Password app gets locked after the SDK client is authenticated, it will now automatically re-authenticate.
