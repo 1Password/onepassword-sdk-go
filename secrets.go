@@ -86,6 +86,7 @@ func (s secretsUtil) ValidateSecretReference(ctx context.Context, secretReferenc
 	return nil
 }
 
+// Generate a password using the provided recipe.
 func (s secretsUtil) GeneratePassword(ctx context.Context, recipe PasswordRecipe) (GeneratePasswordResponse, error) {
 	core, err := internal.GetExtismCore()
 	if err != nil {
