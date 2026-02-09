@@ -9,7 +9,7 @@ import (
 	"github.com/1password/onepassword-sdk-go/internal"
 )
 
-// The Environments API holds all the operations the SDK client can perform on 1Password Environments (Vault Type = 'D').
+// The Environments API holds all the operations the SDK client can perform on 1Password Environments.
 type EnvironmentsAPI interface {
 	// Get environment variables belonging to an Environment.
 	GetVariables(ctx context.Context, environmentID string) (GetVariablesResponse, error)

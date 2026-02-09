@@ -51,7 +51,7 @@ func main() {
 	environmentID := os.Getenv("OP_ENVIRONMENT_ID")
 	if environmentID != "" {
 		// [developer-docs.sdk.go.get-environment-variables]-start
-		// Fetch variables from a 1Password Environment
+		// Read variables from a 1Password Environment
 		environment, err := client.Environments().GetVariables(context.Background(), environmentID)
 		if err != nil {
 			panic(err)
