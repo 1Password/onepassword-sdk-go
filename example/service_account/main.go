@@ -11,8 +11,7 @@ import (
 )
 
 // [developer-docs.sdk.go.sdk-import]-start
-import "github.com/1password/onepassword-sdk-go"
-
+import 	"github.com/1password/onepassword-sdk-go"
 // [developer-docs.sdk.go.sdk-import]-end
 
 func main() {
@@ -37,6 +36,7 @@ func main() {
 	createAndAttachAndDeleteFileFieldItem(client)
 	getAndUpdateItem(client, item.VaultID, item.ID)
 	listVaultsAndItems(client, item.VaultID)
+	showcaseBatchItemOperations(client, item.VaultID)
 	generatePasswords()
 	resolveSecretReference(client, item.VaultID, item.ID, "username")
 	resolveBulkSecretReferences(client, item.VaultID, item.ID, "username", "password")
@@ -45,6 +45,101 @@ func main() {
 	fmt.Println(sharelink)
 	archiveItem(client, item.VaultID, item.ID)
 	deleteItem(client, item.VaultID, item.ID)
+}
+
+func showcaseBatchItemOperations(client *onepassword.Client, vaultID string) {
+	// [developer-docs.sdk.go.batch-create-items]-start
+	sectionID := "extraDetails"
+	var itemsToCreate []onepassword.ItemCreateParams
+	for i := 1; i <= 3; i++ {
+		itemsToCreate = append(itemsToCreate, onepassword.ItemCreateParams{
+			Title:    fmt.Sprintf("Login %d created with the SDK", i),
+			Category: onepassword.ItemCategoryLogin,
+			VaultID:  vaultID,
+			Fields: []onepassword.ItemField{
+				{
+					ID:        "username",
+					Title:     "username",
+					Value:     "Wendy_Appleseed",
+					FieldType: onepassword.ItemFieldTypeText,
+				},
+				{
+					ID:        "password",
+					Title:     "password",
+					Value:     "my_weak_password123",
+					FieldType: onepassword.ItemFieldTypeConcealed,
+				},
+				{
+					ID:        "onetimepassword",
+					Title:     "one-time password",
+					Value:     "otpauth://totp/my-example-otp?secret=jncrjgbdjnrncbjsr&issuer=1Password",
+					SectionID: &sectionID,
+					FieldType: onepassword.ItemFieldTypeTOTP,
+				},
+			},
+			Sections: []onepassword.ItemSection{
+				{
+					ID:    sectionID,
+					Title: "Extra Details",
+				},
+			},
+			Tags: []string{"test tag1", "test tag 2"},
+			Websites: []onepassword.Website{
+				{
+					URL:              "1password.com",
+					AutofillBehavior: onepassword.AutofillBehaviorAnywhereOnWebsite,
+					Label:            "my custom website",
+				},
+			},
+		})
+	}
+
+	// Create all items in the same vault in a single batch
+	batchCreateResponse, err := client.Items().CreateAll(context.Background(), vaultID, itemsToCreate)
+	if err != nil {
+		panic(err)
+	}
+
+	var itemIDs []string
+	for _, res := range batchCreateResponse.IndividualResponses {
+		if res.Content != nil {
+			fmt.Printf("Created Item %q (%s)\n", res.Content.Title, res.Content.ID)
+			itemIDs = append(itemIDs, res.Content.ID)
+		} else if res.Error != nil {
+			fmt.Printf("[Batch create] Something went wrong: %s\n", res.Error)
+		}
+	}
+	// [developer-docs.sdk.go.batch-create-items]-end
+
+	// [developer-docs.sdk.go.batch-get-items]-start
+	// Get multiple items form the same vault in a single batch
+	batchGetResponse, err := client.Items().GetAll(context.Background(), vaultID, itemIDs)
+	if err != nil {
+		panic(err)
+	}
+	for _, res := range batchGetResponse.IndividualResponses {
+		if res.Content != nil {
+			fmt.Printf("Obtained Item %q (%s)\n", res.Content.Title, res.Content.ID)
+		} else if res.Error != nil {
+			fmt.Printf("[Batch get] Something went wrong: %s\n", res.Error)
+		}
+	}
+	// [developer-docs.sdk.go.batch-get-items]-end
+
+	// [developer-docs.sdk.go.batch-delete-items]-start
+	// Delete multiple items from the same vault in a single batch
+	batchDeleteResponse, err := client.Items().DeleteAll(context.Background(), vaultID, itemIDs)
+	if err != nil {
+		panic(err)
+	}
+	for id, res := range batchDeleteResponse.IndividualResponses {
+		if res.Error != nil {
+			fmt.Printf("[Batch delete] Something went wrong: %s\n", res.Error)
+		} else {
+			fmt.Printf("Deleted item %s\n", id)
+		}
+	}
+	// [developer-docs.sdk.go.batch-delete-items]-end
 }
 
 func listVaultsAndItems(client *onepassword.Client, vaultID string) {
