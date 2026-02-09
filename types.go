@@ -27,6 +27,16 @@ type DocumentCreateParams struct {
 	// The content of the file
 	Content []byte `json:"content"`
 }
+
+// Represents an environment variable (name:value pair) and its masked state
+type EnvironmentVariable struct {
+	// An environment variable's name
+	Name string `json:"name"`
+	// An environment variable's value
+	Value string `json:"value"`
+	// An environment variable's masked state
+	Masked bool `json:"masked"`
+}
 type FileAttributes struct {
 	// The name of the file
 	Name string `json:"name"`
@@ -51,6 +61,12 @@ type FileCreateParams struct {
 type GeneratePasswordResponse struct {
 	// The generated password.
 	Password string `json:"password"`
+}
+
+// Response containing the full set of environment variables from an Environment.
+type GetVariablesResponse struct {
+	// List of environment variables.
+	Variables []EnvironmentVariable `json:"variables"`
 }
 type GroupType string
 
@@ -1036,7 +1052,6 @@ type Vault struct {
 	// The access information associated with the vault.
 	Access []VaultAccess `json:"access,omitempty"`
 }
-
 type VaultCreateParams struct {
 	Title             string  `json:"title"`
 	Description       *string `json:"description,omitempty"`

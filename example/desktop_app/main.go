@@ -47,6 +47,20 @@ func main() {
 	}
 	fmt.Printf("Group details: %v\n", group)
 	// [developer-docs.sdk.go.get-group]-end
+
+	environmentID := os.Getenv("OP_ENVIRONMENT_ID")
+	if environmentID != "" {
+		// [developer-docs.sdk.go.get-environment-variables]-start
+		// Read variables from a 1Password Environment
+		environment, err := client.Environments().GetVariables(context.Background(), environmentID)
+		if err != nil {
+			panic(err)
+		}
+		for _, variable := range environment.Variables {
+			fmt.Printf("%s: %s (masked: %t)\n", variable.Name, variable.Value, variable.Masked)
+		}
+		// [developer-docs.sdk.go.get-environment-variables]-end
+	}
 }
 
 func createAndGetItem(client *onepassword.Client, vaultID string) onepassword.Item {
