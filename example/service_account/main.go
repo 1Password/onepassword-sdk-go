@@ -32,11 +32,6 @@ func main() {
 	}
 	// [developer-docs.sdk.go.client-initialization]-end
 
-	groupID := os.Getenv("OP_GROUP_ID")
-	if groupID == "" {
-		panic("OP_GROUP_ID is required")
-	}
-
 	item := createAndGetItem(client)
 	createSSHKeyItem(client)
 	createAndReplaceDocumentItem(client)
@@ -45,7 +40,6 @@ func main() {
 	listVaultsAndItems(client, item.VaultID)
 	showcaseVaultOperations(client)
 	showcaseBatchItemOperations(client, item.VaultID)
-	showcaseGroupPermissionOperations(client, item.VaultID, groupID)
 	generatePasswords()
 	resolveSecretReference(client, item.VaultID, item.ID, "username")
 	resolveBulkSecretReferences(client, item.VaultID, item.ID, "username", "password")
@@ -224,45 +218,6 @@ func showcaseBatchItemOperations(client *onepassword.Client, vaultID string) {
 		}
 	}
 	// [developer-docs.sdk.go.batch-delete-items]-end
-}
-
-func showcaseGroupPermissionOperations(client *onepassword.Client, vaultID string, groupID string) {
-	// Grant group permissions to a vault.
-	groupAccess := onepassword.GroupAccess{
-		GroupID:     groupID,
-		Permissions: onepassword.ReadItems,
-	}
-	err := client.Vaults().GrantGroupPermissions(context.Background(), vaultID, []onepassword.GroupAccess{groupAccess})
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println("Granted group permissions to vault.")
-
-	// update group permissions for vaults.
-	groupVaultAccess := onepassword.GroupVaultAccess{
-		GroupID:     groupID,
-		VaultID:     vaultID,
-		Permissions: onepassword.ReadItems | onepassword.CreateItems | onepassword.UpdateItems,
-	}
-	err = client.Vaults().UpdateGroupPermissions(context.Background(), []onepassword.GroupVaultAccess{groupVaultAccess})
-	if err != nil {
-		panic(err)
-	}
-
-	// Revoke group permissions from a vault.
-	err = client.Vaults().RevokeGroupPermissions(context.Background(), vaultID, groupID)
-	if err != nil {
-		panic(err)
-	}
-
-	// [developer-docs.sdk.go.get-group]-start
-	// Get a group
-	group, err := client.Groups().Get(context.Background(), groupID, onepassword.GroupGetParams{})
-	if err != nil {
-		panic(err)
-	}
-	fmt.Printf("Group details: %v\n", group)
-	// [developer-docs.sdk.go.get-group]-end
 }
 
 func listVaultsAndItems(client *onepassword.Client, vaultID string) {
