@@ -180,7 +180,12 @@ func showcaseVaultOperations(client *onepassword.Client) {
 
 	// [developer-docs.sdk.go.delete-vault]-start
 	// Delete vault
-	client.Vaults().Delete(context.Background(), created_vault.ID)
+	err = client.Vaults().Delete(context.Background(), created_vault.ID)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Deleted vault.")
+
 	// [developer-docs.sdk.go.delete-vault]-end
 
 	// [developer-docs.sdk.go.list-vaults]-start
