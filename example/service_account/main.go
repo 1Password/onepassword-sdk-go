@@ -11,7 +11,7 @@ import (
 )
 
 // [developer-docs.sdk.go.sdk-import]-start
-import "github.com/1password/onepassword-sdk-go"
+import 	"github.com/1password/onepassword-sdk-go"
 // [developer-docs.sdk.go.sdk-import]-end
 
 func main() {
@@ -36,7 +36,7 @@ func main() {
 	createAndAttachAndDeleteFileFieldItem(client)
 	getAndUpdateItem(client, item.VaultID, item.ID)
 	listVaultsAndItems(client, item.VaultID)
-	showcaseVaultOperations(client)
+	showcaseVaultOperations(client, item.VaultID)
 	showcaseBatchItemOperations(client, item.VaultID)
 	generatePasswords()
 	resolveSecretReference(client, item.VaultID, item.ID, "username")
@@ -48,26 +48,26 @@ func main() {
 	deleteItem(client, item.VaultID, item.ID)
 }
 
-func showcaseVaultOperations(client *onepassword.Client) {
+func showcaseVaultOperations(client *onepassword.Client, vaultID string) {
 
-	// [developer-docs.sdk.go.create-vault]-start
-	description := "This vault was created with the Go SDK."
-	// Create a vault with a description
-	create_params := onepassword.VaultCreateParams{
-		Title:       "Go SDK Vault",
-		Description: &description,
-	}
+	// // [developer-docs.sdk.go.create-vault]-start
+	// description := "This vault was created with the Go SDK."
+	// // Create a vault with a description
+	// create_params := onepassword.VaultCreateParams{
+	// 	Title:       "Go SDK Vault",
+	// 	Description: &description,
+	// }
 
-	created_vault, err := client.Vaults().Create(context.Background(), create_params)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Printf("Created vault with description: %v\n", created_vault)
-	// [developer-docs.sdk.go.create-vault]-start
+	// created_vault, err := client.Vaults().Create(context.Background(), create_params)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// fmt.Printf("Created vault with description: %v\n", created_vault)
+	// // [developer-docs.sdk.go.create-vault]-end
 
 	// [developer-docs.sdk.go.get-vault-overview]-start
 	// Get vault overview
-	vaultOverview, err := client.Vaults().GetOverview(context.Background(), created_vault.ID)
+	vaultOverview, err := client.Vaults().GetOverview(context.Background(), vaultID)
 	if err != nil {
 		panic(err)
 	}
@@ -90,21 +90,21 @@ func showcaseVaultOperations(client *onepassword.Client) {
 	}
 
 	name := "Go SDK Updated Vault"
-	description = "Updated description from Go SDK"
+	description := "Updated description from Go SDK"
 	updateParams.Title = &name
 	updateParams.Description = &description
 
 	// Update the vault
-	updated_vault, err := client.Vaults().Update(context.Background(), created_vault.ID, updateParams)
+	updatedVault, err := client.Vaults().Update(context.Background(), vaultID, updateParams)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Updated Vault: ", updated_vault.Title)
+	fmt.Println("Updated Vault: ", updatedVault.Title)
 	// [developer-docs.sdk.go.update-vault]-end
 
 	// [developer-docs.sdk.go.delete-vault]-start
 	// Delete vault
-	err = client.Vaults().Delete(context.Background(), created_vault.ID)
+	err = client.Vaults().Delete(context.Background(), vaultID)
 	if err != nil {
 		panic(err)
 	}
