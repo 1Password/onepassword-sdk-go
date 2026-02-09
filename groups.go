@@ -11,6 +11,7 @@ import (
 
 // The Groups API holds all the operations the SDK client can perform on 1Password groups.
 type GroupsAPI interface {
+	// Get a group by its ID and parameters.
 	Get(ctx context.Context, groupID string, groupParams GroupGetParams) (Group, error)
 }
 
@@ -22,6 +23,7 @@ func NewGroupsSource(inner *internal.InnerClient) GroupsAPI {
 	return &GroupsSource{InnerClient: inner}
 }
 
+// Get a group by its ID and parameters.
 func (g GroupsSource) Get(ctx context.Context, groupID string, groupParams GroupGetParams) (Group, error) {
 	resultString, err := clientInvoke(ctx, g.InnerClient, "GroupsGet", map[string]interface{}{
 		"group_id":     groupID,

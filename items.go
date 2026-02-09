@@ -17,7 +17,7 @@ type ItemsAPI interface {
 	// Create items in batch, within a single vault.
 	CreateAll(ctx context.Context, vaultID string, params []ItemCreateParams) (ItemsUpdateAllResponse, error)
 
-	// Get an item by vault and item ID
+	// Get an item by vault and item ID.
 	Get(ctx context.Context, vaultID string, itemID string) (Item, error)
 
 	// Get items by vault and their item IDs.
@@ -93,7 +93,7 @@ func (i ItemsSource) CreateAll(ctx context.Context, vaultID string, params []Ite
 	return result, nil
 }
 
-// Get an item by vault and item ID
+// Get an item by vault and item ID.
 func (i ItemsSource) Get(ctx context.Context, vaultID string, itemID string) (Item, error) {
 	resultString, err := clientInvoke(ctx, i.InnerClient, "ItemsGet", map[string]interface{}{
 		"vault_id": vaultID,

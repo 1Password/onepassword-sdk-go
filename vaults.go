@@ -11,17 +11,31 @@ import (
 
 // The Vaults API holds all the operations the SDK client can perform on 1Password vaults.
 type VaultsAPI interface {
+	// Create a new user vault.
+	Create(ctx context.Context, params VaultCreateParams) (Vault, error)
+
 	// List information about vaults that's configurable based on some input parameters.
 	List(ctx context.Context, params ...VaultListParams) ([]VaultOverview, error)
 
-	GetOverview(ctx context.Context, vaultUuid string) (VaultOverview, error)
+	// Get an overview of a vault by its ID.
+	GetOverview(ctx context.Context, vaultID string) (VaultOverview, error)
 
-	Get(ctx context.Context, vaultUuid string, vaultParams VaultGetParams) (Vault, error)
+	// Get detailed vault information by vault ID and parameters.
+	Get(ctx context.Context, vaultID string, vaultParams VaultGetParams) (Vault, error)
 
+	// Update a vault
+	Update(ctx context.Context, vaultID string, params VaultUpdateParams) (Vault, error)
+
+	// Delete a vault by its ID.
+	Delete(ctx context.Context, vaultID string) error
+
+	// Grant group permissions to a vault.
 	GrantGroupPermissions(ctx context.Context, vaultID string, groupPermissionsList []GroupAccess) error
 
+	// Update group permissions for vaults.
 	UpdateGroupPermissions(ctx context.Context, groupPermissionsList []GroupVaultAccess) error
 
+	// Revoke group permissions from a vault.
 	RevokeGroupPermissions(ctx context.Context, vaultID string, groupID string) error
 }
 
@@ -33,11 +47,27 @@ func NewVaultsSource(inner *internal.InnerClient) VaultsAPI {
 	return &VaultsSource{InnerClient: inner}
 }
 
+// Create a new user vault.
+func (v VaultsSource) Create(ctx context.Context, params VaultCreateParams) (Vault, error) {
+	resultString, err := clientInvoke(ctx, v.InnerClient, "VaultsCreate", map[string]interface{}{
+		"params": params,
+	})
+	if err != nil {
+		return Vault{}, err
+	}
+	var result Vault
+	err = json.Unmarshal([]byte(*resultString), &result)
+	if err != nil {
+		return Vault{}, err
+	}
+	return result, nil
+}
+
 // List information about vaults that's configurable based on some input parameters.
 func (v VaultsSource) List(ctx context.Context, params ...VaultListParams) ([]VaultOverview, error) {
-	var param VaultListParams
+	var param *VaultListParams
 	if len(params) > 0 {
-		param = params[0]
+		param = &params[0]
 	}
 	resultString, err := clientInvoke(ctx, v.InnerClient, "VaultsList", map[string]interface{}{
 		"params": param,
@@ -53,9 +83,10 @@ func (v VaultsSource) List(ctx context.Context, params ...VaultListParams) ([]Va
 	return result, nil
 }
 
-func (v VaultsSource) GetOverview(ctx context.Context, vaultUuid string) (VaultOverview, error) {
+// Get an overview of a vault by its ID.
+func (v VaultsSource) GetOverview(ctx context.Context, vaultID string) (VaultOverview, error) {
 	resultString, err := clientInvoke(ctx, v.InnerClient, "VaultsGetOverview", map[string]interface{}{
-		"vault_uuid": vaultUuid,
+		"vault_id": vaultID,
 	})
 	if err != nil {
 		return VaultOverview{}, err
@@ -68,9 +99,10 @@ func (v VaultsSource) GetOverview(ctx context.Context, vaultUuid string) (VaultO
 	return result, nil
 }
 
-func (v VaultsSource) Get(ctx context.Context, vaultUuid string, vaultParams VaultGetParams) (Vault, error) {
+// Get detailed vault information by vault ID and parameters.
+func (v VaultsSource) Get(ctx context.Context, vaultID string, vaultParams VaultGetParams) (Vault, error) {
 	resultString, err := clientInvoke(ctx, v.InnerClient, "VaultsGet", map[string]interface{}{
-		"vault_uuid":   vaultUuid,
+		"vault_id":     vaultID,
 		"vault_params": vaultParams,
 	})
 	if err != nil {
@@ -84,6 +116,32 @@ func (v VaultsSource) Get(ctx context.Context, vaultUuid string, vaultParams Vau
 	return result, nil
 }
 
+// Update a vault
+func (v VaultsSource) Update(ctx context.Context, vaultID string, params VaultUpdateParams) (Vault, error) {
+	resultString, err := clientInvoke(ctx, v.InnerClient, "VaultsUpdate", map[string]interface{}{
+		"vault_id": vaultID,
+		"params":   params,
+	})
+	if err != nil {
+		return Vault{}, err
+	}
+	var result Vault
+	err = json.Unmarshal([]byte(*resultString), &result)
+	if err != nil {
+		return Vault{}, err
+	}
+	return result, nil
+}
+
+// Delete a vault by its ID.
+func (v VaultsSource) Delete(ctx context.Context, vaultID string) error {
+	_, err := clientInvoke(ctx, v.InnerClient, "VaultsDelete", map[string]interface{}{
+		"vault_id": vaultID,
+	})
+	return err
+}
+
+// Grant group permissions to a vault.
 func (v VaultsSource) GrantGroupPermissions(ctx context.Context, vaultID string, groupPermissionsList []GroupAccess) error {
 	_, err := clientInvoke(ctx, v.InnerClient, "VaultsGrantGroupPermissions", map[string]interface{}{
 		"vault_id":               vaultID,
@@ -92,6 +150,7 @@ func (v VaultsSource) GrantGroupPermissions(ctx context.Context, vaultID string,
 	return err
 }
 
+// Update group permissions for vaults.
 func (v VaultsSource) UpdateGroupPermissions(ctx context.Context, groupPermissionsList []GroupVaultAccess) error {
 	_, err := clientInvoke(ctx, v.InnerClient, "VaultsUpdateGroupPermissions", map[string]interface{}{
 		"group_permissions_list": groupPermissionsList,
@@ -99,6 +158,7 @@ func (v VaultsSource) UpdateGroupPermissions(ctx context.Context, groupPermissio
 	return err
 }
 
+// Revoke group permissions from a vault.
 func (v VaultsSource) RevokeGroupPermissions(ctx context.Context, vaultID string, groupID string) error {
 	_, err := clientInvoke(ctx, v.InnerClient, "VaultsRevokeGroupPermissions", map[string]interface{}{
 		"vault_id": vaultID,

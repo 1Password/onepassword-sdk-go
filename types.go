@@ -128,7 +128,7 @@ type Group struct {
 // This is used for granting permissions
 type GroupAccess struct {
 	// The group's ID
-	GroupID string `json:"group_id"`
+	GroupID string `json:"groupId"`
 	// The group's set of permissions for the vault
 	Permissions uint32 `json:"permissions"`
 }
@@ -139,9 +139,9 @@ type GroupGetParams struct {
 // Represents a group's access to a 1Password vault.
 type GroupVaultAccess struct {
 	// The vault's ID
-	VaultID string `json:"vault_id"`
+	VaultID string `json:"vaultId"`
 	// The group's ID
-	GroupID string `json:"group_id"`
+	GroupID string `json:"groupId"`
 	// The group's set of permissions for the vault
 	Permissions uint32 `json:"permissions"`
 }
@@ -1037,6 +1037,12 @@ type Vault struct {
 	Access []VaultAccess `json:"access,omitempty"`
 }
 
+type VaultCreateParams struct {
+	Title             string  `json:"title"`
+	Description       *string `json:"description,omitempty"`
+	AllowAdminsAccess *bool   `json:"allowAdminsAccess,omitempty"`
+}
+
 // Represents the possible query parameters used for retrieving extra information about a vault.
 type VaultGetParams struct {
 	// The vault's accessor params.
@@ -1066,6 +1072,10 @@ type VaultOverview struct {
 	CreatedAt time.Time `json:"createdAt"`
 	// The time the vault was updated at
 	UpdatedAt time.Time `json:"updatedAt"`
+}
+type VaultUpdateParams struct {
+	Title       *string `json:"title,omitempty"`
+	Description *string `json:"description,omitempty"`
 }
 
 // Generated type representing the anonymous struct variant `ByState` of the `ItemListFilter` Rust enum
