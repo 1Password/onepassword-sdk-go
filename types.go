@@ -28,7 +28,7 @@ type DocumentCreateParams struct {
 	Content []byte `json:"content"`
 }
 
-// Represents an environment variable (name:value pair) and it's masked state
+// Represents an environment variable (name:value pair) and its masked state
 type EnvironmentVariable struct {
 	// An environment variable's name
 	Name string `json:"name"`
