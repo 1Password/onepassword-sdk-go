@@ -11,7 +11,7 @@ import (
 )
 
 // [developer-docs.sdk.go.sdk-import]-start
-import 	"github.com/1password/onepassword-sdk-go"
+import "github.com/1password/onepassword-sdk-go"
 // [developer-docs.sdk.go.sdk-import]-end
 
 func main() {
@@ -689,6 +689,7 @@ func generateSpecialItemFields() []onepassword.ItemField {
 	}
 }
 
+//lint:ignore U1000 NOTE: this is just to showcase how to do vault crudl operations
 func showcaseVaultOperations(client *onepassword.Client) {
 
 	// [developer-docs.sdk.go.create-vault]-start
