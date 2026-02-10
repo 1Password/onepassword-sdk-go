@@ -138,7 +138,7 @@ func showcaseVaultOperations(client *onepassword.Client) {
 		panic(err)
 	}
 	fmt.Printf("Created vault with description: %v\n", createdVault)
-	// [developer-docs.sdk.go.create-vault]-start
+	// [developer-docs.sdk.go.create-vault]-end
 
 	// [developer-docs.sdk.go.get-vault-overview]-start
 	// Get vault overview
