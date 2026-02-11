@@ -11,7 +11,7 @@ import (
 )
 
 // [developer-docs.sdk.go.sdk-import]-start
-import "github.com/1password/onepassword-sdk-go"
+import 	"github.com/1password/onepassword-sdk-go"
 // [developer-docs.sdk.go.sdk-import]-end
 
 func main() {
@@ -764,4 +764,57 @@ func showcaseVaultOperations(client *onepassword.Client) {
 		fmt.Println("VAULT ID: ", vault.ID, "VAULT NAME: ", vault.Title)
 	}
 	// [developer-docs.sdk.go.list-vaults]-end
+}
+
+//lint:ignore U1000 NOTE: this is just to showcase how to do vault crudl operations
+func showcaseGroupPermissionOperations(client *onepassword.Client, vaultID string, groupID string) {
+	// [developer-docs.sdk.go.grant-group-permissions]-start
+	// Grant group permissions to a vault.
+	groupAccess := onepassword.GroupAccess{
+		GroupID:     groupID,
+		Permissions: onepassword.ReadItems,
+	}
+	err := client.Vaults().GrantGroupPermissions(context.Background(), vaultID, []onepassword.GroupAccess{groupAccess})
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Granted group", groupID, "permissions to vault", vaultID)
+	// [developer-docs.sdk.go.grant-group-permissions]-end
+
+	// [developer-docs.sdk.go.update-group-permissions]-start
+	// Update group permissions for a vault
+	groupVaultAccess := onepassword.GroupVaultAccess{
+		GroupID:     groupID,
+		VaultID:     vaultID,
+		Permissions: onepassword.ReadItems | onepassword.CreateItems | onepassword.UpdateItems,
+	}
+	err = client.Vaults().UpdateGroupPermissions(context.Background(), []onepassword.GroupVaultAccess{groupVaultAccess})
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(
+		"Updated group",
+		groupID,
+		"permissions to vault",
+		vaultID,
+	)
+	// [developer-docs.sdk.go.update-group-permissions]-end
+
+	// [developer-docs.sdk.go.revoke-group-permissions]-start
+	// Revoke group permissions from a vault.
+	err = client.Vaults().RevokeGroupPermissions(context.Background(), vaultID, groupID)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Revoked group permissions from vault", vaultID)
+	// [developer-docs.sdk.go.revoke-group-permissions]-end
+
+	// [developer-docs.sdk.go.get-group]-start
+	// Get a group
+	group, err := client.Groups().Get(context.Background(), groupID, onepassword.GroupGetParams{})
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("Group details: %v\n", group)
+	// [developer-docs.sdk.go.get-group]-end
 }
