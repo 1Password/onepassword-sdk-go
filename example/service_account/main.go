@@ -11,7 +11,7 @@ import (
 )
 
 // [developer-docs.sdk.go.sdk-import]-start
-import 	"github.com/1password/onepassword-sdk-go"
+import "github.com/1password/onepassword-sdk-go"
 // [developer-docs.sdk.go.sdk-import]-end
 
 func main() {
@@ -687,4 +687,134 @@ func generateSpecialItemFields() []onepassword.ItemField {
 		},
 		// [developer-docs.sdk.go.totp-field-type]-end
 	}
+}
+
+//lint:ignore U1000 NOTE: this is just to showcase how to do vault crudl operations
+func showcaseVaultOperations(client *onepassword.Client) {
+
+	// [developer-docs.sdk.go.create-vault]-start
+	description := "This vault was created with the Go SDK."
+	// Create a vault with a description
+	createParams := onepassword.VaultCreateParams{
+		Title:       "Go SDK Vault",
+		Description: &description,
+	}
+
+	createdVault, err := client.Vaults().Create(context.Background(), createParams)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("Created vault with description: %v\n", createdVault)
+	// [developer-docs.sdk.go.create-vault]-end
+
+	// [developer-docs.sdk.go.get-vault-overview]-start
+	// Get vault overview
+	vaultOverview, err := client.Vaults().GetOverview(context.Background(), createdVault.ID)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("Vault overview: %v\n", vaultOverview)
+	// [developer-docs.sdk.go.get-vault-overview]-end
+
+	// [developer-docs.sdk.go.get-vault-details]-start
+	// Get vault details
+	vault, err := client.Vaults().Get(context.Background(), vaultOverview.ID, onepassword.VaultGetParams{})
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("Vault details: %v\n", vault)
+	// [developer-docs.sdk.go.get-vault-details]-end
+
+	// [developer-docs.sdk.go.update-vault]-start
+	updateParams := onepassword.VaultUpdateParams{
+		Title:       nil,
+		Description: nil,
+	}
+
+	name := "Go SDK Updated Vault"
+	description = "Updated description from Go SDK"
+	updateParams.Title = &name
+	updateParams.Description = &description
+
+	// Update the vault
+	updatedVault, err := client.Vaults().Update(context.Background(), createdVault.ID, updateParams)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Updated Vault: ", updatedVault.Title)
+	// [developer-docs.sdk.go.update-vault]-end
+
+	// [developer-docs.sdk.go.delete-vault]-start
+	// Delete vault
+	err = client.Vaults().Delete(context.Background(), createdVault.ID)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Deleted vault.")
+
+	// [developer-docs.sdk.go.delete-vault]-end
+
+	// [developer-docs.sdk.go.list-vaults]-start
+	// List vaults
+	vaults, err := client.Vaults().List(context.Background())
+	if err != nil {
+		panic(err)
+	}
+	for _, vault := range vaults {
+		fmt.Println("VAULT ID: ", vault.ID, "VAULT NAME: ", vault.Title)
+	}
+	// [developer-docs.sdk.go.list-vaults]-end
+}
+
+//lint:ignore U1000 NOTE: this is just to showcase how to do group permissions operations
+func showcaseGroupPermissionOperations(client *onepassword.Client, vaultID string, groupID string) {
+	// [developer-docs.sdk.go.grant-group-permissions]-start
+	// Grant group permissions to a vault.
+	groupAccess := onepassword.GroupAccess{
+		GroupID:     groupID,
+		Permissions: onepassword.ReadItems,
+	}
+	err := client.Vaults().GrantGroupPermissions(context.Background(), vaultID, []onepassword.GroupAccess{groupAccess})
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Granted group", groupID, "permissions to vault", vaultID)
+	// [developer-docs.sdk.go.grant-group-permissions]-end
+
+	// [developer-docs.sdk.go.update-group-permissions]-start
+	// Update group permissions for a vault
+	groupVaultAccess := onepassword.GroupVaultAccess{
+		GroupID:     groupID,
+		VaultID:     vaultID,
+		Permissions: onepassword.ReadItems | onepassword.CreateItems | onepassword.UpdateItems,
+	}
+	err = client.Vaults().UpdateGroupPermissions(context.Background(), []onepassword.GroupVaultAccess{groupVaultAccess})
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(
+		"Updated group",
+		groupID,
+		"permissions to vault",
+		vaultID,
+	)
+	// [developer-docs.sdk.go.update-group-permissions]-end
+
+	// [developer-docs.sdk.go.revoke-group-permissions]-start
+	// Revoke group permissions from a vault.
+	err = client.Vaults().RevokeGroupPermissions(context.Background(), vaultID, groupID)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Revoked group permissions from vault", vaultID)
+	// [developer-docs.sdk.go.revoke-group-permissions]-end
+
+	// [developer-docs.sdk.go.get-group]-start
+	// Get a group
+	group, err := client.Groups().Get(context.Background(), groupID, onepassword.GroupGetParams{})
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("Group details: %v\n", group)
+	// [developer-docs.sdk.go.get-group]-end
 }
