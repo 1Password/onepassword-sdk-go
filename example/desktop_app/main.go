@@ -14,10 +14,10 @@ import 	"github.com/1password/onepassword-sdk-go"
 
 func main() {
 	// [developer-docs.sdk.go.client-initialization]-start
-	// Connects to the 1Password Desktop app.
+	// Connect to the 1Password desktop app
 	client, err := onepassword.NewClient(context.Background(),
 		onepassword.WithDesktopAppIntegration("YourAccountNameAsShownInTheDesktopApp"),
-		// TODO: Set the following to your own integration name and version.
+		// TODO: Set to your own integration name and version
 		onepassword.WithIntegrationInfo("My 1Password Integration", "v1.0.0"),
 	)
 	if err != nil {
@@ -86,7 +86,7 @@ func createAndGetItem(client *onepassword.Client, vaultID string) onepassword.It
 		},
 	}
 
-	// Creates a new item based on the structure definition above
+	// Create a new item based on the structure definition above
 	createdItem, err := client.Items().Create(context.Background(), itemParams)
 	if err != nil {
 		panic(err)
@@ -99,7 +99,7 @@ func createAndGetItem(client *onepassword.Client, vaultID string) onepassword.It
 	// [developer-docs.sdk.go.create-item]-end
 
 	// [developer-docs.sdk.go.get-item]-start
-	// Retrieves the newly created item
+	// Get the newly-created item
 	login, err := client.Items().Get(context.Background(), createdItem.VaultID, createdItem.ID)
 	if err != nil {
 		panic(err)
@@ -107,7 +107,7 @@ func createAndGetItem(client *onepassword.Client, vaultID string) onepassword.It
 	// [developer-docs.sdk.go.get-item]-end
 
 	// [developer-docs.sdk.go.get-totp-item-crud]-start
-	// Retrieve TOTP code from an item
+	// Get a one-time password code from an item
 	for _, f := range login.Fields {
 		if f.FieldType == onepassword.ItemFieldTypeTOTP {
 			OTPFieldDetails := f.Details.OTP()
@@ -127,7 +127,7 @@ func showcaseVaultOperations(client *onepassword.Client) {
 
 	// [developer-docs.sdk.go.create-vault]-start
 	description := "This vault was created with the Go SDK."
-	// Create a vault with a description
+	// Create a vault
 	createParams := onepassword.VaultCreateParams{
 		Title:       "Go SDK Vault",
 		Description: &description,
@@ -141,7 +141,7 @@ func showcaseVaultOperations(client *onepassword.Client) {
 	// [developer-docs.sdk.go.create-vault]-end
 
 	// [developer-docs.sdk.go.get-vault-overview]-start
-	// Get vault overview
+	// Get a vault overview
 	vaultOverview, err := client.Vaults().GetOverview(context.Background(), createdVault.ID)
 	if err != nil {
 		panic(err)
@@ -178,7 +178,7 @@ func showcaseVaultOperations(client *onepassword.Client) {
 	// [developer-docs.sdk.go.update-vault]-end
 
 	// [developer-docs.sdk.go.delete-vault]-start
-	// Delete vault
+	// Delete a vault
 	err = client.Vaults().Delete(context.Background(), createdVault.ID)
 	if err != nil {
 		panic(err)
@@ -246,7 +246,7 @@ func showcaseBatchItemOperations(client *onepassword.Client, vaultID string) {
 		})
 	}
 
-	// Create all items in the same vault in a single batch
+	// Create all items in the same vault
 	batchCreateResponse, err := client.Items().CreateAll(context.Background(), vaultID, itemsToCreate)
 	if err != nil {
 		panic(err)
@@ -264,7 +264,7 @@ func showcaseBatchItemOperations(client *onepassword.Client, vaultID string) {
 	// [developer-docs.sdk.go.batch-create-items]-end
 
 	// [developer-docs.sdk.go.batch-get-items]-start
-	// Get multiple items form the same vault in a single batch
+	// Get multiple items from the same vault
 	batchGetResponse, err := client.Items().GetAll(context.Background(), vaultID, itemIDs)
 	if err != nil {
 		panic(err)
@@ -279,7 +279,7 @@ func showcaseBatchItemOperations(client *onepassword.Client, vaultID string) {
 	// [developer-docs.sdk.go.batch-get-items]-end
 
 	// [developer-docs.sdk.go.batch-delete-items]-start
-	// Delete multiple items from the same vault in a single batch
+	// Delete multiple items from the same vault
 	batchDeleteResponse, err := client.Items().DeleteAll(context.Background(), vaultID, itemIDs)
 	if err != nil {
 		panic(err)
@@ -295,7 +295,7 @@ func showcaseBatchItemOperations(client *onepassword.Client, vaultID string) {
 }
 
 func showcaseGroupPermissionOperations(client *onepassword.Client, vaultID string, groupID string) {
-	// Grant group permissions to a vault.
+	// Grant group permissions in a vault
 	groupAccess := onepassword.GroupAccess{
 		GroupID:     groupID,
 		Permissions: onepassword.ReadItems,
@@ -306,7 +306,7 @@ func showcaseGroupPermissionOperations(client *onepassword.Client, vaultID strin
 	}
 	fmt.Println("Granted group permissions to vault.")
 
-	// update group permissions for vaults.
+	// Update group permissions in a vault
 	groupVaultAccess := onepassword.GroupVaultAccess{
 		GroupID:     groupID,
 		VaultID:     vaultID,
@@ -317,7 +317,7 @@ func showcaseGroupPermissionOperations(client *onepassword.Client, vaultID strin
 		panic(err)
 	}
 
-	// Revoke group permissions from a vault.
+	// Revoke a group's permissions in a vault
 	err = client.Vaults().RevokeGroupPermissions(context.Background(), vaultID, groupID)
 	if err != nil {
 		panic(err)
