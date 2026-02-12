@@ -246,7 +246,7 @@ func showcaseBatchItemOperations(client *onepassword.Client, vaultID string) {
 		})
 	}
 
-	// Create all items in the same vault
+	// Batch create all items in the same vault
 	batchCreateResponse, err := client.Items().CreateAll(context.Background(), vaultID, itemsToCreate)
 	if err != nil {
 		panic(err)
