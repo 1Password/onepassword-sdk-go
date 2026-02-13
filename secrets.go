@@ -5,7 +5,6 @@ package onepassword
 import (
 	"context"
 	"encoding/json"
-
 	"github.com/1password/onepassword-sdk-go/internal"
 )
 
@@ -13,12 +12,13 @@ import (
 // Use secret reference URIs to securely load secrets from 1Password: `op://<vault-name>/<item-name>[/<section-name>]/<field-name>`
 type SecretsAPI interface {
 	// Resolve returns the secret the provided secret reference points to.
-	Resolve(ctx context.Context, secretReference string) (string, error)
+    Resolve(ctx context.Context, secretReference string) (string, error)
 
 	// Resolve takes in a list of secret references and returns the secrets they point to or errors if any.
-	ResolveAll(ctx context.Context, secretReferences []string) (ResolveAllResponse, error)
-}
+    ResolveAll(ctx context.Context, secretReferences []string) (ResolveAllResponse, error)
 
+}
+        
 type SecretsSource struct {
 	*internal.InnerClient
 }
@@ -30,6 +30,7 @@ func NewSecretsSource(inner *internal.InnerClient) SecretsAPI {
 type secretsUtil struct{}
 
 var Secrets = secretsUtil{}
+
 
 // Resolve returns the secret the provided secret reference points to.
 func (s SecretsSource) Resolve(ctx context.Context, secretReference string) (string, error) {
@@ -65,54 +66,55 @@ func (s SecretsSource) ResolveAll(ctx context.Context, secretReferences []string
 
 // Validate the secret reference to ensure there are no syntax errors.
 func (s secretsUtil) ValidateSecretReference(ctx context.Context, secretReference string) error {
-	core, err := internal.GetExtismCore()
-	if err != nil {
-		return err
-	}
+    core, err := internal.GetExtismCore()
+        if err != nil {
+            return err
+        }
 
-	_, err = core.Invoke(ctx, internal.InvokeConfig{
-		Invocation: internal.Invocation{
-			Parameters: internal.Parameters{
-				MethodName:       "ValidateSecretReference",
-				SerializedParams: map[string]interface{}{"secret_reference": secretReference},
-			},
-		},
-	})
+    _, err = core.Invoke(ctx, internal.InvokeConfig{
+        Invocation: internal.Invocation{
+            Parameters: internal.Parameters{
+                MethodName:     "ValidateSecretReference",
+                SerializedParams: map[string]interface{}{"secret_reference": secretReference,},
+            },
+        },
+    })
 
-	if err != nil {
-		return unmarshalError(err.Error())
-	}
+    if err != nil {
+        return unmarshalError(err.Error())
+    }
 
-	return nil
+    return nil
 }
 
 // Generate a password using the provided recipe.
 func (s secretsUtil) GeneratePassword(ctx context.Context, recipe PasswordRecipe) (GeneratePasswordResponse, error) {
-	core, err := internal.GetExtismCore()
-	if err != nil {
-		return GeneratePasswordResponse{}, err
-	}
+    core, err := internal.GetExtismCore()
+        if err != nil {
+            return GeneratePasswordResponse{}, err
+        }
 
-	resultString, err := core.Invoke(ctx, internal.InvokeConfig{
-		Invocation: internal.Invocation{
-			Parameters: internal.Parameters{
-				MethodName:       "GeneratePassword",
-				SerializedParams: map[string]interface{}{"recipe": recipe},
-			},
-		},
-	})
+    resultString, err := core.Invoke(ctx, internal.InvokeConfig{
+        Invocation: internal.Invocation{
+            Parameters: internal.Parameters{
+                MethodName:     "GeneratePassword",
+                SerializedParams: map[string]interface{}{"recipe": recipe,},
+            },
+        },
+    })
 
-	if err != nil {
-		return GeneratePasswordResponse{}, unmarshalError(err.Error())
-	}
+    if err != nil {
+        return GeneratePasswordResponse{}, unmarshalError(err.Error())
+    }
 
-	var result GeneratePasswordResponse
+    var result GeneratePasswordResponse
 
-	err = json.Unmarshal([]byte(*resultString), &result)
+    err = json.Unmarshal([]byte(*resultString), &result)
 
-	if err != nil {
-		return GeneratePasswordResponse{}, err
-	}
+    if err != nil {
+        return GeneratePasswordResponse{}, err
+    }
 
-	return result, nil
+    return result, nil
 }
+

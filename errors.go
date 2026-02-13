@@ -3,8 +3,8 @@
 package onepassword
 
 import (
-	"encoding/json"
 	"errors"
+	"encoding/json"
 )
 
 type DesktopSessionExpiredError struct {
@@ -24,23 +24,23 @@ func (e *RateLimitExceededError) Error() string {
 }
 
 func unmarshalError(err string) error {
-	v := struct {
-		Name    string `json:"name"`
+    v := struct {
+		Name string    `json:"name"`
 		Message string `json:"message"`
 	}{}
-	if e := json.Unmarshal([]byte(err), &v); e != nil {
-		return errors.New(err)
-	}
-	switch v.Name {
-	case "DesktopSessionExpired":
-		return &DesktopSessionExpiredError{
-			message: v.Message,
-		}
-	case "RateLimitExceeded":
-		return &RateLimitExceededError{
-			message: v.Message,
-		}
-	default:
-		return errors.New(v.Message)
-	}
+	if e:= json.Unmarshal([]byte(err), &v); e != nil {
+            return errors.New(err)
+    }
+    switch v.Name { 
+		case "DesktopSessionExpired":
+			return &DesktopSessionExpiredError{
+                    message: v.Message,
+                }
+		case "RateLimitExceeded":
+			return &RateLimitExceededError{
+                    message: v.Message,
+                }
+		default:
+            return errors.New(v.Message)
+        }
 }

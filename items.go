@@ -5,48 +5,47 @@ package onepassword
 import (
 	"context"
 	"encoding/json"
-
 	"github.com/1password/onepassword-sdk-go/internal"
 )
 
 // The Items API holds all operations the SDK client can perform on 1Password items.
 type ItemsAPI interface {
 	// Create a new item.
-	Create(ctx context.Context, params ItemCreateParams) (Item, error)
+    Create(ctx context.Context, params ItemCreateParams) (Item, error)
 
 	// Create items in batch, within a single vault.
-	CreateAll(ctx context.Context, vaultID string, params []ItemCreateParams) (ItemsUpdateAllResponse, error)
+    CreateAll(ctx context.Context, vaultID string, params []ItemCreateParams) (ItemsUpdateAllResponse, error)
 
 	// Get an item by vault and item ID.
-	Get(ctx context.Context, vaultID string, itemID string) (Item, error)
+    Get(ctx context.Context, vaultID string, itemID string) (Item, error)
 
 	// Get items by vault and their item IDs.
-	GetAll(ctx context.Context, vaultID string, itemIds []string) (ItemsGetAllResponse, error)
+    GetAll(ctx context.Context, vaultID string, itemIds []string) (ItemsGetAllResponse, error)
 
 	// Update an existing item.
-	Put(ctx context.Context, item Item) (Item, error)
+    Put(ctx context.Context, item Item) (Item, error)
 
 	// Delete an item.
-	Delete(ctx context.Context, vaultID string, itemID string) error
+    Delete(ctx context.Context, vaultID string, itemID string) error
 
 	// Delete items in batch, within a single vault.
-	DeleteAll(ctx context.Context, vaultID string, itemIds []string) (ItemsDeleteAllResponse, error)
+    DeleteAll(ctx context.Context, vaultID string, itemIds []string) (ItemsDeleteAllResponse, error)
 
 	// Archive an item.
-	Archive(ctx context.Context, vaultID string, itemID string) error
+    Archive(ctx context.Context, vaultID string, itemID string) error
 
 	// List items based on filters.
-	List(ctx context.Context, vaultID string, filters ...ItemListFilter) ([]ItemOverview, error)
+    List(ctx context.Context, vaultID string, filters ...ItemListFilter) ([]ItemOverview, error)
 
 	// ----- Sub APIs - these methods are used to access subordinate function groups -----
-	Shares() ItemsSharesAPI
-	Files() ItemsFilesAPI
+    Shares() ItemsSharesAPI
+    Files() ItemsFilesAPI
 }
-
+        
 type ItemsSource struct {
 	*internal.InnerClient
 	SharesAPI ItemsSharesAPI
-	FilesAPI  ItemsFilesAPI
+	FilesAPI ItemsFilesAPI
 }
 
 func NewItemsSource(inner *internal.InnerClient) ItemsAPI {
@@ -54,10 +53,10 @@ func NewItemsSource(inner *internal.InnerClient) ItemsAPI {
 }
 
 func (i ItemsSource) Shares() ItemsSharesAPI {
-	return i.SharesAPI
+    return i.SharesAPI
 }
 func (i ItemsSource) Files() ItemsFilesAPI {
-	return i.FilesAPI
+    return i.FilesAPI
 }
 
 // Create a new item.
@@ -80,7 +79,7 @@ func (i ItemsSource) Create(ctx context.Context, params ItemCreateParams) (Item,
 func (i ItemsSource) CreateAll(ctx context.Context, vaultID string, params []ItemCreateParams) (ItemsUpdateAllResponse, error) {
 	resultString, err := clientInvoke(ctx, i.InnerClient, "ItemsCreateAll", map[string]interface{}{
 		"vault_id": vaultID,
-		"params":   params,
+		"params": params,
 	})
 	if err != nil {
 		return ItemsUpdateAllResponse{}, err
@@ -97,7 +96,7 @@ func (i ItemsSource) CreateAll(ctx context.Context, vaultID string, params []Ite
 func (i ItemsSource) Get(ctx context.Context, vaultID string, itemID string) (Item, error) {
 	resultString, err := clientInvoke(ctx, i.InnerClient, "ItemsGet", map[string]interface{}{
 		"vault_id": vaultID,
-		"item_id":  itemID,
+		"item_id": itemID,
 	})
 	if err != nil {
 		return Item{}, err
@@ -147,7 +146,7 @@ func (i ItemsSource) Put(ctx context.Context, item Item) (Item, error) {
 func (i ItemsSource) Delete(ctx context.Context, vaultID string, itemID string) error {
 	_, err := clientInvoke(ctx, i.InnerClient, "ItemsDelete", map[string]interface{}{
 		"vault_id": vaultID,
-		"item_id":  itemID,
+		"item_id": itemID,
 	})
 	return err
 }
@@ -173,7 +172,7 @@ func (i ItemsSource) DeleteAll(ctx context.Context, vaultID string, itemIds []st
 func (i ItemsSource) Archive(ctx context.Context, vaultID string, itemID string) error {
 	_, err := clientInvoke(ctx, i.InnerClient, "ItemsArchive", map[string]interface{}{
 		"vault_id": vaultID,
-		"item_id":  itemID,
+		"item_id": itemID,
 	})
 	return err
 }
@@ -185,7 +184,7 @@ func (i ItemsSource) List(ctx context.Context, vaultID string, filters ...ItemLi
 	}
 	resultString, err := clientInvoke(ctx, i.InnerClient, "ItemsList", map[string]interface{}{
 		"vault_id": vaultID,
-		"filters":  filters,
+		"filters": filters,
 	})
 	if err != nil {
 		return nil, err
@@ -197,3 +196,4 @@ func (i ItemsSource) List(ctx context.Context, vaultID string, filters ...ItemLi
 	}
 	return result, nil
 }
+

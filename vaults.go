@@ -5,40 +5,40 @@ package onepassword
 import (
 	"context"
 	"encoding/json"
-
 	"github.com/1password/onepassword-sdk-go/internal"
 )
 
 // The Vaults API holds all the operations the SDK client can perform on 1Password vaults.
 type VaultsAPI interface {
 	// Create a new user vault.
-	Create(ctx context.Context, params VaultCreateParams) (Vault, error)
+    Create(ctx context.Context, params VaultCreateParams) (Vault, error)
 
 	// List information about vaults that's configurable based on some input parameters.
-	List(ctx context.Context, params ...VaultListParams) ([]VaultOverview, error)
+    List(ctx context.Context, params ...VaultListParams) ([]VaultOverview, error)
 
 	// Get an overview of a vault by its ID.
-	GetOverview(ctx context.Context, vaultID string) (VaultOverview, error)
+    GetOverview(ctx context.Context, vaultID string) (VaultOverview, error)
 
 	// Get detailed vault information by vault ID and parameters.
-	Get(ctx context.Context, vaultID string, vaultParams VaultGetParams) (Vault, error)
+    Get(ctx context.Context, vaultID string, vaultParams VaultGetParams) (Vault, error)
 
 	// Update a vault
-	Update(ctx context.Context, vaultID string, params VaultUpdateParams) (Vault, error)
+    Update(ctx context.Context, vaultID string, params VaultUpdateParams) (Vault, error)
 
 	// Delete a vault by its ID.
-	Delete(ctx context.Context, vaultID string) error
+    Delete(ctx context.Context, vaultID string) error
 
 	// Grant group permissions to a vault.
-	GrantGroupPermissions(ctx context.Context, vaultID string, groupPermissionsList []GroupAccess) error
+    GrantGroupPermissions(ctx context.Context, vaultID string, groupPermissionsList []GroupAccess) error
 
 	// Update group permissions for vaults.
-	UpdateGroupPermissions(ctx context.Context, groupPermissionsList []GroupVaultAccess) error
+    UpdateGroupPermissions(ctx context.Context, groupPermissionsList []GroupVaultAccess) error
 
 	// Revoke group permissions from a vault.
-	RevokeGroupPermissions(ctx context.Context, vaultID string, groupID string) error
-}
+    RevokeGroupPermissions(ctx context.Context, vaultID string, groupID string) error
 
+}
+        
 type VaultsSource struct {
 	*internal.InnerClient
 }
@@ -46,6 +46,7 @@ type VaultsSource struct {
 func NewVaultsSource(inner *internal.InnerClient) VaultsAPI {
 	return &VaultsSource{InnerClient: inner}
 }
+
 
 // Create a new user vault.
 func (v VaultsSource) Create(ctx context.Context, params VaultCreateParams) (Vault, error) {
@@ -102,7 +103,7 @@ func (v VaultsSource) GetOverview(ctx context.Context, vaultID string) (VaultOve
 // Get detailed vault information by vault ID and parameters.
 func (v VaultsSource) Get(ctx context.Context, vaultID string, vaultParams VaultGetParams) (Vault, error) {
 	resultString, err := clientInvoke(ctx, v.InnerClient, "VaultsGet", map[string]interface{}{
-		"vault_id":     vaultID,
+		"vault_id": vaultID,
 		"vault_params": vaultParams,
 	})
 	if err != nil {
@@ -120,7 +121,7 @@ func (v VaultsSource) Get(ctx context.Context, vaultID string, vaultParams Vault
 func (v VaultsSource) Update(ctx context.Context, vaultID string, params VaultUpdateParams) (Vault, error) {
 	resultString, err := clientInvoke(ctx, v.InnerClient, "VaultsUpdate", map[string]interface{}{
 		"vault_id": vaultID,
-		"params":   params,
+		"params": params,
 	})
 	if err != nil {
 		return Vault{}, err
@@ -144,7 +145,7 @@ func (v VaultsSource) Delete(ctx context.Context, vaultID string) error {
 // Grant group permissions to a vault.
 func (v VaultsSource) GrantGroupPermissions(ctx context.Context, vaultID string, groupPermissionsList []GroupAccess) error {
 	_, err := clientInvoke(ctx, v.InnerClient, "VaultsGrantGroupPermissions", map[string]interface{}{
-		"vault_id":               vaultID,
+		"vault_id": vaultID,
 		"group_permissions_list": groupPermissionsList,
 	})
 	return err
@@ -166,3 +167,4 @@ func (v VaultsSource) RevokeGroupPermissions(ctx context.Context, vaultID string
 	})
 	return err
 }
+

@@ -5,24 +5,24 @@ package onepassword
 import (
 	"context"
 	"encoding/json"
-
 	"github.com/1password/onepassword-sdk-go/internal"
 )
 
 type ItemsFilesAPI interface {
 	// Attach files to Items.
-	Attach(ctx context.Context, item Item, fileParams FileCreateParams) (Item, error)
+    Attach(ctx context.Context, item Item, fileParams FileCreateParams) (Item, error)
 
 	// Read file content from the Item.
-	Read(ctx context.Context, vaultID string, itemID string, attr FileAttributes) ([]byte, error)
+    Read(ctx context.Context, vaultID string, itemID string, attr FileAttributes) ([]byte, error)
 
 	// Delete a field file from Item using the section and field IDs.
-	Delete(ctx context.Context, item Item, sectionID string, fieldID string) (Item, error)
+    Delete(ctx context.Context, item Item, sectionID string, fieldID string) (Item, error)
 
 	// Replace the document file within a document item.
-	ReplaceDocument(ctx context.Context, item Item, docParams DocumentCreateParams) (Item, error)
-}
+    ReplaceDocument(ctx context.Context, item Item, docParams DocumentCreateParams) (Item, error)
 
+}
+        
 type ItemsFilesSource struct {
 	*internal.InnerClient
 }
@@ -31,10 +31,11 @@ func NewItemsFilesSource(inner *internal.InnerClient) ItemsFilesAPI {
 	return &ItemsFilesSource{InnerClient: inner}
 }
 
+
 // Attach files to Items.
 func (i ItemsFilesSource) Attach(ctx context.Context, item Item, fileParams FileCreateParams) (Item, error) {
 	resultString, err := clientInvoke(ctx, i.InnerClient, "ItemsFilesAttach", map[string]interface{}{
-		"item":        item,
+		"item": item,
 		"file_params": fileParams,
 	})
 	if err != nil {
@@ -52,8 +53,8 @@ func (i ItemsFilesSource) Attach(ctx context.Context, item Item, fileParams File
 func (i ItemsFilesSource) Read(ctx context.Context, vaultID string, itemID string, attr FileAttributes) ([]byte, error) {
 	resultString, err := clientInvoke(ctx, i.InnerClient, "ItemsFilesRead", map[string]interface{}{
 		"vault_id": vaultID,
-		"item_id":  itemID,
-		"attr":     attr,
+		"item_id": itemID,
+		"attr": attr,
 	})
 	if err != nil {
 		return nil, err
@@ -69,9 +70,9 @@ func (i ItemsFilesSource) Read(ctx context.Context, vaultID string, itemID strin
 // Delete a field file from Item using the section and field IDs.
 func (i ItemsFilesSource) Delete(ctx context.Context, item Item, sectionID string, fieldID string) (Item, error) {
 	resultString, err := clientInvoke(ctx, i.InnerClient, "ItemsFilesDelete", map[string]interface{}{
-		"item":       item,
+		"item": item,
 		"section_id": sectionID,
-		"field_id":   fieldID,
+		"field_id": fieldID,
 	})
 	if err != nil {
 		return Item{}, err
@@ -87,7 +88,7 @@ func (i ItemsFilesSource) Delete(ctx context.Context, item Item, sectionID strin
 // Replace the document file within a document item.
 func (i ItemsFilesSource) ReplaceDocument(ctx context.Context, item Item, docParams DocumentCreateParams) (Item, error) {
 	resultString, err := clientInvoke(ctx, i.InnerClient, "ItemsFilesReplaceDocument", map[string]interface{}{
-		"item":       item,
+		"item": item,
 		"doc_params": docParams,
 	})
 	if err != nil {
@@ -100,3 +101,4 @@ func (i ItemsFilesSource) ReplaceDocument(ctx context.Context, item Item, docPar
 	}
 	return result, nil
 }
+
