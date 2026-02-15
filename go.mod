@@ -6,7 +6,7 @@ require (
 	github.com/extism/go-sdk v1.7.1
 	github.com/stretchr/testify v1.11.1
 	github.com/tetratelabs/wazero v1.11.0
-	golang.org/x/sys v0.40.0
+	golang.org/x/sys v0.41.0
 )
 
 require (
