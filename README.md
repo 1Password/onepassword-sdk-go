@@ -182,7 +182,12 @@ Make sure to use [secret reference URIs](https://developer.1password.com/docs/cl
 - [ ] Create groups
 - [ ] Update group membership
 
+## Environments management
+
+- [x] [Read 1Password Environments](/docs/sdks/environments) (beta)
+
 ### Compliance & reporting
+
 - [ ] Watchtower insights
 - [ ] Travel mode
 - [ ] Events ([#76](https://github.com/1Password/onepassword-sdk-go/issues/76)). For now, use [1Password Events Reporting API](https://developer.1password.com/docs/events-api/) directly.
