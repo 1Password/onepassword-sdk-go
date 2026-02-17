@@ -20,7 +20,7 @@ You can choose between two [authentication methods](https://developer.1password.
 
 ### Option 1: 1Password desktop app
 
-[1Password desktop app authentication](https://developer.1password.com/docs/sdks/concepts#1password-desktop-app) is best for local integrations that require minimal setup from end users and sensitive workflows that require human-in-the-loop approval. 
+[1Password desktop app authentication](https://developer.1password.com/docs/sdks/concepts#1password-desktop-app) is best for local integrations that require minimal setup from end users and sensitive workflows that require human-in-the-loop approval. To set up the SDK to authenticate with the 1Password app:
 
 1. Install the [1Password desktop app](https://1password.com/downloads/) and sign in to your account in the app.
 2. Select your account or collection at the top of the sidebar, then navigate to **Settings** > **[Developer](onepassword://settings/developers)**.
@@ -65,7 +65,7 @@ Make sure to use [secret reference URIs](https://developer.1password.com/docs/cl
 
 ### Option 2: 1Password Service Account
 
-[Service account authentication](https://developer.1password.com/docs/sdks/concepts#service-account) is best for automated access and limiting your integration to least privilege access.
+[Service account authentication](https://developer.1password.com/docs/sdks/concepts#service-account) is best for automated access and limiting your integration to least privilege access. To set up the SDK to authenticate with a service account token:
 
 1. [Create a service account](https://my.1password.com/developer-tools/infrastructure-secrets/serviceaccount/?source=github-sdk) and give it the appropriate permissions in the vaults where the items you want to use with the SDK are saved.
 2. Provision your service account token. We recommend provisioning your token from the environment. For example, to export your token to the `OP_SERVICE_ACCOUNT_TOKEN` environment variable:
