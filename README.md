@@ -65,7 +65,7 @@ Make sure to use [secret reference URIs](https://developer.1password.com/docs/cl
 
 ### Option 2: 1Password Service Account
 
-[Service account authentication](https://developer.1password.com/docs/sdks/concepts#service-account) is best for automated access and limiting your integration to least privilege access. To set up the SDK to authenticate with a service account token:
+[Service account authentication](https://developer.1password.com/docs/sdks/concepts/#1password-service-account) is best for automated access and limiting your integration to least privilege access. To set up the SDK to authenticate with a service account token:
 
 1. [Create a service account](https://my.1password.com/developer-tools/infrastructure-secrets/serviceaccount/?source=github-sdk) and give it the appropriate permissions in the vaults where the items you want to use with the SDK are saved.
 2. Provision your service account token. We recommend provisioning your token from the environment. For example, to export your token to the `OP_SERVICE_ACCOUNT_TOKEN` environment variable:
