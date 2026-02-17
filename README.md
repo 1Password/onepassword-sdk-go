@@ -20,9 +20,9 @@ You can choose between two [authentication methods](https://developer.1password.
 
 ### Option 1: 1Password desktop app
 
-Authentication with the [1Password desktop app](https://developer.1password.com/docs/sdks/concepts#1password-desktop-app) is best for local integrations that require minimal setup and sensitive workflows that require human-in-the-loop approval. 
+[1Password desktop app authentication](https://developer.1password.com/docs/sdks/concepts#1password-desktop-app) is best for local integrations that require minimal setup from end users and sensitive workflows that require human-in-the-loop approval. 
 
-1. Install 1Password for [Mac](https://1password.com/downloads/mac), [Windows](https://1password.com/downloads/windows), or [Linux](https://1password.com/downloads/linux) and sign in to your account in the app.
+1. Install the [1Password desktop app](https://1password.com/downloads/) and sign in to your account in the app.
 2. Select your account or collection at the top of the sidebar, then navigate to **Settings** > **[Developer](onepassword://settings/developers)**.
 3. Under Integrate with the 1Password SDKs, select **Integrate with other apps**.
 4. If you want to authenticate with biometrics, navigate to **Settings** > **[Security](onepassword://settings/security)**, then turn on the option to unlock using [Touch ID](https://support.1password.com/touch-id-mac/),  [Windows Hello](https://support.1password.com/windows-hello/), or [system authentication](https://support.1password.com/system-authentication-linux/).
@@ -32,7 +32,7 @@ Authentication with the [1Password desktop app](https://developer.1password.com/
    go get github.com/1password/onepassword-sdk-go
    ```
 
-4. Use the Go SDK in your project:
+4. To use the Go SDK in your project, replace `your-account-name` in the code below with the name of your 1Password account as it appears at the top left sidebar of the 1Password desktop app.
 
 ```go
 import (
@@ -65,7 +65,7 @@ Make sure to use [secret reference URIs](https://developer.1password.com/docs/cl
 
 ### Option 2: 1Password Service Account
 
-Best for automated access and limiting your integration to least privilege access.
+[Service account authentication](https://developer.1password.com/docs/sdks/concepts#service-account) is best for automated access and limiting your integration to least privilege access.
 
 1. [Create a service account](https://my.1password.com/developer-tools/infrastructure-secrets/serviceaccount/?source=github-sdk) and give it the appropriate permissions in the vaults where the items you want to use with the SDK are saved.
 2. Provision your service account token. We recommend provisioning your token from the environment. For example, to export your token to the `OP_SERVICE_ACCOUNT_TOKEN` environment variable:
@@ -125,7 +125,9 @@ Make sure to use [secret reference URIs](https://developer.1password.com/docs/cl
 1Password SDKs are in active development. We're keen to hear what you'd like to see next. Let us know by [upvoting](https://github.com/1Password/onepassword-sdk-go/issues) or [filing](https://github.com/1Password/onepassword-sdk-go/issues/new/choose) an issue.
 
 ### Item management
-Operations:
+
+**Operations:**
+
 - [x] [Retrieve secrets](https://developer.1password.com/docs/sdks/load-secrets)
 - [x] [Retrieve items](https://developer.1password.com/docs/sdks/manage-items#get-an-item)
 - [x] [Create items](https://developer.1password.com/docs/sdks/manage-items#create-an-item)
@@ -136,7 +138,8 @@ Operations:
 - [x] [Share items](https://developer.1password.com/docs/sdks/share-items)
 - [x] [Generate PIN, random and memorable passwords](https://developer.1password.com/docs/sdks/manage-items#generate-a-password)
 
-Field types:
+**Field types:**
+
 - [x] API Keys
 - [x] Passwords
 - [x] Concealed fields
@@ -179,7 +182,6 @@ Field types:
 - [ ] Create groups
 - [ ] Update group membership
 
-
 ## Environments management
 
 - [x] [Read 1Password Environments](/docs/sdks/environments) (beta)
@@ -214,5 +216,5 @@ CGO can be enabled either by default if your system permits that, or deliberatel
 - [List vaults and items](https://developer.1password.com/docs/sdks/list-vaults-items)
 - [Manage vaults](https://developer.1password.com/docs/sdks/vaults)
 - [Manage vault permissions](https://developer.1password.com/docs/sdks/vault-permissions)
-- [1Password SDK concepts](https://developer.1password.com/docs/sdks/concepts)
 - [Manage groups](https://developer.1password.com/docs/sdks/groups)
+- [1Password SDK concepts](https://developer.1password.com/docs/sdks/concepts)
