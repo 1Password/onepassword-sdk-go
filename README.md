@@ -23,9 +23,9 @@ You can choose between two [authentication methods](https://developer.1password.
 [1Password desktop app authentication](https://developer.1password.com/docs/sdks/concepts#1password-desktop-app) is best for local integrations that require minimal setup from end users and sensitive workflows that require human-in-the-loop approval. To set up the SDK to authenticate with the 1Password app:
 
 1. Install the [1Password desktop app](https://1password.com/downloads/) and sign in to your account in the app.
-2. Select your account or collection at the top of the sidebar, then navigate to **Settings** > [Developer](onepassword://settings/developers).
+2. Select your account or collection at the top of the sidebar, then navigate to **Settings** > **Developer**.
 3. Under Integrate with the 1Password SDKs, select **Integrate with other apps**.
-4. If you want to authenticate with biometrics, navigate to **Settings** > [Security](onepassword://settings/security), then turn on the option to unlock using [Touch ID](https://support.1password.com/touch-id-mac/),  [Windows Hello](https://support.1password.com/windows-hello/), or [system authentication](https://support.1password.com/system-authentication-linux/).
+4. If you want to authenticate with biometrics, navigate to **Settings** > **Security**, then turn on the option to unlock using [Touch ID](https://support.1password.com/touch-id-mac/),  [Windows Hello](https://support.1password.com/windows-hello/), or [system authentication](https://support.1password.com/system-authentication-linux/).
 3. Install the 1Password Go SDK in your project:
 
    ```bash
