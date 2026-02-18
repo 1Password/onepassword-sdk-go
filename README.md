@@ -35,6 +35,8 @@ You can choose between two [authentication methods](https://developer.1password.
 4. To use the Go SDK in your project, replace `your-account-name` in the code below with the name of your 1Password account as it appears at the top left sidebar of the 1Password desktop app.
 
 ```go
+package main
+
 import (
     "context"
     "os"
@@ -91,6 +93,8 @@ Make sure to use [secret reference URIs](https://developer.1password.com/docs/cl
 4. Use the Go SDK in your project:
 
 ```go
+package main
+
 import (
     "context"
     "os"
