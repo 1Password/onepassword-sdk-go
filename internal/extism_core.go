@@ -110,7 +110,7 @@ func (c *ExtismCore) call(functionName string, serializedParameters []byte) ([]b
 // `loadWASM` returns the WASM core loaded into an `extism.Plugin`.
 func loadWASM(ctx context.Context) (*extism.Plugin, error) {
 	// Allow plugin logs at the level you want (global in SDK).
-	extism.SetLogLevel(extism.LogLevelTrace)
+	// extism.SetLogLevel(extism.LogLevelTrace)
 
 	manifest := extism.Manifest{
 		Wasm: []extism.Wasm{
@@ -128,9 +128,9 @@ func loadWASM(ctx context.Context) (*extism.Plugin, error) {
 	}
 
 	// Attach a logger callback to this plugin instance so plugin log::info! etc. show up.
-	plugin.SetLogger(func(level extism.LogLevel, msg string) {
-		fmt.Printf("[extism %s] %s\n", level.String(), msg)
-	})
+	// plugin.SetLogger(func(level extism.LogLevel, msg string) {
+	// 	fmt.Printf("[extism %s] %s\n", level.String(), msg)
+	// })
 
 	return plugin, nil
 }
