@@ -211,6 +211,12 @@ CGO can be enabled either by default if your system permits that, or deliberatel
 - Setting the `CGO_ENABLED` env var to 1.
 - Downloading and selecting the right cross-compiler depending on your desired target and host system.
 
+## 💙 Community & Support
+
+- File or upvote an [issue](https://github.com/1Password/terraform-provider-onepassword/issues) for bugs and feature requests.
+- Join the [Developer Slack workspace](https://join.slack.com/t/1password-devs/shared_invite/zt-1halo11ps-6o9pEv96xZ3LtX_VE0fJQA).
+- Subscribe to the [Developer Newsletter](https://1password.com/dev-subscribe/).
+
 ## 📖 Learn more
 
 - [Load secrets](https://developer.1password.com/docs/sdks/load-secrets)
