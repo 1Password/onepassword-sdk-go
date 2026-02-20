@@ -10,9 +10,12 @@ on:
 jobs:
   Notify-Vulnerabilities:
     runs-on: ubuntu-latest
+    permissions:
+      security-events: read
+      contents: read
     steps:
       - name: Notify Vulnerabilities
         uses: kunalnagarco/action-cve@de3f42dfceaaff2abdee84454a0db2c7b93c06ce
         with:
-          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           slack_webhook: ${{ secrets.SLACK_WEBHOOK }}
