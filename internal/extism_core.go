@@ -127,7 +127,7 @@ func loadWASM(ctx context.Context) (*extism.Plugin, error) {
 		return nil, fmt.Errorf("failed to initialize plugin: %v", err)
 	}
 
-	// Attach a logger callback to this plugin instance so plugin log::info! etc. show up.
+	// Attach a logger callback to this plugin instance so logging within WASM shows up.
 	// plugin.SetLogger(func(level extism.LogLevel, msg string) {
 	// 	fmt.Printf("[extism %s] %s\n", level.String(), msg)
 	// })
