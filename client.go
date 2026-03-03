@@ -8,17 +8,19 @@ import (
 
 // Client represents an instance of the 1Password Go SDK client.
 type Client struct {
-	config     internal.ClientConfig
-	SecretsAPI SecretsAPI
-	ItemsAPI   ItemsAPI
-	VaultsAPI  VaultsAPI
-	GroupsAPI  GroupsAPI
+	config          internal.ClientConfig
+	SecretsAPI      SecretsAPI
+	ItemsAPI        ItemsAPI
+	VaultsAPI       VaultsAPI
+	EnvironmentsAPI EnvironmentsAPI
+	GroupsAPI       GroupsAPI
 }
 
 func initAPIs(client *Client, inner *internal.InnerClient) {
 	client.SecretsAPI = NewSecretsSource(inner)
 	client.ItemsAPI = NewItemsSource(inner)
 	client.VaultsAPI = NewVaultsSource(inner)
+	client.EnvironmentsAPI = NewEnvironmentsSource(inner)
 	client.GroupsAPI = NewGroupsSource(inner)
 }
 
@@ -30,6 +32,9 @@ func (c *Client) Items() ItemsAPI {
 }
 func (c *Client) Vaults() VaultsAPI {
 	return c.VaultsAPI
+}
+func (c *Client) Environments() EnvironmentsAPI {
+	return c.EnvironmentsAPI
 }
 func (c *Client) Groups() GroupsAPI {
 	return c.GroupsAPI

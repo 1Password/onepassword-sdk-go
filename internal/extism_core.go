@@ -109,7 +109,10 @@ func (c *ExtismCore) call(functionName string, serializedParameters []byte) ([]b
 
 // `loadWASM` returns the WASM core loaded into an `extism.Plugin`.
 func loadWASM(ctx context.Context) (*extism.Plugin, error) {
+<<<<<<< Updated upstream
 	// Allow plugin logs at the level you want (global in SDK).
+=======
+>>>>>>> Stashed changes
 	extism.SetLogLevel(extism.LogLevelTrace)
 	manifest := extism.Manifest{
 		Wasm: []extism.Wasm{
@@ -125,10 +128,18 @@ func loadWASM(ctx context.Context) (*extism.Plugin, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize plugin: %v", err)
 	}
+<<<<<<< Updated upstream
 	// Attach a logger callback to this plugin instance so logging within WASM shows up.
 	plugin.SetLogger(func(level extism.LogLevel, msg string) {
 		fmt.Printf("[extism %s] %s\n", level.String(), msg)
 	})
+=======
+
+	plugin.SetLogger(func(level extism.LogLevel, msg string) {
+		fmt.Printf("[extism %s] %s\n", level.String(), msg)
+	})
+
+>>>>>>> Stashed changes
 	return plugin, nil
 }
 
@@ -138,6 +149,7 @@ func allowed1PHosts() []string {
 		"*.1password.com",
 		"*.1password.ca",
 		"*.1password.eu",
+		"*.1passwordservices.dev",
 		"*.b5staging.com",
 		"*.b5dev.com",
 		"*.b5dev.ca",
