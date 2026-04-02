@@ -7,13 +7,10 @@ on:
     branches: ["main"]
     types: [ opened, ready_for_review ]
 
-  # Allows to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
 jobs:
   slackNotification:
     name: Slack Notification
-    if: startsWith(github.head_ref, 'dependabot/') # This step only runs when PR has dependabot/ HEAD
+    if: github.event.pull_request.user.login == 'dependabot[bot]' # This step only runs when PR is opened by dependabot
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
