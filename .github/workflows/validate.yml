@@ -9,8 +9,8 @@ on:
     paths-ignore:
       - '**.md'
   # Triggered by ok-to-test.yml when a maintainer comments "/ok-to-test" on a fork PR.
-  # On repository_dispatch, github.sha is the default branch HEAD — not the PR commit.
-  # The actual PR head SHA comes from client_payload.pull_request.head.sha.
+  # github.sha resolves to the default branch here, so jobs check out
+  # client_payload.pull_request.head.sha instead.
   repository_dispatch:
     types: [ok-to-test-command]
 
@@ -29,9 +29,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          # On repository_dispatch, check out the exact SHA the maintainer reviewed.
-          # Prevents TOCTOU: fork author could force-push between review and checkout.
-          # Empty string falls back to the default ref (correct for push/pull_request).
+          # Pin to the SHA the maintainer reviewed. Empty string uses the default ref.
           ref: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.pull_request.head.sha || '' }}
 
       - name: Set up Go
@@ -43,10 +41,10 @@ jobs:
         run: go build -v ./...
 
       - name: Integration Test
-        # Run when secrets are available: push (always internal), internal PRs, or /ok-to-test dispatch.
-        # Skips on fork pull_request events where secrets are withheld.
+        # Skip fork PRs — they can't access pipeline secrets.
         if: >-
-          github.event_name != 'pull_request' ||
+          github.event_name == 'push' ||
+          github.event_name == 'repository_dispatch' ||
           github.event.pull_request.head.repo.full_name == github.repository
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.TEST_SA_TOKEN }}
@@ -60,7 +58,8 @@ jobs:
     needs: test
     # Same fork guard — example tests require secrets.
     if: >-
-      github.event_name != 'pull_request' ||
+      github.event_name == 'push' ||
+      github.event_name == 'repository_dispatch' ||
       github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
