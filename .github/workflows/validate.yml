@@ -8,6 +8,11 @@ on:
   pull_request:
     paths-ignore:
       - '**.md'
+  # Triggered by ok-to-test.yml when a maintainer comments "/ok-to-test" on a fork PR.
+  # On repository_dispatch, github.sha is the default branch HEAD — not the PR commit.
+  # The actual PR head SHA comes from client_payload.pull_request.head.sha.
+  repository_dispatch:
+    types: [ok-to-test-command]
 
 jobs:
 
@@ -23,6 +28,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+        with:
+          # On repository_dispatch, check out the exact SHA the maintainer reviewed.
+          # Prevents TOCTOU: fork author could force-push between review and checkout.
+          # Empty string falls back to the default ref (correct for push/pull_request).
+          ref: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.pull_request.head.sha || '' }}
 
       - name: Set up Go
         uses: actions/setup-go@v6
@@ -55,6 +65,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.pull_request.head.sha || '' }}
 
       - name: Run Example Test
         run: go run example/service_account/main.go
@@ -73,6 +85,30 @@ jobs:
 
       - name: Check out code
         uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.pull_request.head.sha || '' }}
 
       - name: Lint with golanci-lint
         uses: golangci/golangci-lint-action@v9
+
+  comment-result:
+    name: Comment Result on PR
+    if: ${{ always() && github.event_name == 'repository_dispatch' }}
+    needs: [test, example_test, golangci]
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: peter-evans/create-or-update-comment@v5
+        with:
+          issue-number: ${{ github.event.client_payload.pull_request.number }}
+          body: |
+            `/ok-to-test` result: **${{ (needs.test.result == 'success' && needs.example_test.result == 'success' && needs.golangci.result == 'success') && 'All checks passed ✅' || 'Some checks failed ❌' }}**
+
+            | Job | Result |
+            |-----|--------|
+            | Build & Test | `${{ needs.test.result }}` |
+            | Example Test | `${{ needs.example_test.result }}` |
+            | Lint | `${{ needs.golangci.result }}` |
+
+            [View run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
