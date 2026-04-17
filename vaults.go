@@ -49,7 +49,7 @@ func NewVaultsSource(inner *internal.InnerClient) VaultsAPI {
 
 // Create a new user vault.
 func (v VaultsSource) Create(ctx context.Context, params VaultCreateParams) (Vault, error) {
-	resultString, err := clientInvoke(ctx, v.InnerClient, "VaultsCreate", map[string]interface{}{
+	resultString, err := clientInvoke(ctx, v.InnerClient, "VaultsCreate", map[string]any{
 		"params": params,
 	})
 	if err != nil {
@@ -69,7 +69,7 @@ func (v VaultsSource) List(ctx context.Context, params ...VaultListParams) ([]Va
 	if len(params) > 0 {
 		param = &params[0]
 	}
-	resultString, err := clientInvoke(ctx, v.InnerClient, "VaultsList", map[string]interface{}{
+	resultString, err := clientInvoke(ctx, v.InnerClient, "VaultsList", map[string]any{
 		"params": param,
 	})
 	if err != nil {
@@ -85,7 +85,7 @@ func (v VaultsSource) List(ctx context.Context, params ...VaultListParams) ([]Va
 
 // Get an overview of a vault by its ID.
 func (v VaultsSource) GetOverview(ctx context.Context, vaultID string) (VaultOverview, error) {
-	resultString, err := clientInvoke(ctx, v.InnerClient, "VaultsGetOverview", map[string]interface{}{
+	resultString, err := clientInvoke(ctx, v.InnerClient, "VaultsGetOverview", map[string]any{
 		"vault_id": vaultID,
 	})
 	if err != nil {
@@ -101,7 +101,7 @@ func (v VaultsSource) GetOverview(ctx context.Context, vaultID string) (VaultOve
 
 // Get detailed vault information by vault ID and parameters.
 func (v VaultsSource) Get(ctx context.Context, vaultID string, vaultParams VaultGetParams) (Vault, error) {
-	resultString, err := clientInvoke(ctx, v.InnerClient, "VaultsGet", map[string]interface{}{
+	resultString, err := clientInvoke(ctx, v.InnerClient, "VaultsGet", map[string]any{
 		"vault_id":     vaultID,
 		"vault_params": vaultParams,
 	})
@@ -118,7 +118,7 @@ func (v VaultsSource) Get(ctx context.Context, vaultID string, vaultParams Vault
 
 // Update a vault
 func (v VaultsSource) Update(ctx context.Context, vaultID string, params VaultUpdateParams) (Vault, error) {
-	resultString, err := clientInvoke(ctx, v.InnerClient, "VaultsUpdate", map[string]interface{}{
+	resultString, err := clientInvoke(ctx, v.InnerClient, "VaultsUpdate", map[string]any{
 		"vault_id": vaultID,
 		"params":   params,
 	})
@@ -135,7 +135,7 @@ func (v VaultsSource) Update(ctx context.Context, vaultID string, params VaultUp
 
 // Delete a vault by its ID.
 func (v VaultsSource) Delete(ctx context.Context, vaultID string) error {
-	_, err := clientInvoke(ctx, v.InnerClient, "VaultsDelete", map[string]interface{}{
+	_, err := clientInvoke(ctx, v.InnerClient, "VaultsDelete", map[string]any{
 		"vault_id": vaultID,
 	})
 	return err
@@ -143,7 +143,7 @@ func (v VaultsSource) Delete(ctx context.Context, vaultID string) error {
 
 // Grant group permissions to a vault.
 func (v VaultsSource) GrantGroupPermissions(ctx context.Context, vaultID string, groupPermissionsList []GroupAccess) error {
-	_, err := clientInvoke(ctx, v.InnerClient, "VaultsGrantGroupPermissions", map[string]interface{}{
+	_, err := clientInvoke(ctx, v.InnerClient, "VaultsGrantGroupPermissions", map[string]any{
 		"vault_id":               vaultID,
 		"group_permissions_list": groupPermissionsList,
 	})
@@ -152,7 +152,7 @@ func (v VaultsSource) GrantGroupPermissions(ctx context.Context, vaultID string,
 
 // Update group permissions for vaults.
 func (v VaultsSource) UpdateGroupPermissions(ctx context.Context, groupPermissionsList []GroupVaultAccess) error {
-	_, err := clientInvoke(ctx, v.InnerClient, "VaultsUpdateGroupPermissions", map[string]interface{}{
+	_, err := clientInvoke(ctx, v.InnerClient, "VaultsUpdateGroupPermissions", map[string]any{
 		"group_permissions_list": groupPermissionsList,
 	})
 	return err
@@ -160,7 +160,7 @@ func (v VaultsSource) UpdateGroupPermissions(ctx context.Context, groupPermissio
 
 // Revoke group permissions from a vault.
 func (v VaultsSource) RevokeGroupPermissions(ctx context.Context, vaultID string, groupID string) error {
-	_, err := clientInvoke(ctx, v.InnerClient, "VaultsRevokeGroupPermissions", map[string]interface{}{
+	_, err := clientInvoke(ctx, v.InnerClient, "VaultsRevokeGroupPermissions", map[string]any{
 		"vault_id": vaultID,
 		"group_id": groupID,
 	})
