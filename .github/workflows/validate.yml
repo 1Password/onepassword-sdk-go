@@ -33,7 +33,11 @@ jobs:
         run: go build -v ./...
 
       - name: Integration Test
-        if: github.repository_owner == '1Password' # don't run integration tests on forked PRs because those don't have access to pipeline secrets
+        # Run when secrets are available: push (always internal), internal PRs, or /ok-to-test dispatch.
+        # Skips on fork pull_request events where secrets are withheld.
+        if: >-
+          github.event_name != 'pull_request' ||
+          github.event.pull_request.head.repo.full_name == github.repository
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.TEST_SA_TOKEN }}
         run: go test -v ./integration_tests/...
@@ -43,7 +47,11 @@ jobs:
   
   example_test:
     name: Run Example Code
-    needs: test  
+    needs: test
+    # Same fork guard — example tests require secrets.
+    if: >-
+      github.event_name != 'pull_request' ||
+      github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
