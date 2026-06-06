@@ -3,11 +3,17 @@ name: Validate
 
 on:
   push:
+    branches: [main]
     paths-ignore:
       - '**.md'
   pull_request:
     paths-ignore:
       - '**.md'
+  # Triggered by ok-to-test.yml when a maintainer comments "/ok-to-test" on a fork PR.
+  # github.sha resolves to the default branch here, so jobs check out
+  # client_payload.pull_request.head.sha instead.
+  repository_dispatch:
+    types: [ok-to-test-command]
 
 jobs:
 
@@ -23,6 +29,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+        with:
+          # Pin to the SHA the maintainer reviewed. Empty string uses the default ref.
+          ref: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.pull_request.head.sha || '' }}
 
       - name: Set up Go
         uses: actions/setup-go@v6
@@ -33,7 +42,11 @@ jobs:
         run: go build -v ./...
 
       - name: Integration Test
-        if: github.repository_owner == '1Password' # don't run integration tests on forked PRs because those don't have access to pipeline secrets
+        # Skip fork PRs — they can't access pipeline secrets.
+        if: >-
+          github.event_name == 'push' ||
+          github.event_name == 'repository_dispatch' ||
+          github.event.pull_request.head.repo.full_name == github.repository
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.TEST_SA_TOKEN }}
         run: go test -v ./integration_tests/...
@@ -43,10 +56,17 @@ jobs:
   
   example_test:
     name: Run Example Code
-    needs: test  
+    needs: test
+    # Same fork guard — example tests require secrets.
+    if: >-
+      github.event_name == 'push' ||
+      github.event_name == 'repository_dispatch' ||
+      github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.pull_request.head.sha || '' }}
 
       - name: Run Example Test
         run: go run example/service_account/main.go
@@ -65,6 +85,30 @@ jobs:
 
       - name: Check out code
         uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.pull_request.head.sha || '' }}
 
       - name: Lint with golanci-lint
         uses: golangci/golangci-lint-action@v9
+
+  comment-result:
+    name: Comment Result on PR
+    if: ${{ always() && github.event_name == 'repository_dispatch' }}
+    needs: [test, example_test, golangci]
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: peter-evans/create-or-update-comment@v5
+        with:
+          issue-number: ${{ github.event.client_payload.pull_request.number }}
+          body: |
+            `/ok-to-test` result: **${{ (needs.test.result == 'success' && needs.example_test.result == 'success' && needs.golangci.result == 'success') && 'All checks passed ✅' || 'Some checks failed ❌' }}**
+
+            | Job | Result |
+            |-----|--------|
+            | Build & Test | `${{ needs.test.result }}` |
+            | Example Test | `${{ needs.example_test.result }}` |
+            | Lint | `${{ needs.golangci.result }}` |
+
+            [View run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
