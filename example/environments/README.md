@@ -9,9 +9,7 @@ This example shows how to read environment variables from a [1Password Environme
    - Open the 1Password desktop app and unlock it.
    - Go to **Developer** > **View Environments**.
    - Select **View environment** next to the Environment you want to use.
-   - Select **Manage environment** > **Copy environment ID**.
-
-   **Tip:** To see the Environment ID in the 'manage environment' dropdown, enable **Show debugging tools** under **Application** > **Settings** > **Advanced**. You may need to log out and back in for this setting to take effect.
+   - Select the **vertical ellipsis button** > **Copy environment ID**.
 
 ## Authentication
 
