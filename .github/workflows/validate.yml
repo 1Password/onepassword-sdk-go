@@ -4,23 +4,22 @@ name: Validate
 on:
   push:
     paths-ignore:
-      - '**.md'
+      - "**.md"
   pull_request:
     paths-ignore:
-      - '**.md'
+      - "**.md"
 
 jobs:
-
   test:
     name: Build & Test
     strategy:
       matrix:
-        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        os: [ubuntu-latest, windows-latest, macos-latest]
         # supported versions at the time of writing (Nov. 3rd, 2025)
         # https://go.dev/dl/
-        go-version: [ '1.24', '1.25' ]
+        go-version: ["1.24", "1.25"]
 
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v6
 
@@ -40,10 +39,10 @@ jobs:
 
       - name: Unit Test
         run: go test -v ./internal/...
-  
+
   example_test:
     name: Run Example Code
-    needs: test  
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -61,7 +60,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v6
         with:
-          go-version: '^1.24'
+          go-version: "^1.24"
 
       - name: Check out code
         uses: actions/checkout@v6
