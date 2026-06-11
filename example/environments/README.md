@@ -1,11 +1,11 @@
 # Read 1Password Environments
 
-This example shows how to read environment variables from a [1Password Environment](https://developer.1password.com/docs/sdks/environments/) using the Go SDK.
+This example shows how to read environment variables from a [1Password Environment](https://1password.dev/sdks/environments/) using the Go SDK.
 
 ## Prerequisites
 
 1. Clone the repository and follow the [get started](https://github.com/1Password/onepassword-sdk-go#-get-started) steps.
-2. Get your Environment ID from the 1Password app:
+2. Get your environment ID from the 1Password app:
    - Open the 1Password desktop app and unlock it.
    - Go to **Developer** > **View Environments**.
    - Select **View environment** next to the Environment you want to use.
@@ -29,7 +29,7 @@ export OP_ACCOUNT_NAME="<your account name>"
 
 ## How to run
 
-Set the Environment ID, then run the example from the project root:
+Set the environment ID, then run the example from the project root:
 
 ```bash
 export OP_ENVIRONMENT_ID="<your environment id>"
@@ -42,4 +42,4 @@ The program prints each variable in the environment, including its name, value, 
 
 ## Documentation
 
-- [Read 1Password Environments (SDK guide)](https://developer.1password.com/docs/sdks/environments/)
+- [Read 1Password Environments (SDK guide)](https://1password.dev/sdks/environments/)

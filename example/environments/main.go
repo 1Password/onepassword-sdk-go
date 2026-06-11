@@ -1,5 +1,5 @@
 // This example demonstrates reading environment variables from a 1Password Environment
-// using the 1Password Go SDK. See: https://developer.1password.com/docs/sdks/environments/
+// using the 1Password Go SDK. See: https://1password.dev/sdks/environments/
 package main
 
 import (
@@ -14,7 +14,7 @@ func main() {
 	environmentID := os.Getenv("OP_ENVIRONMENT_ID")
 	if environmentID == "" {
 		fmt.Fprintln(os.Stderr, "OP_ENVIRONMENT_ID is required. You can find your Environment ID from the 1Password app:")
-		fmt.Fprintln(os.Stderr, "  Developer > View Environments > Manage environment > Copy environment ID")
+		fmt.Fprintln(os.Stderr, `Navigate to: Developer > View Environments > Select "View Environment" for the desired environment > Click the vertical ellipsis button > Select "Copy environment ID"`)
 		os.Exit(1)
 	}
 
