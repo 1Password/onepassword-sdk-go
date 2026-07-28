@@ -1,4 +1,4 @@
-//go:build darwin || linux
+//go:build cgo && (darwin || linux)
 
 package internal
 
