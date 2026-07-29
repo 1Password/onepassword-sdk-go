@@ -5,11 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-
-	"github.com/1password/onepassword-sdk-go"
 )
 
 // [developer-docs.sdk.go.sdk-import]-start
+import "github.com/1password/onepassword-sdk-go"
 
 // [developer-docs.sdk.go.sdk-import]-end
 
@@ -41,15 +40,6 @@ func main() {
 	}
 
 	showcaseGroupPermissionOperations(client, vaultID, groupID)
-
-	// [developer-docs.sdk.go.get-group]-start
-	// Get a group
-	group, err := client.Groups().Get(context.Background(), groupID, onepassword.GroupGetParams{})
-	if err != nil {
-		panic(err)
-	}
-	fmt.Printf("Group details: %v\n", group)
-	// [developer-docs.sdk.go.get-group]-end
 }
 
 func createAndGetItem(client *onepassword.Client, vaultID string) onepassword.Item {
