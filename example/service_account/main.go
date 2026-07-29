@@ -12,6 +12,7 @@ import (
 
 // [developer-docs.sdk.go.sdk-import]-start
 import "github.com/1password/onepassword-sdk-go"
+
 // [developer-docs.sdk.go.sdk-import]-end
 
 func main() {
@@ -45,6 +46,20 @@ func main() {
 	fmt.Println(sharelink)
 	archiveItem(client, item.VaultID, item.ID)
 	deleteItem(client, item.VaultID, item.ID)
+
+	environmentID := os.Getenv("OP_ENVIRONMENT_ID")
+	if environmentID != "" {
+		// [developer-docs.sdk.go.get-environment-variables]-start
+		// Read variables from a 1Password Environment
+		environment, err := client.Environments().GetVariables(context.Background(), environmentID)
+		if err != nil {
+			panic(err)
+		}
+		for _, variable := range environment.Variables {
+			fmt.Printf("%s: %s (masked: %t)\n", variable.Name, variable.Value, variable.Masked)
+		}
+		// [developer-docs.sdk.go.get-environment-variables]-end
+	}
 }
 
 func showcaseBatchItemOperations(client *onepassword.Client, vaultID string) {

@@ -1,1 +1,4 @@
 .idea/
+
+# Compiled binary from environments.go
+/environments
