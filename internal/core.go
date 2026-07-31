@@ -116,8 +116,8 @@ type Invocation struct {
 }
 
 type Parameters struct {
-	MethodName       string                 `json:"name"`
-	SerializedParams map[string]interface{} `json:"parameters"`
+	MethodName       string         `json:"name"`
+	SerializedParams map[string]any `json:"parameters"`
 }
 
 // InnerClient represents the sdk-core client on which calls will be made.

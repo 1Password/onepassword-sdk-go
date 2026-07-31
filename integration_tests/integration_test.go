@@ -83,10 +83,10 @@ func TestInvalidInvoke(t *testing.T) {
 
 	validClientID := uint64(0)
 	validMethodName := "SecretsResolve"
-	validParams := map[string]interface{}{"secret_reference": "op://gowwbvgow7kxocrfmfvtwni6vi/6ydrn7ne6mwnqc2prsbqx4i4aq/password"}
+	validParams := map[string]any{"secret_reference": "op://gowwbvgow7kxocrfmfvtwni6vi/6ydrn7ne6mwnqc2prsbqx4i4aq/password"}
 	invalidClientID := uint64(1)
 	invalidMethodName := "InvalidName"
-	invalidParams := map[string]interface{}{"secret_reference": ""}
+	invalidParams := map[string]any{"secret_reference": ""}
 
 	// invalid client id
 	invocation1 := internal.InvokeConfig{
@@ -139,7 +139,7 @@ func TestClientReleasedSuccessfully(t *testing.T) {
 			ClientID: &clientID, // this client id should be invalid because the client has been cleaned up by GC
 			Parameters: internal.Parameters{
 				MethodName:       "SecretsResolve",
-				SerializedParams: map[string]interface{}{"secret_reference": "op://foo/bar/baz"},
+				SerializedParams: map[string]any{"secret_reference": "op://foo/bar/baz"},
 			},
 		},
 	}
@@ -161,7 +161,7 @@ func TestConcurrentCallsFromOneClient(t *testing.T) {
 
 	concurrentCalls := 10
 	wg.Add(concurrentCalls)
-	for i := 0; i < concurrentCalls; i++ {
+	for range concurrentCalls {
 		go func() {
 			secret, err := client.Secrets().Resolve(context.Background(), "op://gowwbvgow7kxocrfmfvtwni6vi/6ydrn7ne6mwnqc2prsbqx4i4aq/password")
 			require.NoError(t, err)
@@ -181,7 +181,7 @@ func TestConcurrentCallsFromMultipleClientsOnTheSameToken(t *testing.T) {
 	token := os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
 	concurrentClients := 5
 	wg.Add(concurrentClients)
-	for i := 0; i < concurrentClients; i++ {
+	for range concurrentClients {
 		go func() {
 			client, err := onepassword.NewClient(context.Background(),
 				onepassword.WithServiceAccountToken(token),
