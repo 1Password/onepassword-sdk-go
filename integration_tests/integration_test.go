@@ -29,7 +29,7 @@ func TestSecretRetrievalFromTestAccount(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	secret, err := client.Secrets().Resolve(context.Background(), "op://gowwbvgow7kxocrfmfvtwni6vi/6ydrn7ne6mwnqc2prsbqx4i4aq/password")
+	secret, err := client.Secrets().Resolve(context.Background(), "op://dm42px5dmgusczoarfdubfmodm/2fwfzpvjvaey2lwph5jupovjaq/password")
 	require.NoError(t, err)
 
 	assert.Equal(t, "test_password_42", secret)
@@ -83,7 +83,7 @@ func TestInvalidInvoke(t *testing.T) {
 
 	validClientID := uint64(0)
 	validMethodName := "SecretsResolve"
-	validParams := map[string]interface{}{"secret_reference": "op://gowwbvgow7kxocrfmfvtwni6vi/6ydrn7ne6mwnqc2prsbqx4i4aq/password"}
+	validParams := map[string]interface{}{"secret_reference": "op://dm42px5dmgusczoarfdubfmodm/2fwfzpvjvaey2lwph5jupovjaq/password"}
 	invalidClientID := uint64(1)
 	invalidMethodName := "InvalidName"
 	invalidParams := map[string]interface{}{"secret_reference": ""}
@@ -163,7 +163,7 @@ func TestConcurrentCallsFromOneClient(t *testing.T) {
 	wg.Add(concurrentCalls)
 	for i := 0; i < concurrentCalls; i++ {
 		go func() {
-			secret, err := client.Secrets().Resolve(context.Background(), "op://gowwbvgow7kxocrfmfvtwni6vi/6ydrn7ne6mwnqc2prsbqx4i4aq/password")
+			secret, err := client.Secrets().Resolve(context.Background(), "op://dm42px5dmgusczoarfdubfmodm/2fwfzpvjvaey2lwph5jupovjaq/password")
 			require.NoError(t, err)
 
 			assert.Equal(t, "test_password_42", secret)
@@ -189,7 +189,7 @@ func TestConcurrentCallsFromMultipleClientsOnTheSameToken(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			secret, err := client.Secrets().Resolve(context.Background(), "op://gowwbvgow7kxocrfmfvtwni6vi/6ydrn7ne6mwnqc2prsbqx4i4aq/password")
+			secret, err := client.Secrets().Resolve(context.Background(), "op://dm42px5dmgusczoarfdubfmodm/2fwfzpvjvaey2lwph5jupovjaq/password")
 			require.NoError(t, err)
 
 			assert.Equal(t, "test_password_42", secret)
