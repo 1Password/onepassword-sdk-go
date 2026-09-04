@@ -23,17 +23,38 @@ const (
 	releaseClientFuncName = "release_client"
 )
 
-var core *ExtismCore
+var (
+	coreMu sync.Mutex
+	core   *ExtismCore
+)
 
 // GetExtismCore initializes the shared core once and returns the already existing one on subsequent calls.
 func GetExtismCore() (*CoreWrapper, error) {
-	runtimeCtx := context.Background()
-	if core == nil {
+	return getExtismCore(func() (*ExtismCore, error) {
+		runtimeCtx := context.Background()
 		p, err := loadWASM(runtimeCtx)
 		if err != nil {
 			return nil, err
 		}
-		core = &ExtismCore{plugin: p}
+		return &ExtismCore{plugin: p}, nil
+	})
+}
+
+func getExtismCore(init func() (*ExtismCore, error)) (*CoreWrapper, error) {
+	return getExtismCoreWithLock(&coreMu, init)
+}
+
+// The injectable lock keeps lifecycle contention observable in deterministic unit tests.
+func getExtismCoreWithLock(coreLock sync.Locker, init func() (*ExtismCore, error)) (*CoreWrapper, error) {
+	coreLock.Lock()
+	defer coreLock.Unlock()
+
+	if core == nil {
+		initializedCore, err := init()
+		if err != nil {
+			return nil, err
+		}
+		core = initializedCore
 	}
 
 	coreWrapper := CoreWrapper{
@@ -44,6 +65,13 @@ func GetExtismCore() (*CoreWrapper, error) {
 }
 
 func ReleaseCore() {
+	releaseCoreWithLock(&coreMu)
+}
+
+func releaseCoreWithLock(coreLock sync.Locker) {
+	coreLock.Lock()
+	defer coreLock.Unlock()
+
 	core = nil
 }
 
