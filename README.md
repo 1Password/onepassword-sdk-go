@@ -126,6 +126,40 @@ func main() {
 
 Make sure to use [secret reference URIs](https://developer.1password.com/docs/cli/secret-reference-syntax/) with the syntax `op://vault/item/field` to securely load secrets from 1Password into your code.
 
+### Optional WASM compilation cache
+
+Service-account applications that restart frequently can reuse compiled WASM code
+through an explicitly owned runtime. The package-level `NewClient` is unchanged.
+
+```go
+ctx := context.Background()
+r, err := onepassword.NewRuntime(onepassword.WithCompilationCacheDir("trusted-cache"))
+if err != nil {
+    return err
+}
+defer r.Close(ctx) // close only after all clients using this runtime are finished
+
+// Optional: populate the cache without credentials, authentication or networking.
+if err := r.Prepare(ctx); err != nil {
+    return err
+}
+client, err := r.NewClient(ctx, onepassword.WithServiceAccountToken(token))
+```
+
+A runtime shares one serialized WASM core across its clients. Construction is lazy;
+without a directory option its compilation cache is in memory. `Close` waits for
+active calls, then closes the core/cache. Further calls through those clients fail
+with `ErrRuntimeClosed`; create a new runtime to start again. Desktop authentication
+continues to use the package-level `NewClient`.
+
+The directory contains **trusted executable code**, not credentials, sessions or
+secret values. Protect it from untrusted writers. Cache compatibility depends on
+runtime version, architecture, CPU features and the embedded WASM. Missing entries
+are compiled normally, which can use more memory than a cache hit. This API is
+**not require-hit/read-only mode**; mounting a cache read-only does not prevent
+compilation on a miss. Keep capacity for compilation and populate caches on
+compatible hosts. Compilation caching does not skip client authentication.
+
 ## Supported functionality
 
 1Password SDKs are in active development. We're keen to hear what you'd like to see next. Let us know by [upvoting](https://github.com/1Password/onepassword-sdk-go/issues) or [filing](https://github.com/1Password/onepassword-sdk-go/issues/new/choose) an issue.
