@@ -26,41 +26,67 @@ type Response struct {
 
 func (r Response) Error() string { return string(r.Payload) }
 
+// desktopLibLocations returns the candidate paths for the 1Password desktop
+// app shared library, in priority order.
+func desktopLibLocations(home string) ([]string, error) {
+	var locations []string
+
+	switch runtime.GOOS {
+	case "darwin":
+		locations = append(locations,
+			"/Applications/1Password.app/Contents/Frameworks/libop_sdk_ipc_client.dylib",
+			path.Join(home, "Applications/1Password.app/Contents/Frameworks/libop_sdk_ipc_client.dylib"),
+		)
+
+	case "linux":
+		locations = append(locations,
+			"/usr/bin/1password/libop_sdk_ipc_client.so",
+			"/opt/1Password/libop_sdk_ipc_client.so",
+			"/snap/bin/1password/libop_sdk_ipc_client.so",
+			// NixOS system profile (stable across app upgrades) and Nix
+			// user profiles. On NixOS the desktop app lives under a
+			// content-addressed store path, so none of the FHS locations
+			// above exist.
+			"/run/current-system/sw/share/1password/libop_sdk_ipc_client.so",
+			path.Join(home, ".nix-profile/share/1password/libop_sdk_ipc_client.so"),
+			path.Join(home, ".local/state/nix/profile/share/1password/libop_sdk_ipc_client.so"),
+		)
+
+	case "windows":
+		locations = append(locations,
+			path.Join(home, `AppData\Local\1Password\op_sdk_ipc_client.dll`),
+			`C:\Program Files\1Password\app\8\op_sdk_ipc_client.dll`,
+			`C:\Program Files (x86)\1Password\app\8\op_sdk_ipc_client.dll`,
+			path.Join(home, `AppData\Local\1Password\app\8\op_sdk_ipc_client.dll`),
+		)
+
+	default:
+		return nil, fmt.Errorf("unsupported OS: %s", runtime.GOOS)
+	}
+
+	// An explicit override always wins. Useful for immutable/atomic distros
+	// where the desktop app is installed in a non-standard location, and for
+	// containerized setups.
+	if override := os.Getenv("OP_DESKTOP_APP_LIB_PATH"); override != "" {
+		locations = append([]string{override}, locations...)
+	}
+
+	return locations, nil
+}
+
 // find1PasswordLibPath returns the path to the 1Password shared library
 // (libop_sdk_ipc_client.dylib/.so/.dll) depending on OS.
 func find1PasswordLibPath() (string, error) {
-	var locations []string
-
 	home, err := os.UserHomeDir()
 	if err != nil {
 		return "", err
 	}
 
-	switch runtime.GOOS {
-	case "darwin":
-		locations = []string{
-			"/Applications/1Password.app/Contents/Frameworks/libop_sdk_ipc_client.dylib",
-			path.Join(home, "Applications/1Password.app/Contents/Frameworks/libop_sdk_ipc_client.dylib"),
-		}
-
-	case "linux":
-		locations = []string{
-			"/usr/bin/1password/libop_sdk_ipc_client.so",
-			"/opt/1Password/libop_sdk_ipc_client.so",
-			"/snap/bin/1password/libop_sdk_ipc_client.so",
-		}
-
-	case "windows":
-		locations = []string{
-			path.Join(home, `AppData\Local\1Password\op_sdk_ipc_client.dll`),
-			`C:\Program Files\1Password\app\8\op_sdk_ipc_client.dll`,
-			`C:\Program Files (x86)\1Password\app\8\op_sdk_ipc_client.dll`,
-			path.Join(home, `AppData\Local\1Password\app\8\op_sdk_ipc_client.dll`),
-		}
-
-	default:
-		return "", fmt.Errorf("unsupported OS: %s", runtime.GOOS)
+	locations, err := desktopLibLocations(home)
+	if err != nil {
+		return "", err
 	}
+
 	for _, libPath := range locations {
 		if _, err := os.Stat(libPath); err == nil {
 			return libPath, nil
