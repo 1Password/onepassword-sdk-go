@@ -1,15 +1,12 @@
-# 1Password Go SDK v0.4.1
-
-## NEW
-
-
-- **1Password Environment access:** The SDK can now read variables from a 1Password Environment.
-
-## IMPROVED
-
-- **Documentation:** The README now covers desktop app authentication and an updated list of supported functionality. Example code and comments are consistent with the other 1Password SDKs.
-- **Terms of Service:** The README now links the terms of service that apply to the 1Password APIs/SDKs.
+# 1Password Go SDK v0.4.2-beta.1
 
 ## FIXED
 
-- **CGO handling:** The SDK now builds with `CGO_ENABLED=0`. CGO is only required for Desktop App Integration.
+
+- **Secret references with a vault's account-type name:** Secret references that name a Personal vault by its account-type name now resolve. For example, `op://Employee/...` on a Team or Business account, as copied with "Copy Secret Reference" in the 1Password app. Before, they failed with "no vault matched the secret reference query".
+
+## IMPROVED
+
+
+- **Support link in error messages:** Internal error messages now link to https://www.1password.dev/joinslack.
+
