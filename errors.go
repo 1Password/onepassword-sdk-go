@@ -23,6 +23,14 @@ func (e *RateLimitExceededError) Error() string {
 	return e.message
 }
 
+type AuthExpiredError struct {
+	message string
+}
+
+func (e *AuthExpiredError) Error() string {
+	return e.message
+}
+
 func unmarshalError(err string) error {
 	v := struct {
 		Name    string `json:"name"`
@@ -38,6 +46,10 @@ func unmarshalError(err string) error {
 		}
 	case "RateLimitExceeded":
 		return &RateLimitExceededError{
+			message: v.Message,
+		}
+	case "AuthExpired":
+		return &AuthExpiredError{
 			message: v.Message,
 		}
 	default:

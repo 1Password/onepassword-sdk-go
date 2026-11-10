@@ -28,7 +28,9 @@ type DocumentCreateParams struct {
 	Content []byte `json:"content"`
 }
 
-// Represents an environment variable (name:value pair) and its masked state
+// One environment variable resolved by the credential broker.
+//
+// Used by the Environments API (`GetVariablesResponse`).
 type EnvironmentVariable struct {
 	// An environment variable's name
 	Name string `json:"name"`
@@ -116,8 +118,9 @@ const (
 type VaultAccessorType string
 
 const (
-	VaultAccessorTypeUser  VaultAccessorType = "user"
-	VaultAccessorTypeGroup VaultAccessorType = "group"
+	VaultAccessorTypeUser   VaultAccessorType = "user"
+	VaultAccessorTypeGroup  VaultAccessorType = "group"
+	VaultAccessorTypeBroker VaultAccessorType = "broker"
 )
 
 // Represents the vault access information.
@@ -1047,7 +1050,7 @@ type Vault struct {
 	ActiveItemCount uint32 `json:"activeItemCount"`
 	// The content version number of the vault. It gets incremented whenever the state of the vault's contents changes (e.g. items from within the vault get created or updated).
 	ContentVersion uint32 `json:"contentVersion"`
-	// The attribute version number of the vault. It gets incremented whenever vault presentation information changes, such as its title or icon.
+	// The attribute version number of the vault. It gets incremented whenever vault presentation information changes, such as its name or icon.
 	AttributeVersion uint32 `json:"attributeVersion"`
 	// The access information associated with the vault.
 	Access []VaultAccess `json:"access,omitempty"`
@@ -1081,7 +1084,7 @@ type VaultOverview struct {
 	ActiveItemCount uint32 `json:"activeItemCount"`
 	// The content version number of the vault. It gets incremented whenever the state of the vault's contents changes (e.g. items from within the vault get created or updated).
 	ContentVersion uint32 `json:"contentVersion"`
-	// The attribute version number of the vault. It gets incremented whenever vault presentation information changes, such as its title or icon.
+	// The attribute version number of the vault. It gets incremented whenever vault presentation information changes, such as its name or icon.
 	AttributeVersion uint32 `json:"attributeVersion"`
 	// The time the vault was created at
 	CreatedAt time.Time `json:"createdAt"`
