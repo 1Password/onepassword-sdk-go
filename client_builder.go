@@ -49,6 +49,9 @@ func NewClient(ctx context.Context, opts ...ClientOption) (*Client, error) {
 func initClient(ctx context.Context, core internal.CoreWrapper, client Client) (*Client, error) {
 	clientID, err := core.InitClient(ctx, client.config)
 	if err != nil {
+		if errors.Is(err, ErrRuntimeClosed) {
+			return nil, err
+		}
 		return nil, fmt.Errorf("error initializing client: %w", unmarshalError(err.Error()))
 	}
 
@@ -96,6 +99,9 @@ func clientInvoke(ctx context.Context, innerClient *internal.InnerClient, invoca
 		},
 	})
 	if err != nil {
+		if errors.Is(err, ErrRuntimeClosed) {
+			return nil, err
+		}
 		err = unmarshalError(err.Error())
 		var e *DesktopSessionExpiredError
 		if errors.As(err, &e) {
