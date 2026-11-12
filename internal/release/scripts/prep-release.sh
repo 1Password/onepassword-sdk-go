@@ -27,6 +27,12 @@ enforce_latest_code() {
         echo "Please stash your changes and try again."
         exit 1
     fi
+    git fetch --quiet origin main
+    if [[ "$(git rev-parse HEAD)" != "$(git rev-parse origin/main)" ]]; then
+        echo "ERROR: This script was not run from the latest code from origin/main."
+        echo "Make sure to update your git branch with the latest from main and try again."
+        exit 1
+    fi
 }
 
 # Function to validate the version number format x.y.z(-beta.w)
@@ -76,7 +82,7 @@ update_and_validate_build() {
     done
 }
 
-# Ensure that the current working directory is clean
+# Ensure that the current working directory is clean and release is made off of latest main
 enforce_latest_code
 
 # Update and validate the version number
