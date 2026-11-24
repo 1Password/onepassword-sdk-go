@@ -71,6 +71,9 @@ func find1PasswordLibPath() (string, error) {
 }
 
 func GetSharedLibCore(accountName string) (*CoreWrapper, error) {
+	if runtime.GOOS == "linux" && os.Getenv("OP_WSL_DESKTOP_BRIDGE") != "" {
+		return getDesktopBridgeCore(accountName, os.Getenv("OP_WSL_DESKTOP_BRIDGE"))
+	}
 	if coreLib == nil {
 		libPath, err := find1PasswordLibPath()
 		if err != nil {
